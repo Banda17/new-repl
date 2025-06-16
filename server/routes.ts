@@ -346,6 +346,46 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.put("/api/railway-loading-operations/:id", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      const { id } = req.params;
+      const updateData = { ...req.body };
+      
+      // Handle date fields
+      if (updateData.pDate) {
+        updateData.pDate = new Date(updateData.pDate);
+      }
+      if (updateData.rrDate) {
+        updateData.rrDate = new Date(updateData.rrDate);
+      }
+
+      const [updated] = await db
+        .update(railwayLoadingOperations)
+        .set(updateData)
+        .where(eq(railwayLoadingOperations.id, parseInt(id)))
+        .returning();
+
+      if (!updated) {
+        return res.status(404).json({ error: "Railway loading operation not found" });
+      }
+
+      res.json({
+        message: "Loading operation updated successfully",
+        operation: updated
+      });
+    } catch (error: any) {
+      console.error("Error updating loading operation:", error);
+      res.status(500).json({
+        error: "Failed to update loading operation",
+        details: error.message
+      });
+    }
+  });
+
   app.get("/api/railway-loading-operations/dropdown-options", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {
