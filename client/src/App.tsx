@@ -1,16 +1,12 @@
 import { Switch, Route, useLocation } from "wouter";
 import { SCRLogo } from "./components/SCRLogo";
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Loader2, Upload, Package2, FileText, Activity, Search, ChevronDown, Train, Users, Map, Clock, Calendar } from "lucide-react";
+import { AlertCircle, Loader2, Upload, Package2, FileText, Activity, Search, ChevronDown, Train, Users, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AuthPage from "./pages/AuthPage";
@@ -29,8 +25,6 @@ import RailwayReportsPage from "./pages/RailwayReportsPage";
 import DailyReportsPage from "./pages/DailyReportsPage";
 import AllEntriesPage from "./pages/AllEntriesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
-import PunctualityPage from "./pages/PunctualityPage";
-import DataSubmissionPage from "./pages/DataSubmissionPage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
@@ -56,24 +50,59 @@ function Navigation() {
   return (
     <nav className="bg-[#1a365d] text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-lg sticky top-0 z-50">
       <div className="container mx-auto flex flex-nowrap gap-3 sm:gap-4 items-center min-w-max">
-        {/* 
-          Updated Navigation Structure:
-          - Removed DASHBOARD tab completely
-          - Renamed OPERATIONS to BULK DATA UPLOAD
-          - Restructured GOODS with nested sub-menus
-        */}
+        {/* Main Dashboard */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate("/dashboard")}
+          className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/dashboard" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+        >
+          <Activity className="w-4 h-4 mr-2" />
+          Dashboard
+        </Button>
 
-        {/* GOODS Dropdown - Primary navigation with nested structure */}
+        {/* Goods Tab */}
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate("/goods")}
+          className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/goods" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+        >
+          <Package2 className="w-4 h-4 mr-2" />
+          Goods
+        </Button>
+
+        {/* Coaching Tab - Hidden for now */}
+        {false && (
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/coaching")}
+            className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/coaching" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+          >
+            <Train className="w-4 h-4 mr-2" />
+            Coaching
+          </Button>
+        )}
+
+        {/* Planning Tab - Hidden for now */}
+        {false && (
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate("/planning")}
+            className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/planning" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+          >
+            <Map className="w-4 h-4 mr-2" />
+            Planning
+          </Button>
+        )}
+
+        {/* Operations Dropdown - moved to secondary position */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4">
-              <Package2 className="w-4 h-4 mr-2" />
-              GOODS
+              Operations
               <ChevronDown className="w-4 h-4 ml-2" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56">
-            {/* Root GOODS menu items */}
+          <DropdownMenuContent className="w-48">
             <DropdownMenuItem onClick={() => navigate("/")}>
               <Activity className="w-4 h-4 mr-2" />
               Detention Form
@@ -82,74 +111,23 @@ function Navigation() {
               <Upload className="w-4 h-4 mr-2" />
               Upload Data
             </DropdownMenuItem>
-            
-            <DropdownMenuSeparator />
-            
-            {/* Interchange Sub-menu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Train className="w-4 h-4 mr-2" />
-                Interchange
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => navigate("/goods/interchange/historical")}>
-                  <Search className="w-4 h-4 mr-2" />
-                  Historical
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            
-            {/* Loading Sub-menu */}
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger>
-                <Package2 className="w-4 h-4 mr-2" />
-                Loading
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onClick={() => navigate("/goods/loading/all-entries")}>
-                  <Search className="w-4 h-4 mr-2" />
-                  All Entries
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/goods/loading/punctuality")}>
-                  <Clock className="w-4 h-4 mr-2" />
-                  Punctuality
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/goods/loading/planning")}>
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Planning
-                </DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-            
-            <DropdownMenuSeparator />
-            
-            {/* Remaining root GOODS menu items */}
+            <DropdownMenuItem onClick={() => navigate("/historical")}>
+              <Search className="w-4 h-4 mr-2" />
+              Historical
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/railway-reports")}>
+              <FileText className="w-4 h-4 mr-2" />
+              Railway Reports
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/daily-reports")}>
               <FileText className="w-4 h-4 mr-2" />
               Daily Reports
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/all-entries")}>
+              <Search className="w-4 h-4 mr-2" />
+              All Entries
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/excel-upload")}>
-              <Upload className="w-4 h-4 mr-2" />
-              Excel Upload
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* BULK DATA UPLOAD Dropdown - Simplified operations menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4">
-              <Upload className="w-4 h-4 mr-2" />
-              BULK DATA UPLOAD
-              <ChevronDown className="w-4 h-4 ml-2" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
-            <DropdownMenuItem onClick={() => navigate("/bulk/upload")}>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Data
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/bulk/excel-upload")}>
               <Upload className="w-4 h-4 mr-2" />
               Excel Upload
             </DropdownMenuItem>
@@ -212,73 +190,42 @@ function App() {
       <SCRLogo />
       <Navigation />
       <Switch>
-        {/* 
-          Updated Routes to match new navigation structure:
-          - Removed /dashboard route (Dashboard tab removed)
-          - Added nested routes for new GOODS structure
-          - Added BULK DATA UPLOAD routes
-        */}
-        
-        {/* Root route - Detention Form (GOODS main item) */}
         <Route path="/">
-          {() => <DataSubmissionPage />}
+          {() => <DetentionForm />}
         </Route>
-        
-        {/* GOODS routes */}
-        <Route path="/upload">
-          {() => <DataUploadPage />}
+        <Route path="/dashboard">
+          {() => <DashboardPage />}
         </Route>
-        <Route path="/daily-reports">
-          {() => <DailyReportsPage />}
-        </Route>
-        <Route path="/excel-upload">
-          {() => <ExcelUploadPage />}
-        </Route>
-        
-        {/* GOODS -> Interchange sub-menu */}
-        <Route path="/goods/interchange/historical">
-          {() => <HistoricalRecords />}
-        </Route>
-        
-        {/* GOODS -> Loading sub-menu */}
-        <Route path="/goods/loading/all-entries">
-          {() => <AllEntriesPage />}
-        </Route>
-        <Route path="/goods/loading/punctuality">
-          {() => <PunctualityPage />}
-        </Route>
-        <Route path="/goods/loading/planning">
-          {() => <PlanningTabPage />}
-        </Route>
-        
-        {/* BULK DATA UPLOAD routes */}
-        <Route path="/bulk/upload">
-          {() => <DataUploadPage />}
-        </Route>
-        <Route path="/bulk/excel-upload">
-          {() => <ExcelUploadPage />}
-        </Route>
-        
-        {/* Legacy routes for backward compatibility */}
         <Route path="/goods">
           {() => <GoodsTabPage />}
         </Route>
-        <Route path="/historical">
-          {() => <HistoricalRecords />}
+        <Route path="/coaching">
+          {() => <CoachingTabPage />}
         </Route>
-        <Route path="/all-entries">
-          {() => <AllEntriesPage />}
+        <Route path="/planning">
+          {() => <PlanningTabPage />}
         </Route>
         <Route path="/railway-reports">
           {() => <RailwayReportsPage />}
         </Route>
-        
-        {/* Admin route */}
+        <Route path="/daily-reports">
+          {() => <DailyReportsPage />}
+        </Route>
+        <Route path="/all-entries">
+          {() => <AllEntriesPage />}
+        </Route>
+        <Route path="/excel-upload">
+          {() => <ExcelUploadPage />}
+        </Route>
+        <Route path="/historical">
+          {() => <HistoricalRecords />}
+        </Route>
+        <Route path="/upload">
+          {() => <DataUploadPage />}
+        </Route>
         <Route path="/auth">
           {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
         </Route>
-        
-        {/* 404 fallback */}
         <Route>
           {() => <NotFound />}
         </Route>
