@@ -2,5 +2,6 @@ node_modules
 dist
 .DS_Store
 server/public
+new-repl/new-repl/nimble-willow-433310-n1-f8d544889cfe
 vite.config.ts.*
 *.tar.gz
