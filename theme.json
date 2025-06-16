@@ -1,0 +1,17 @@
+{
+  "variant": "professional",
+  "primary": "hsl(215 50% 23%)",
+  "appearance": "light",
+  "radius": 0.5,
+  "toast": {
+    "defaultDuration": 5000,
+    "position": "bottom-right",
+    "spacing": 12,
+    "swipeDirection": "right",
+    "closeButton": true,
+    "animation": {
+      "duration": 200,
+      "type": "slide"
+    }
+  }
+}
