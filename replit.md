@@ -79,6 +79,8 @@ The system follows a modern full-stack architecture with clear separation of con
 
 ## Changelog
 - June 16, 2025. Initial setup
+- June 16, 2025. Successfully migrated from Replit Agent to Replit environment
+- June 16, 2025. Added editable table functionality to Data Submission page with inline editing capabilities
 
 ## User Preferences
 
