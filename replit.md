@@ -81,6 +81,8 @@ The system follows a modern full-stack architecture with clear separation of con
 - June 16, 2025. Initial setup
 - June 16, 2025. Successfully migrated from Replit Agent to Replit environment
 - June 16, 2025. Added editable table functionality to Data Submission page with inline editing capabilities
+- June 16, 2025. Updated navigation structure: removed DASHBOARD, renamed OPERATIONS to BULK DATA UPLOAD, restructured GOODS with nested Interchange and Loading sub-menus
+- June 16, 2025. Fixed commodity comparison report division by zero error with proper SQL parameter handling
 
 ## User Preferences
 
