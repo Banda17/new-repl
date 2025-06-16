@@ -2011,23 +2011,7 @@ export function registerRoutes(app: Express): Server {
               COUNT(*) as total_wagons,
               SUM(units) as total_units,
               SUM(tonnage) as total_tonnage,
-              SUM(freight) as total_freight,
-              CASE 
-                WHEN ${commodity.totalWagons || 0} > 0 THEN ROUND((COUNT(*)::decimal / NULLIF(${commodity.totalWagons || 0}, 0)) * 100, 2)
-                ELSE 0
-              END as wagons_percentage,
-              CASE 
-                WHEN ${commodity.totalUnits || 0} > 0 THEN ROUND((SUM(units)::decimal / NULLIF(${commodity.totalUnits || 0}, 0)) * 100, 2)
-                ELSE 0
-              END as units_percentage,
-              CASE 
-                WHEN ${commodity.totalTonnage || 0} > 0 THEN ROUND((SUM(tonnage)::decimal / NULLIF(${commodity.totalTonnage || 0}, 0)) * 100, 2)
-                ELSE 0
-              END as tonnage_percentage,
-              CASE 
-                WHEN ${commodity.totalFreight || 0} > 0 THEN ROUND((SUM(freight)::decimal / NULLIF(${commodity.totalFreight || 0}, 0)) * 100, 2)
-                ELSE 0
-              END as freight_percentage
+              SUM(freight) as total_freight
             FROM railway_loading_operations 
             WHERE EXTRACT(YEAR FROM p_date) = ${year}
               AND commodity = ${commodity.commodity}
@@ -2037,16 +2021,45 @@ export function registerRoutes(app: Express): Server {
             ORDER BY total_wagons DESC
           `);
 
-          commodity.stations = stationResult.rows.map(station => ({
-            station: station.station || 'Unknown',
-            totalWagons: Number(station.total_wagons) || 0,
-            totalUnits: Number(station.total_units) || 0,
-            totalTonnage: Number(station.total_tonnage) || 0,
-            totalFreight: Number(station.total_freight) || 0,
-            wagonsPercentage: Number(station.wagons_percentage) || 0,
-            unitsPercentage: Number(station.units_percentage) || 0,
-            tonnagePercentage: Number(station.tonnage_percentage) || 0,
-            freightPercentage: Number(station.freight_percentage) || 0
+          // Calculate percentages in JavaScript to avoid SQL type issues
+          const stationData = stationResult.rows.map(station => {
+            const totalWagons = Number(station.total_wagons) || 0;
+            const totalUnits = Number(station.total_units) || 0;
+            const totalTonnage = Number(station.total_tonnage) || 0;
+            const totalFreight = Number(station.total_freight) || 0;
+            
+            const wagonsPercentage = commodity.totalWagons > 0 ? 
+              Math.round((totalWagons / commodity.totalWagons) * 100 * 100) / 100 : 0;
+            const unitsPercentage = commodity.totalUnits > 0 ? 
+              Math.round((totalUnits / commodity.totalUnits) * 100 * 100) / 100 : 0;
+            const tonnagePercentage = commodity.totalTonnage > 0 ? 
+              Math.round((totalTonnage / commodity.totalTonnage) * 100 * 100) / 100 : 0;
+            const freightPercentage = commodity.totalFreight > 0 ? 
+              Math.round((totalFreight / commodity.totalFreight) * 100 * 100) / 100 : 0;
+
+            return {
+              station: station.station || 'Unknown',
+              total_wagons: totalWagons,
+              total_units: totalUnits,
+              total_tonnage: totalTonnage,
+              total_freight: totalFreight,
+              wagons_percentage: wagonsPercentage,
+              units_percentage: unitsPercentage,
+              tonnage_percentage: tonnagePercentage,
+              freight_percentage: freightPercentage
+            };
+          });
+
+          commodity.stations = stationData.map(station => ({
+            station: station.station,
+            totalWagons: station.total_wagons,
+            totalUnits: station.total_units,
+            totalTonnage: station.total_tonnage,
+            totalFreight: station.total_freight,
+            wagonsPercentage: station.wagons_percentage,
+            unitsPercentage: station.units_percentage,
+            tonnagePercentage: station.tonnage_percentage,
+            freightPercentage: station.freight_percentage
           }));
         }
       }
