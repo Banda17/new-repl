@@ -2012,10 +2012,22 @@ export function registerRoutes(app: Express): Server {
               SUM(units) as total_units,
               SUM(tonnage) as total_tonnage,
               SUM(freight) as total_freight,
-              ROUND((COUNT(*)::decimal / ${commodity.totalWagons}) * 100, 2) as wagons_percentage,
-              ROUND((SUM(units)::decimal / ${commodity.totalUnits}) * 100, 2) as units_percentage,
-              ROUND((SUM(tonnage)::decimal / ${commodity.totalTonnage}) * 100, 2) as tonnage_percentage,
-              ROUND((SUM(freight)::decimal / ${commodity.totalFreight}) * 100, 2) as freight_percentage
+              CASE 
+                WHEN ${commodity.totalWagons || 0} > 0 THEN ROUND((COUNT(*)::decimal / NULLIF(${commodity.totalWagons || 0}, 0)) * 100, 2)
+                ELSE 0
+              END as wagons_percentage,
+              CASE 
+                WHEN ${commodity.totalUnits || 0} > 0 THEN ROUND((SUM(units)::decimal / NULLIF(${commodity.totalUnits || 0}, 0)) * 100, 2)
+                ELSE 0
+              END as units_percentage,
+              CASE 
+                WHEN ${commodity.totalTonnage || 0} > 0 THEN ROUND((SUM(tonnage)::decimal / NULLIF(${commodity.totalTonnage || 0}, 0)) * 100, 2)
+                ELSE 0
+              END as tonnage_percentage,
+              CASE 
+                WHEN ${commodity.totalFreight || 0} > 0 THEN ROUND((SUM(freight)::decimal / NULLIF(${commodity.totalFreight || 0}, 0)) * 100, 2)
+                ELSE 0
+              END as freight_percentage
             FROM railway_loading_operations 
             WHERE EXTRACT(YEAR FROM p_date) = ${year}
               AND commodity = ${commodity.commodity}
