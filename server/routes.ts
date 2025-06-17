@@ -2208,14 +2208,15 @@ export function registerRoutes(app: Express): Server {
       currentMonday.setDate(today.getDate() + mondayOffset);
       currentMonday.setHours(0, 0, 0, 0);
       
-      // Calculate the Sunday of current week (end of period) in current year
-      const currentSunday = new Date(currentMonday);
-      currentSunday.setDate(currentMonday.getDate() + 6);
-      currentSunday.setHours(23, 59, 59, 999);
-      
       // Calculate the same week period in previous year
+      // Previous Monday: same date as current Monday but in previous year
       const previousMonday = new Date(previousYear, currentMonday.getMonth(), currentMonday.getDate());
-      const previousSunday = new Date(previousYear, currentSunday.getMonth(), currentSunday.getDate());
+      
+      // Previous period end: same relative day of week in previous year as today
+      const daysDifference = Math.floor((today.getTime() - currentMonday.getTime()) / (1000 * 60 * 60 * 24));
+      const previousPeriodEnd = new Date(previousMonday);
+      previousPeriodEnd.setDate(previousMonday.getDate() + daysDifference);
+      previousPeriodEnd.setHours(23, 59, 59, 999);
       
       // Format dates for period labels
       const formatDate = (date: Date) => {
@@ -2227,9 +2228,9 @@ export function registerRoutes(app: Express): Server {
       };
       
       const currentPeriodStart = formatDate(currentMonday);
-      const currentPeriodEnd = formatDate(today); // Show up to today in current week
+      const currentPeriodEndFormatted = formatDate(today); // Show up to today in current week
       const previousPeriodStart = formatDate(previousMonday);
-      const previousPeriodEnd = formatDate(previousSunday);
+      const previousPeriodEndFormatted = formatDate(previousPeriodEnd);
       
       // Fetch current period data (current week in 2025)
       const currentPeriodData = await db.execute(sql`
@@ -2260,7 +2261,7 @@ export function registerRoutes(app: Express): Server {
           SUM(freight) as total_freight
         FROM railway_loading_operations 
         WHERE p_date >= ${previousMonday.toISOString().split('T')[0]}
-          AND p_date <= ${previousSunday.toISOString().split('T')[0]}
+          AND p_date <= ${previousPeriodEnd.toISOString().split('T')[0]}
           AND commodity IS NOT NULL
           AND commodity != ''
         GROUP BY commodity
@@ -2282,7 +2283,7 @@ export function registerRoutes(app: Express): Server {
       
       const previousMap = new Map();
       previousPeriodData.rows.forEach(row => {
-        const daysInPreviousPeriod = Math.ceil((previousSunday.getTime() - previousMonday.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const daysInPreviousPeriod = Math.ceil((previousPeriodEnd.getTime() - previousMonday.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         previousMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
@@ -2342,8 +2343,8 @@ export function registerRoutes(app: Express): Server {
       
       res.json({
         periods: {
-          current: `${currentPeriodStart} to ${currentPeriodEnd}`,
-          previous: `${previousPeriodStart} to ${previousPeriodEnd}`
+          current: `${currentPeriodStart} to ${currentPeriodEndFormatted}`,
+          previous: `${previousPeriodStart} to ${previousPeriodEndFormatted}`
         },
         data: comparativeData.sort((a, b) => b.currentPeriod.tonnage - a.currentPeriod.tonnage),
         totals: {
