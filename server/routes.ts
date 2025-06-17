@@ -2196,27 +2196,42 @@ export function registerRoutes(app: Express): Server {
       return res.status(401).send("Not authenticated");
     }
     try {
-      // Calculate weekly comparison between current year and previous year for same week
+      // Calculate weekly comparison with specific date pattern as requested
       const today = new Date();
       const currentYear = today.getFullYear(); // 2025
       const previousYear = currentYear - 1; // 2024
       const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
       
-      // Calculate the Monday of current week in current year
-      const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
-      const currentMonday = new Date(today);
-      currentMonday.setDate(today.getDate() + mondayOffset);
-      currentMonday.setHours(0, 0, 0, 0);
+      let currentPeriodStart: Date;
+      let currentPeriodEnd: Date;
       
-      // Calculate the same week period in previous year
-      // Previous Monday: same date as current Monday but in previous year
-      const previousMonday = new Date(previousYear, currentMonday.getMonth(), currentMonday.getDate());
+      // Implement the specific weekly pattern:
+      // - On Monday: show previous week (Monday to Sunday)
+      // - On Tuesday-Sunday: show current week Monday to previous day
+      if (currentDay === 1) { // Monday
+        // Show previous week (Monday to Sunday)
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() - 7); // Previous Monday
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous Sunday
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      } else {
+        // Show current week Monday to previous day
+        const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() + mondayOffset);
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous day
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      }
       
-      // Previous period end: same relative day of week in previous year as today
-      const daysDifference = Math.floor((today.getTime() - currentMonday.getTime()) / (1000 * 60 * 60 * 24));
-      const previousPeriodEnd = new Date(previousMonday);
-      previousPeriodEnd.setDate(previousMonday.getDate() + daysDifference);
-      previousPeriodEnd.setHours(23, 59, 59, 999);
+      // Calculate the same period in previous year
+      const previousPeriodStart = new Date(previousYear, currentPeriodStart.getMonth(), currentPeriodStart.getDate());
+      const previousPeriodEnd = new Date(previousYear, currentPeriodEnd.getMonth(), currentPeriodEnd.getDate());
       
       // Format dates for period labels
       const formatDate = (date: Date) => {
@@ -2227,12 +2242,12 @@ export function registerRoutes(app: Express): Server {
         }).replace(/\//g, '-');
       };
       
-      const currentPeriodStart = formatDate(currentMonday);
-      const currentPeriodEndFormatted = formatDate(today); // Show up to today in current week
-      const previousPeriodStart = formatDate(previousMonday);
+      const currentPeriodStartFormatted = formatDate(currentPeriodStart);
+      const currentPeriodEndFormatted = formatDate(currentPeriodEnd);
+      const previousPeriodStartFormatted = formatDate(previousPeriodStart);
       const previousPeriodEndFormatted = formatDate(previousPeriodEnd);
       
-      // Fetch current period data (current week in 2025)
+      // Fetch current period data (based on weekly pattern)
       const currentPeriodData = await db.execute(sql`
         SELECT 
           commodity,
@@ -2242,15 +2257,15 @@ export function registerRoutes(app: Express): Server {
           SUM(tonnage) as total_tonnage,
           SUM(freight) as total_freight
         FROM railway_loading_operations 
-        WHERE p_date >= ${currentMonday.toISOString().split('T')[0]}
-          AND p_date <= ${today.toISOString().split('T')[0]}
+        WHERE p_date >= ${currentPeriodStart.toISOString().split('T')[0]}
+          AND p_date <= ${currentPeriodEnd.toISOString().split('T')[0]}
           AND commodity IS NOT NULL
           AND commodity != ''
         GROUP BY commodity
         ORDER BY total_tonnage DESC
       `);
       
-      // Fetch previous period data (same week in 2024)
+      // Fetch previous period data (same period in previous year)
       const previousPeriodData = await db.execute(sql`
         SELECT 
           commodity,
@@ -2260,7 +2275,7 @@ export function registerRoutes(app: Express): Server {
           SUM(tonnage) as total_tonnage,
           SUM(freight) as total_freight
         FROM railway_loading_operations 
-        WHERE p_date >= ${previousMonday.toISOString().split('T')[0]}
+        WHERE p_date >= ${previousPeriodStart.toISOString().split('T')[0]}
           AND p_date <= ${previousPeriodEnd.toISOString().split('T')[0]}
           AND commodity IS NOT NULL
           AND commodity != ''
@@ -2270,7 +2285,7 @@ export function registerRoutes(app: Express): Server {
       // Process and combine data
       const currentMap = new Map();
       currentPeriodData.rows.forEach(row => {
-        const daysInCurrentPeriod = Math.ceil((today.getTime() - currentMonday.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const daysInCurrentPeriod = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
@@ -2283,7 +2298,7 @@ export function registerRoutes(app: Express): Server {
       
       const previousMap = new Map();
       previousPeriodData.rows.forEach(row => {
-        const daysInPreviousPeriod = Math.ceil((previousPeriodEnd.getTime() - previousMonday.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const daysInPreviousPeriod = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
         previousMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
@@ -2343,8 +2358,8 @@ export function registerRoutes(app: Express): Server {
       
       res.json({
         periods: {
-          current: `${currentPeriodStart} to ${currentPeriodEndFormatted}`,
-          previous: `${previousPeriodStart} to ${previousPeriodEndFormatted}`
+          current: `${currentPeriodStartFormatted} to ${currentPeriodEndFormatted}`,
+          previous: `${previousPeriodStartFormatted} to ${previousPeriodEndFormatted}`
         },
         data: comparativeData.sort((a, b) => b.currentPeriod.tonnage - a.currentPeriod.tonnage),
         totals: {
