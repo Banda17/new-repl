@@ -57,7 +57,7 @@ function Navigation() {
           className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/dashboard" ? "bg-white/25 font-bold shadow-sm" : ""}`}
         >
           <Activity className="w-4 h-4 mr-2" />
-          Dashboard
+          Operating Dashboard
         </Button>
 
         {/* Goods Tab */}
