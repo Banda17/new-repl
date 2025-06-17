@@ -81,6 +81,8 @@ The system follows a modern full-stack architecture with clear separation of con
 - June 16, 2025. Initial setup
 - June 16, 2025. Successfully migrated from Replit Agent to Replit environment
 - June 16, 2025. Added editable table functionality to Data Submission page with inline editing capabilities
+- June 17, 2025. Implemented Charts tab in Operating Dashboard with yearly comparison bar charts for commodities and stations using Recharts library
+- June 17, 2025. Added backend API endpoints for yearly loading data aggregation (/api/yearly-loading-commodities and /api/yearly-loading-stations)
 
 ## User Preferences
 
