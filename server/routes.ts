@@ -2189,6 +2189,187 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Weekly comparative loading data endpoint
+  app.get("/api/comparative-loading", async (req, res) => {
+    // Check if user is authenticated
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    try {
+      // Calculate current Monday-to-Monday week period
+      const today = new Date();
+      const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+      
+      // Calculate the Monday of current week
+      const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+      const currentMonday = new Date(today);
+      currentMonday.setDate(today.getDate() + mondayOffset);
+      currentMonday.setHours(0, 0, 0, 0);
+      
+      // Calculate the Sunday of current week (end of period)
+      const currentSunday = new Date(currentMonday);
+      currentSunday.setDate(currentMonday.getDate() + 6);
+      currentSunday.setHours(23, 59, 59, 999);
+      
+      // Calculate previous week (Monday to Sunday)
+      const previousMonday = new Date(currentMonday);
+      previousMonday.setDate(currentMonday.getDate() - 7);
+      
+      const previousSunday = new Date(currentSunday);
+      previousSunday.setDate(currentSunday.getDate() - 7);
+      
+      // Format dates for period labels
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-GB', {
+          day: '2-digit',
+          month: '2-digit', 
+          year: 'numeric'
+        }).replace(/\//g, '-');
+      };
+      
+      const currentPeriodStart = formatDate(currentMonday);
+      const currentPeriodEnd = formatDate(today); // Show up to today
+      const previousPeriodStart = formatDate(previousMonday);
+      const previousPeriodEnd = formatDate(previousSunday);
+      
+      // Fetch current period data
+      const currentPeriodData = await db.execute(sql`
+        SELECT 
+          commodity,
+          COUNT(DISTINCT rrdate) as rks,
+          COUNT(*) as total_wagons,
+          SUM(units) as total_units,
+          SUM(tonnage) as total_tonnage,
+          SUM(freight) as total_freight
+        FROM railway_loading_operations 
+        WHERE p_date >= ${currentMonday.toISOString().split('T')[0]}
+          AND p_date <= ${today.toISOString().split('T')[0]}
+          AND commodity IS NOT NULL
+          AND commodity != ''
+        GROUP BY commodity
+        ORDER BY total_tonnage DESC
+      `);
+      
+      // Fetch previous period data  
+      const previousPeriodData = await db.execute(sql`
+        SELECT 
+          commodity,
+          COUNT(DISTINCT rrdate) as rks,
+          COUNT(*) as total_wagons,
+          SUM(units) as total_units,
+          SUM(tonnage) as total_tonnage,
+          SUM(freight) as total_freight
+        FROM railway_loading_operations 
+        WHERE p_date >= ${previousMonday.toISOString().split('T')[0]}
+          AND p_date <= ${previousSunday.toISOString().split('T')[0]}
+          AND commodity IS NOT NULL
+          AND commodity != ''
+        GROUP BY commodity
+      `);
+      
+      // Process and combine data
+      const currentMap = new Map();
+      currentPeriodData.rows.forEach(row => {
+        const daysInPeriod = Math.ceil((today.getTime() - currentMonday.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        currentMap.set(row.commodity, {
+          commodity: row.commodity,
+          rks: Number(row.rks) || 0,
+          avgPerDay: daysInPeriod > 0 ? Math.round((Number(row.total_tonnage) || 0) / daysInPeriod * 100) / 100 : 0,
+          wagons: Number(row.total_wagons) || 0,
+          tonnage: Number(row.total_tonnage) || 0,
+          freight: Number(row.total_freight) || 0
+        });
+      });
+      
+      const previousMap = new Map();
+      previousPeriodData.rows.forEach(row => {
+        previousMap.set(row.commodity, {
+          commodity: row.commodity,
+          rks: Number(row.rks) || 0,
+          avgPerDay: Math.round((Number(row.total_tonnage) || 0) / 7 * 100) / 100, // Full 7 days
+          wagons: Number(row.total_wagons) || 0,
+          tonnage: Number(row.total_tonnage) || 0,
+          freight: Number(row.total_freight) || 0
+        });
+      });
+      
+      // Combine all commodities
+      const allCommodities = new Set([...Array.from(currentMap.keys()), ...Array.from(previousMap.keys())]);
+      
+      const comparativeData = Array.from(allCommodities).map(commodity => {
+        const current = currentMap.get(commodity) || { 
+          commodity, rks: 0, avgPerDay: 0, wagons: 0, tonnage: 0, freight: 0 
+        };
+        const previous = previousMap.get(commodity) || { 
+          commodity, rks: 0, avgPerDay: 0, wagons: 0, tonnage: 0, freight: 0 
+        };
+        
+        const changeInMT = current.tonnage - previous.tonnage;
+        const changeInPercentage = previous.tonnage > 0 ? 
+          Math.round((changeInMT / previous.tonnage) * 100 * 100) / 100 : 
+          (current.tonnage > 0 ? 100 : 0);
+        
+        return {
+          commodity,
+          currentPeriod: current,
+          previousPeriod: previous,
+          changeInMT: Math.round(changeInMT * 100) / 100,
+          changeInPercentage: Math.round(changeInPercentage * 100) / 100
+        };
+      });
+      
+      // Calculate totals
+      const totalCurrent = comparativeData.reduce((acc, item) => ({
+        rks: acc.rks + item.currentPeriod.rks,
+        avgPerDay: acc.avgPerDay + item.currentPeriod.avgPerDay,
+        wagons: acc.wagons + item.currentPeriod.wagons,
+        tonnage: acc.tonnage + item.currentPeriod.tonnage,
+        freight: acc.freight + item.currentPeriod.freight
+      }), { rks: 0, avgPerDay: 0, wagons: 0, tonnage: 0, freight: 0 });
+      
+      const totalPrevious = comparativeData.reduce((acc, item) => ({
+        rks: acc.rks + item.previousPeriod.rks,
+        avgPerDay: acc.avgPerDay + item.previousPeriod.avgPerDay,
+        wagons: acc.wagons + item.previousPeriod.wagons,
+        tonnage: acc.tonnage + item.previousPeriod.tonnage,
+        freight: acc.freight + item.previousPeriod.freight
+      }), { rks: 0, avgPerDay: 0, wagons: 0, tonnage: 0, freight: 0 });
+      
+      const totalChangeInMT = totalCurrent.tonnage - totalPrevious.tonnage;
+      const totalChangeInPercentage = totalPrevious.tonnage > 0 ? 
+        Math.round((totalChangeInMT / totalPrevious.tonnage) * 100 * 100) / 100 : 
+        (totalCurrent.tonnage > 0 ? 100 : 0);
+      
+      res.json({
+        periods: {
+          current: `${currentPeriodStart} to ${currentPeriodEnd}`,
+          previous: `${previousPeriodStart} to ${previousPeriodEnd}`
+        },
+        data: comparativeData.sort((a, b) => b.currentPeriod.tonnage - a.currentPeriod.tonnage),
+        totals: {
+          commodity: 'TOTAL',
+          currentPeriod: {
+            ...totalCurrent,
+            avgPerDay: Math.round(totalCurrent.avgPerDay * 100) / 100
+          },
+          previousPeriod: {
+            ...totalPrevious,
+            avgPerDay: Math.round(totalPrevious.avgPerDay * 100) / 100
+          },
+          changeInMT: Math.round(totalChangeInMT * 100) / 100,
+          changeInPercentage: Math.round(totalChangeInPercentage * 100) / 100
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error generating comparative loading data:", error);
+      res.status(500).json({
+        error: "Failed to generate comparative loading data",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

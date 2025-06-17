@@ -1,0 +1,18 @@
+In my React app for a railway management dashboard, update the "Tables" tab under OPERATING DASHBOARD to display a weekly comparative loading table fetched from the backend. The navigation structure includes OPERATING DASHBOARD (sub-menus: Charts, Tables), GOODS (sub-menus: Detention Form, Upload Data, Interchange->Historical, Loading->All Entries, Loading->Punctuality, Loading->Planning, Daily Reports, Excel Upload), and OPERATIONS (sub-menus: Upload Data, Excel Upload). The Tables tab currently shows a placeholder ("Operations Tables" with "Tables will be displayed here"). Today is 17-06-2025. Do the following:
+
+1. Locate the component for the Tables tab under OPERATING DASHBOARD (likely in src/pages/Tables.js or a similar file at route /operating-dashboard/tables).
+2. Replace the placeholder with a table titled "Commodity-wise Comparative Loading Particulars" with dynamic period labels:
+   - The period is a Monday-to-Monday week (e.g., 16-06-2025 to 22-06-2025 since today is 17-06-2025).
+   - The label shows the start date (Monday) to the current date (e.g., "16-06-2025 to 17-06-2025" on 17-06-2025, "16-06-2025 to 18-06-2025" on 18-06-2025, etc., until "16-06-2025 to 22-06-2025" on 22-06-2025).
+   - On 23-06-2025, the period resets to "23-06-2025 to 23-06-2025", then "23-06-2025 to 24-06-2025", and so on.
+3. Fetch the table data from the backend (e.g., via an API endpoint like /api/comparative-loading) for the current week’s period. The data should include commodities with fields: Commodity, Rks (Period 1), Avg/Day (Period 1), Wagons (Period 1), MT (Period 1), Freight (Period 1), Rks (Period 2), Avg/Day (Period 2), Wagons (Period 2), MT (Period 2), Freight (Period 2), Change in MT, Change in %age.
+4. The table format should match the PDF layout:
+   - Columns: Commodity | Rks | Avg/Day | Wagons | MT | Freight (Period 1) | Rks | Avg/Day | Wagons | MT | Freight (Period 2) | Change in MT (in Unit) | Change in %age.
+   - Include a "Total" row at the bottom.
+   - Highlight variations: color positive Change in %age green and negative red.
+5. Style the table with a clean, professional look (bordered, alternating row colors, consistent padding) matching the app’s existing style (e.g., in src/App.css).
+6. Add comments explaining the period calculation and API fetching logic.
+7. Create checkpoints for rollback.
+8. Test the page to ensure the period label updates correctly and the table displays the backend data with colored variations.
+
+The app uses a React template in Replit’s Node.js environment. Use modern JavaScript, avoid new dependencies, and ensure the output is previewable in Replit’s web view. If the Tables tab or API fetching cannot be updated without breaking the app, stop and report the issue.
