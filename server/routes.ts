@@ -2236,7 +2236,7 @@ export function registerRoutes(app: Express): Server {
       const currentPeriodData = await db.execute(sql`
         SELECT 
           commodity,
-          COUNT(DISTINCT rrdate) as rks,
+          COUNT(DISTINCT rr_date) as rks,
           COUNT(*) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
@@ -2254,7 +2254,7 @@ export function registerRoutes(app: Express): Server {
       const previousPeriodData = await db.execute(sql`
         SELECT 
           commodity,
-          COUNT(DISTINCT rrdate) as rks,
+          COUNT(DISTINCT rr_date) as rks,
           COUNT(*) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
