@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Activity, BarChart3, Table2 } from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Interface for comparative loading data
 interface ComparativeLoadingData {
@@ -33,6 +34,24 @@ interface ComparativeLoadingData {
   totals: any;
 }
 
+// Interface for yearly commodity data
+interface YearlyCommodityData {
+  year: string;
+  commodity: string;
+  totalTonnage: number;
+  totalWagons: number;
+  totalFreight: number;
+}
+
+// Interface for yearly station data
+interface YearlyStationData {
+  year: string;
+  station: string;
+  totalTonnage: number;
+  totalWagons: number;
+  totalFreight: number;
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("charts");
 
@@ -40,6 +59,18 @@ export default function DashboardPage() {
   const { data: comparativeData, isLoading: isLoadingComparative } = useQuery<ComparativeLoadingData>({
     queryKey: ["/api/comparative-loading"],
     enabled: activeTab === "tables", // Only fetch when Tables tab is active
+  });
+
+  // Fetch yearly commodity data for Charts tab
+  const { data: commodityData, isLoading: isLoadingCommodities } = useQuery<YearlyCommodityData[]>({
+    queryKey: ["/api/yearly-loading-commodities"],
+    enabled: activeTab === "charts", // Only fetch when Charts tab is active
+  });
+
+  // Fetch yearly station data for Charts tab
+  const { data: stationData, isLoading: isLoadingStations } = useQuery<YearlyStationData[]>({
+    queryKey: ["/api/yearly-loading-stations"],
+    enabled: activeTab === "charts", // Only fetch when Charts tab is active
   });
 
   // Helper function to format numbers with proper separators
@@ -53,6 +84,56 @@ export default function DashboardPage() {
     if (percentage < 0) return "text-red-600 font-semibold";
     return "text-gray-600";
   };
+
+  // Helper function to transform commodity data for chart display
+  const prepareCommodityChartData = () => {
+    if (!commodityData) return [];
+    
+    // Group data by year and create chart format
+    const yearGroups = commodityData.reduce((acc, item) => {
+      if (!acc[item.year]) {
+        acc[item.year] = { year: item.year };
+      }
+      acc[item.year][item.commodity] = item.totalTonnage;
+      return acc;
+    }, {} as Record<string, any>);
+
+    return Object.values(yearGroups);
+  };
+
+  // Helper function to transform station data for chart display
+  const prepareStationChartData = () => {
+    if (!stationData) return [];
+    
+    // Group data by year and create chart format
+    const yearGroups = stationData.reduce((acc, item) => {
+      if (!acc[item.year]) {
+        acc[item.year] = { year: item.year };
+      }
+      acc[item.year][item.station] = item.totalTonnage;
+      return acc;
+    }, {} as Record<string, any>);
+
+    return Object.values(yearGroups);
+  };
+
+  // Get unique commodities for chart colors
+  const getUniqueCommodities = () => {
+    if (!commodityData) return [];
+    return Array.from(new Set(commodityData.map(item => item.commodity)));
+  };
+
+  // Get unique stations for chart colors
+  const getUniqueStations = () => {
+    if (!stationData) return [];
+    return Array.from(new Set(stationData.map(item => item.station)));
+  };
+
+  // Color palette for charts
+  const chartColors = [
+    '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00', '#0088fe',
+    '#ff0080', '#8dd1e1', '#d084d0', '#ffb347', '#87d068', '#ff6b6b'
+  ];
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -74,17 +155,111 @@ export default function DashboardPage() {
         </TabsList>
 
         <TabsContent value="charts" className="space-y-6">
+          {/* Commodity Loading Chart */}
           <Card>
             <CardHeader>
-              <CardTitle>Operations Charts</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Yearly Commodity Loading Comparison (MT)
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-center h-64 text-muted-foreground">
-                <div className="text-center">
-                  <BarChart3 className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Charts will be displayed here</p>
+              {isLoadingCommodities ? (
+                <div className="h-96 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p className="ml-3 text-muted-foreground">Loading commodity data...</p>
                 </div>
-              </div>
+              ) : (
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={prepareCommodityChartData()}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="year" 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                      />
+                      <Tooltip 
+                        formatter={(value: any, name: string) => [
+                          `${Number(value).toLocaleString()} MT`, 
+                          name
+                        ]}
+                        labelFormatter={(label) => `Year: ${label}`}
+                      />
+                      <Legend />
+                      {getUniqueCommodities().map((commodity, index) => (
+                        <Bar 
+                          key={commodity}
+                          dataKey={commodity}
+                          fill={chartColors[index % chartColors.length]}
+                          name={commodity}
+                        />
+                      ))}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Station Loading Chart */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5" />
+                Yearly Station Loading Comparison (MT)
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {isLoadingStations ? (
+                <div className="h-96 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p className="ml-3 text-muted-foreground">Loading station data...</p>
+                </div>
+              ) : (
+                <div className="h-96">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={prepareStationChartData()}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis 
+                        dataKey="year" 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                      />
+                      <YAxis 
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                      />
+                      <Tooltip 
+                        formatter={(value: any, name: string) => [
+                          `${Number(value).toLocaleString()} MT`, 
+                          name
+                        ]}
+                        labelFormatter={(label) => `Year: ${label}`}
+                      />
+                      <Legend />
+                      {getUniqueStations().map((station, index) => (
+                        <Bar 
+                          key={station}
+                          dataKey={station}
+                          fill={chartColors[index % chartColors.length]}
+                          name={station}
+                        />
+                      ))}
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

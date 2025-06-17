@@ -2386,6 +2386,88 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Yearly commodity loading data endpoint for charts
+  app.get("/api/yearly-loading-commodities", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    try {
+      // Fetch yearly commodity data grouped by year and commodity
+      const yearlyData = await db.execute(sql`
+        SELECT 
+          EXTRACT(YEAR FROM p_date) as year,
+          commodity,
+          SUM(tonnage) as total_tonnage,
+          SUM(wagons) as total_wagons,
+          SUM(freight) as total_freight
+        FROM railway_loading_operations 
+        WHERE commodity IS NOT NULL 
+          AND commodity != ''
+          AND tonnage > 0
+        GROUP BY EXTRACT(YEAR FROM p_date), commodity
+        ORDER BY year DESC, total_tonnage DESC
+      `);
+
+      // Transform data for chart consumption
+      const formattedData = yearlyData.rows.map(row => ({
+        year: String(row.year),
+        commodity: String(row.commodity),
+        totalTonnage: Number(row.total_tonnage) || 0,
+        totalWagons: Number(row.total_wagons) || 0,
+        totalFreight: Number(row.total_freight) || 0
+      }));
+
+      res.json(formattedData);
+    } catch (error) {
+      console.error("Error fetching yearly commodity data:", error);
+      res.status(500).json({
+        error: "Failed to fetch yearly commodity data",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Yearly station loading data endpoint for charts
+  app.get("/api/yearly-loading-stations", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    try {
+      // Fetch yearly station data grouped by year and station
+      const yearlyData = await db.execute(sql`
+        SELECT 
+          EXTRACT(YEAR FROM p_date) as year,
+          station,
+          SUM(tonnage) as total_tonnage,
+          SUM(wagons) as total_wagons,
+          SUM(freight) as total_freight
+        FROM railway_loading_operations 
+        WHERE station IS NOT NULL 
+          AND station != ''
+          AND tonnage > 0
+        GROUP BY EXTRACT(YEAR FROM p_date), station
+        ORDER BY year DESC, total_tonnage DESC
+      `);
+
+      // Transform data for chart consumption
+      const formattedData = yearlyData.rows.map(row => ({
+        year: String(row.year),
+        station: String(row.station),
+        totalTonnage: Number(row.total_tonnage) || 0,
+        totalWagons: Number(row.total_wagons) || 0,
+        totalFreight: Number(row.total_freight) || 0
+      }));
+
+      res.json(formattedData);
+    } catch (error) {
+      console.error("Error fetching yearly station data:", error);
+      res.status(500).json({
+        error: "Failed to fetch yearly station data",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
