@@ -3,7 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Activity, BarChart3, Table2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Activity, BarChart3, Table2, ChevronDown, ChevronUp } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 // Interface for comparative loading data
@@ -54,6 +55,8 @@ interface YearlyStationData {
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("charts");
+  const [showAllCommodities, setShowAllCommodities] = useState(false);
+  const [showAllStations, setShowAllStations] = useState(false);
 
   // Fetch weekly comparative loading data for Tables tab
   const { data: comparativeData, isLoading: isLoadingComparative } = useQuery<ComparativeLoadingData>({
@@ -85,12 +88,59 @@ export default function DashboardPage() {
     return "text-gray-600";
   };
 
+  // Get top commodities by total tonnage across all years
+  const getTopCommodities = () => {
+    if (!commodityData) return [];
+    
+    // Calculate total tonnage per commodity across all years
+    const commodityTotals = commodityData.reduce((acc, item) => {
+      if (!acc[item.commodity]) {
+        acc[item.commodity] = 0;
+      }
+      acc[item.commodity] += item.totalTonnage;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Sort by total tonnage and get top 5 or all based on state
+    const sortedCommodities = Object.entries(commodityTotals)
+      .sort(([, a], [, b]) => b - a)
+      .map(([commodity]) => commodity);
+
+    return showAllCommodities ? sortedCommodities : sortedCommodities.slice(0, 5);
+  };
+
+  // Get top stations by total tonnage across all years
+  const getTopStations = () => {
+    if (!stationData) return [];
+    
+    // Calculate total tonnage per station across all years
+    const stationTotals = stationData.reduce((acc, item) => {
+      if (!acc[item.station]) {
+        acc[item.station] = 0;
+      }
+      acc[item.station] += item.totalTonnage;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // Sort by total tonnage and get top 5 or all based on state
+    const sortedStations = Object.entries(stationTotals)
+      .sort(([, a], [, b]) => b - a)
+      .map(([station]) => station);
+
+    return showAllStations ? sortedStations : sortedStations.slice(0, 5);
+  };
+
   // Helper function to transform commodity data for chart display
   const prepareCommodityChartData = () => {
     if (!commodityData) return [];
     
+    const topCommodities = getTopCommodities();
+    const filteredData = commodityData.filter(item => 
+      topCommodities.includes(item.commodity)
+    );
+    
     // Group data by year and create chart format
-    const yearGroups = commodityData.reduce((acc, item) => {
+    const yearGroups = filteredData.reduce((acc, item) => {
       if (!acc[item.year]) {
         acc[item.year] = { year: item.year };
       }
@@ -98,15 +148,22 @@ export default function DashboardPage() {
       return acc;
     }, {} as Record<string, any>);
 
-    return Object.values(yearGroups);
+    return Object.values(yearGroups).sort((a: any, b: any) => 
+      parseInt(a.year) - parseInt(b.year)
+    );
   };
 
   // Helper function to transform station data for chart display
   const prepareStationChartData = () => {
     if (!stationData) return [];
     
+    const topStations = getTopStations();
+    const filteredData = stationData.filter(item => 
+      topStations.includes(item.station)
+    );
+    
     // Group data by year and create chart format
-    const yearGroups = stationData.reduce((acc, item) => {
+    const yearGroups = filteredData.reduce((acc, item) => {
       if (!acc[item.year]) {
         acc[item.year] = { year: item.year };
       }
@@ -114,26 +171,53 @@ export default function DashboardPage() {
       return acc;
     }, {} as Record<string, any>);
 
-    return Object.values(yearGroups);
+    return Object.values(yearGroups).sort((a: any, b: any) => 
+      parseInt(a.year) - parseInt(b.year)
+    );
   };
 
-  // Get unique commodities for chart colors
-  const getUniqueCommodities = () => {
-    if (!commodityData) return [];
-    return Array.from(new Set(commodityData.map(item => item.commodity)));
-  };
-
-  // Get unique stations for chart colors
-  const getUniqueStations = () => {
-    if (!stationData) return [];
-    return Array.from(new Set(stationData.map(item => item.station)));
-  };
-
-  // Color palette for charts
+  // Professional color palette for charts - optimized for readability
   const chartColors = [
-    '#8884d8', '#82ca9d', '#ffc658', '#ff7300', '#00ff00', '#0088fe',
-    '#ff0080', '#8dd1e1', '#d084d0', '#ffb347', '#87d068', '#ff6b6b'
+    '#2563eb', // Blue
+    '#16a34a', // Green
+    '#dc2626', // Red
+    '#ca8a04', // Yellow
+    '#7c3aed', // Purple
+    '#ea580c', // Orange
+    '#0891b2', // Cyan
+    '#be185d', // Pink
+    '#059669', // Emerald
+    '#7c2d12', // Brown
+    '#374151', // Gray
+    '#1e40af'  // Indigo
   ];
+
+  // Custom tooltip component for better readability
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-gray-900 text-white p-3 rounded-lg shadow-lg border border-gray-700">
+          <p className="font-semibold text-sm mb-2">{`Year: ${label}`}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {`${entry.dataKey}: ${Number(entry.value).toLocaleString()} MT`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Format large numbers for Y-axis labels (layman-friendly)
+  const formatYAxisLabel = (value: number) => {
+    if (value >= 1000000) {
+      return `${(value / 1000000).toFixed(1)}M`;
+    } else if (value >= 1000) {
+      return `${(value / 1000).toFixed(0)}K`;
+    }
+    return value.toString();
+  };
 
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
@@ -158,10 +242,36 @@ export default function DashboardPage() {
           {/* Commodity Loading Chart */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Yearly Commodity Loading Comparison (MT)
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Yearly Commodity Loading Comparison (MT)
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAllCommodities(!showAllCommodities)}
+                  className="flex items-center gap-2"
+                >
+                  {showAllCommodities ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Show Top 5
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Show All ({commodityData ? Array.from(new Set(commodityData.map(item => item.commodity))).length : 0})
+                    </>
+                  )}
+                </Button>
               </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {showAllCommodities 
+                  ? "Displaying all commodities sorted by total tonnage" 
+                  : "Displaying top 5 commodities by total tonnage. Click 'Show All' to see more."
+                }
+              </p>
             </CardHeader>
             <CardContent>
               {isLoadingCommodities ? (
@@ -172,34 +282,36 @@ export default function DashboardPage() {
               ) : (
                 <div className="h-96">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={prepareCommodityChartData()}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                    <BarChart 
+                      data={prepareCommodityChartData()}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                       <XAxis 
                         dataKey="year" 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        tick={{ fill: '#374151', fontWeight: 500 }}
                       />
                       <YAxis 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                        tickFormatter={formatYAxisLabel}
+                        tick={{ fill: '#374151' }}
                       />
-                      <Tooltip 
-                        formatter={(value: any, name: string) => [
-                          `${Number(value).toLocaleString()} MT`, 
-                          name
-                        ]}
-                        labelFormatter={(label) => `Year: ${label}`}
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend 
+                        wrapperStyle={{ fontSize: '12px', fontWeight: '500' }}
                       />
-                      <Legend />
-                      {getUniqueCommodities().map((commodity, index) => (
+                      {getTopCommodities().map((commodity: string, index: number) => (
                         <Bar 
                           key={commodity}
                           dataKey={commodity}
                           fill={chartColors[index % chartColors.length]}
                           name={commodity}
+                          radius={[2, 2, 0, 0]}
                         />
                       ))}
                     </BarChart>
@@ -212,10 +324,36 @@ export default function DashboardPage() {
           {/* Station Loading Chart */}
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
-                Yearly Station Loading Comparison (MT)
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Yearly Station Loading Comparison (MT)
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowAllStations(!showAllStations)}
+                  className="flex items-center gap-2"
+                >
+                  {showAllStations ? (
+                    <>
+                      <ChevronUp className="h-4 w-4" />
+                      Show Top 5
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="h-4 w-4" />
+                      Show All ({stationData ? Array.from(new Set(stationData.map(item => item.station))).length : 0})
+                    </>
+                  )}
+                </Button>
               </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {showAllStations 
+                  ? "Displaying all stations sorted by total tonnage" 
+                  : "Displaying top 5 stations by total tonnage. Click 'Show All' to see more."
+                }
+              </p>
             </CardHeader>
             <CardContent>
               {isLoadingStations ? (
@@ -226,34 +364,36 @@ export default function DashboardPage() {
               ) : (
                 <div className="h-96">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={prepareStationChartData()}>
-                      <CartesianGrid strokeDasharray="3 3" />
+                    <BarChart 
+                      data={prepareStationChartData()}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                       <XAxis 
                         dataKey="year" 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        tick={{ fill: '#374151', fontWeight: 500 }}
                       />
                       <YAxis 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                        tickFormatter={formatYAxisLabel}
+                        tick={{ fill: '#374151' }}
                       />
-                      <Tooltip 
-                        formatter={(value: any, name: string) => [
-                          `${Number(value).toLocaleString()} MT`, 
-                          name
-                        ]}
-                        labelFormatter={(label) => `Year: ${label}`}
+                      <Tooltip content={<CustomTooltip />} />
+                      <Legend 
+                        wrapperStyle={{ fontSize: '12px', fontWeight: '500' }}
                       />
-                      <Legend />
-                      {getUniqueStations().map((station, index) => (
+                      {getTopStations().map((station: string, index: number) => (
                         <Bar 
                           key={station}
                           dataKey={station}
                           fill={chartColors[index % chartColors.length]}
                           name={station}
+                          radius={[2, 2, 0, 0]}
                         />
                       ))}
                     </BarChart>

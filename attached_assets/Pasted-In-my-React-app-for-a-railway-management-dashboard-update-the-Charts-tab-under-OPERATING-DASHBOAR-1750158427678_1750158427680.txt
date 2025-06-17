@@ -1,0 +1,32 @@
+In my React app for a railway management dashboard, update the "Charts" tab under OPERATING DASHBOARD to display two bar charts for yearly comparisons of loading data with respect to commodities and stations, fetched from the backend, ensuring no flickering on hover and readability for laymen. The navigation structure includes OPERATING DASHBOARD (sub-menus: Charts, Tables), GOODS (sub-menus: Detention Form, Upload Data, Interchange->Historical, Loading->All Entries, Loading->Punctuality, Loading->Planning, Daily Reports, Excel Upload), and OPERATIONS (sub-menus: Upload Data, Excel Upload). The Charts tab currently shows a placeholder. Today is 17-06-2025 (Tuesday). Do the following:
+
+1. Locate the component for the Charts tab under OPERATING DASHBOARD (likely in src/pages/Charts.js or a similar file at route /operating-dashboard/charts).
+2. Replace the placeholder with two bar charts:
+   - **Commodities Chart**: Title: "Yearly Commodity Loading Comparison (MT)".
+     - X-axis: Years (e.g., 2024, 2025, or more if available).
+     - Y-axis: Total MT (Metric Tons).
+     - Bars: One bar per year for each commodity (e.g., COAL, FERT., LIMESTONE, etc.), with distinct colors for each commodity.
+     - Initially display only the top 5 commodities by total MT (summed across years), with a button or dropdown to toggle the rest.
+     - Fetch data from the backend (e.g., via /api/yearly-loading-commodities) with fields: Year, Commodity, Total MT.
+   - **Stations Chart**: Title: "Yearly Station Loading Comparison (MT)".
+     - X-axis: Years (e.g., 2024, 2025, or more if available).
+     - Y-axis: Total MT (Metric Tons).
+     - Bars: One bar per year for each station (station names fetched from the backend), with distinct colors for each station.
+     - Initially display only the top 5 stations by total MT (summed across years), with a button or dropdown to toggle the rest.
+     - Fetch data from the backend (e.g., via /api/yearly-loading-stations) with fields: Year, Station, Total MT.
+3. Use Chart.js (add react-chartjs-2 as a dependency if not already present) to render the bar charts with the following optimizations:
+   - Prevent flickering on hover by debouncing tooltip updates (e.g., set a 100ms delay for tooltip updates).
+   - Use a custom tooltip to display simplified data (e.g., for a bar: "[Commodity/Station] in [Year]: [Total MT] MT").
+   - Ensure the tooltip font is large and readable (e.g., 14px, sans-serif), with a dark background and white text for contrast.
+   - Limit the number of bars rendered at once (via the top 5 filter) to improve performance.
+4. Style the charts with a clean, professional look:
+   - Use a limited color palette (e.g., 5 distinct colors like blue, green, red, yellow, purple) that works for both light and dark themes.
+   - Ensure labels are clear (e.g., 12px font, sans-serif, black text).
+   - Make the charts responsive and scrollable on small screens.
+   - Match the app’s existing style (e.g., in src/App.css).
+5. Add a legend for each chart to identify commodities and stations, with an option to toggle visibility of each.
+6. Add comments explaining the API fetching logic, chart configuration, and anti-flickering optimizations.
+7. Create checkpoints for rollback.
+8. Test the page to ensure the charts display the backend data correctly, with no flickering on hover, and the data is readable for laymen.
+
+The app uses a React template in Replit’s Node.js environment. Use modern JavaScript, ensure Chart.js and react-chartjs-2 are added as dependencies if needed, and ensure the output is previewable in Replit’s web view. If the Charts tab or API fetching cannot be updated without breaking the app, stop and report the issue.
