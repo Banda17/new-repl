@@ -77,8 +77,11 @@ export default function DashboardPage() {
   });
 
   // Helper function to format numbers with proper separators
-  const formatNumber = (num: number) => {
-    return num.toLocaleString();
+  const formatNumber = (num: number, decimals: number = 0) => {
+    return num.toLocaleString(undefined, {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals
+    });
   };
 
   // Helper function to get color class for percentage changes
@@ -449,14 +452,14 @@ export default function DashboardPage() {
                         <TableHead className="border text-center text-xs bg-green-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Million MT</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Freight</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Million MT</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Freight</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50">in MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50">in Million MT</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -478,7 +481,7 @@ export default function DashboardPage() {
                             {formatNumber(row.currentPeriod.wagons)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-medium">
-                            {formatNumber(row.currentPeriod.tonnage)}
+                            {(row.currentPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
                             {formatNumber(row.currentPeriod.freight)}
@@ -495,7 +498,7 @@ export default function DashboardPage() {
                             {formatNumber(row.previousPeriod.wagons)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-medium">
-                            {formatNumber(row.previousPeriod.tonnage)}
+                            {(row.previousPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
                             {formatNumber(row.previousPeriod.freight)}
