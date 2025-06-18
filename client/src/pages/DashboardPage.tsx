@@ -192,7 +192,7 @@ export default function DashboardPage() {
     '#1e40af'  // Indigo
   ];
 
-  // Custom tooltip component for better readability
+  // Custom tooltip component for better readability (values in million tonnes)
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
@@ -200,7 +200,7 @@ export default function DashboardPage() {
           <p className="font-semibold text-sm mb-2">{`Year: ${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} className="text-sm" style={{ color: entry.color }}>
-              {`${entry.dataKey}: ${Number(entry.value).toLocaleString()} MT`}
+              {`${entry.dataKey}: ${(Number(entry.value) / 1000000).toFixed(2)} Million MT`}
             </p>
           ))}
         </div>
@@ -209,14 +209,15 @@ export default function DashboardPage() {
     return null;
   };
 
-  // Format large numbers for Y-axis labels (layman-friendly)
+  // Format Y-axis labels in million tonnes
   const formatYAxisLabel = (value: number) => {
-    if (value >= 1000000) {
-      return `${(value / 1000000).toFixed(1)}M`;
-    } else if (value >= 1000) {
-      return `${(value / 1000).toFixed(0)}K`;
+    const millionTonnes = value / 1000000;
+    if (millionTonnes >= 1) {
+      return `${millionTonnes.toFixed(1)}M MT`;
+    } else if (millionTonnes >= 0.1) {
+      return `${millionTonnes.toFixed(2)}M MT`;
     }
-    return value.toString();
+    return `${millionTonnes.toFixed(3)}M MT`;
   };
 
   return (
