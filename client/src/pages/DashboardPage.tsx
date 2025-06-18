@@ -506,7 +506,7 @@ export default function DashboardPage() {
                           
                           {/* Change Data */}
                           <TableCell className={`border text-center text-sm font-medium ${getChangeColor(row.changeInMT)}`}>
-                            {row.changeInMT > 0 ? '+' : ''}{formatNumber(row.changeInMT)}
+                            {row.changeInMT > 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(2)}
                           </TableCell>
                           <TableCell className={`border text-center text-sm font-bold ${getChangeColor(row.changeInPercentage)}`}>
                             {row.changeInPercentage > 0 ? '+' : ''}{row.changeInPercentage}%
@@ -531,7 +531,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.currentPeriod.wagons)}
                         </TableCell>
                         <TableCell className="border text-center font-bold text-lg">
-                          {formatNumber(comparativeData.totals.currentPeriod.tonnage)}
+                          {(comparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           {formatNumber(comparativeData.totals.currentPeriod.freight)}
@@ -548,7 +548,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.previousPeriod.wagons)}
                         </TableCell>
                         <TableCell className="border text-center font-bold text-lg">
-                          {formatNumber(comparativeData.totals.previousPeriod.tonnage)}
+                          {(comparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           {formatNumber(comparativeData.totals.previousPeriod.freight)}
@@ -556,7 +556,7 @@ export default function DashboardPage() {
                         
                         {/* Total Change */}
                         <TableCell className={`border text-center font-bold text-lg ${getChangeColor(comparativeData.totals.changeInMT)}`}>
-                          {comparativeData.totals.changeInMT > 0 ? '+' : ''}{formatNumber(comparativeData.totals.changeInMT)}
+                          {comparativeData.totals.changeInMT > 0 ? '+' : ''}{(comparativeData.totals.changeInMT / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className={`border text-center font-bold text-lg ${getChangeColor(comparativeData.totals.changeInPercentage)}`}>
                           {comparativeData.totals.changeInPercentage > 0 ? '+' : ''}{comparativeData.totals.changeInPercentage}%
