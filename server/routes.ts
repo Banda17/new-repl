@@ -2289,7 +2289,7 @@ export function registerRoutes(app: Express): Server {
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInCurrentPeriod > 0 ? Math.round((Number(row.total_tonnage) || 0) / daysInCurrentPeriod * 100) / 100 : 0,
+          avgPerDay: daysInCurrentPeriod > 0 ? Math.round((Number(row.rks) || 0) / daysInCurrentPeriod * 100) / 100 : 0,
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
@@ -2302,7 +2302,7 @@ export function registerRoutes(app: Express): Server {
         previousMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInPreviousPeriod > 0 ? Math.round((Number(row.total_tonnage) || 0) / daysInPreviousPeriod * 100) / 100 : 0,
+          avgPerDay: daysInPreviousPeriod > 0 ? Math.round((Number(row.rks) || 0) / daysInPreviousPeriod * 100) / 100 : 0,
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
