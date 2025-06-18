@@ -453,12 +453,12 @@ export default function DashboardPage() {
                         <TableHead className="border text-center text-xs bg-green-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Wagons</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Million MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Freight</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Freight (₹)</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Wagons</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Million MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Freight</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Freight (₹)</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50">in Million MT</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
                       </TableRow>
@@ -484,7 +484,7 @@ export default function DashboardPage() {
                             {(row.currentPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
-                            {formatNumber(row.currentPeriod.freight)}
+                            ₹{formatNumber(row.currentPeriod.freight)}
                           </TableCell>
                           
                           {/* Previous Period Data */}
@@ -501,7 +501,7 @@ export default function DashboardPage() {
                             {(row.previousPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
-                            {formatNumber(row.previousPeriod.freight)}
+                            ₹{formatNumber(row.previousPeriod.freight)}
                           </TableCell>
                           
                           {/* Change Data */}
@@ -534,7 +534,7 @@ export default function DashboardPage() {
                           {(comparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {formatNumber(comparativeData.totals.currentPeriod.freight)}
+                          ₹{formatNumber(comparativeData.totals.currentPeriod.freight)}
                         </TableCell>
                         
                         {/* Previous Period Totals */}
@@ -551,7 +551,7 @@ export default function DashboardPage() {
                           {(comparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {formatNumber(comparativeData.totals.previousPeriod.freight)}
+                          ₹{formatNumber(comparativeData.totals.previousPeriod.freight)}
                         </TableCell>
                         
                         {/* Total Change */}
