@@ -25,6 +25,7 @@ import RailwayReportsPage from "./pages/RailwayReportsPage";
 import DailyReportsPage from "./pages/DailyReportsPage";
 import AllEntriesPage from "./pages/AllEntriesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
+import StationComparativePage from "./pages/StationComparativePage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
@@ -130,6 +131,10 @@ function Navigation() {
             <DropdownMenuItem onClick={() => navigate("/excel-upload")}>
               <Upload className="w-4 h-4 mr-2" />
               Excel Upload
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/station-comparative")}>
+              <FileText className="w-4 h-4 mr-2" />
+              Station Comparative (May 26-31)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

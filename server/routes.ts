@@ -305,6 +305,127 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
   }
 }
 
+function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
+  // Header
+  doc.fontSize(16).text("Station wise Comparative Loading Particulars", 50, 50, { align: 'center' });
+  
+  let yPosition = 90;
+  
+  // Period headers
+  doc.fontSize(12);
+  doc.text(`${data.periods.current}`, 150, yPosition, { width: 150, align: 'center' });
+  doc.text(`${data.periods.previous}`, 350, yPosition, { width: 150, align: 'center' });
+  doc.text("Variation in", 650, yPosition, { width: 100, align: 'center' });
+  
+  yPosition += 20;
+  
+  // Column headers
+  const headers = [
+    'Station', 'Rks', 'Avg/Day', 'Wagon', 'MT', 'Freight', 
+    'Rks', 'Avg/Day', 'Wagon', 'MT', 'Freight', 
+    'in Units', 'in %age'
+  ];
+  
+  const colWidths = [60, 35, 45, 45, 45, 45, 35, 45, 45, 45, 45, 50, 50];
+  let xPosition = 50;
+  
+  doc.fontSize(10);
+  headers.forEach((header, index) => {
+    doc.text(header, xPosition, yPosition, { width: colWidths[index], align: 'center' });
+    xPosition += colWidths[index];
+  });
+  
+  yPosition += 15;
+  
+  // Draw header line
+  doc.moveTo(50, yPosition).lineTo(750, yPosition).stroke();
+  yPosition += 5;
+  
+  // Data rows
+  data.data.forEach((item: any) => {
+    if (yPosition > 500) {
+      doc.addPage();
+      yPosition = 50;
+    }
+    
+    xPosition = 50;
+    
+    // Safe numeric handling
+    const currentRks = Number(item.currentRks) || 0;
+    const currentAvgPerDay = Number(item.currentAvgPerDay) || 0;
+    const currentWagon = Number(item.currentWagon) || 0;
+    const currentMT = Number(item.currentMT) || 0;
+    const currentFreight = Number(item.currentFreight) || 0;
+    
+    const compareRks = Number(item.compareRks) || 0;
+    const compareAvgPerDay = Number(item.compareAvgPerDay) || 0;
+    const compareWagon = Number(item.compareWagon) || 0;
+    const compareMT = Number(item.compareMT) || 0;
+    const compareFreight = Number(item.compareFreight) || 0;
+    
+    const changeInMT = currentMT - compareMT;
+    const changeInPercentage = compareMT > 0 ? ((changeInMT / compareMT) * 100) : (currentMT > 0 ? 100 : 0);
+    
+    const values = [
+      String(item.station || 'N/A'),
+      currentRks.toString(),
+      currentAvgPerDay.toFixed(2),
+      currentWagon.toString(),
+      currentMT.toFixed(3),
+      currentFreight.toFixed(2),
+      compareRks.toString(),
+      compareAvgPerDay.toFixed(2),
+      compareWagon.toString(),
+      compareMT.toFixed(3),
+      compareFreight.toFixed(2),
+      changeInMT.toFixed(3),
+      changeInPercentage.toFixed(2)
+    ];
+    
+    values.forEach((value, index) => {
+      doc.text(String(value), xPosition, yPosition, { width: colWidths[index], align: 'center' });
+      xPosition += colWidths[index];
+    });
+    
+    yPosition += 12;
+  });
+  
+  // Total row
+  yPosition += 5;
+  doc.moveTo(50, yPosition).lineTo(750, yPosition).stroke();
+  yPosition += 5;
+  
+  xPosition = 50;
+  const totals = data.totals;
+  
+  const totalChangeInMT = Number(totals.currentPeriod.tonnage) - Number(totals.previousPeriod.tonnage);
+  const totalChangeInPercentage = Number(totals.previousPeriod.tonnage) > 0 ? 
+    ((totalChangeInMT / Number(totals.previousPeriod.tonnage)) * 100) : 
+    (Number(totals.currentPeriod.tonnage) > 0 ? 100 : 0);
+  
+  const totalValues = [
+    'Total',
+    Number(totals.currentPeriod.rks).toString(),
+    Number(totals.currentPeriod.avgPerDay).toFixed(2),
+    Number(totals.currentPeriod.wagons).toString(),
+    Number(totals.currentPeriod.tonnage).toFixed(3),
+    Number(totals.currentPeriod.freight).toFixed(2),
+    Number(totals.previousPeriod.rks).toString(),
+    Number(totals.previousPeriod.avgPerDay).toFixed(2),
+    Number(totals.previousPeriod.wagons).toString(),
+    Number(totals.previousPeriod.tonnage).toFixed(3),
+    Number(totals.previousPeriod.freight).toFixed(2),
+    totalChangeInMT.toFixed(3),
+    totalChangeInPercentage.toFixed(2)
+  ];
+  
+  doc.fontSize(10).font('Helvetica-Bold');
+  totalValues.forEach((value, index) => {
+    doc.text(String(value), xPosition, yPosition, { width: colWidths[index], align: 'center' });
+    xPosition += colWidths[index];
+  });
+}
+
 function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
   try {
     doc.fontSize(20).text("Railway Loading Operations - All Entries", { align: "center" });
@@ -704,6 +825,98 @@ export function registerRoutes(app: Express): Server {
 
     } catch (error: any) {
       console.error("Error generating yearly comparison PDF:", error);
+      res.status(500).json({
+        error: "Failed to generate PDF",
+        details: error.message
+      });
+    }
+  });
+
+  // Station-wise comparative loading PDF export
+  app.get("/api/exports/station-comparative-loading-pdf", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      const currentYear = new Date().getFullYear();
+      const previousYear = currentYear - 1;
+      
+      // May 26-31 periods
+      const currentPeriodStart = new Date(currentYear, 4, 26);
+      const currentPeriodEnd = new Date(currentYear, 4, 31);
+      const previousPeriodStart = new Date(previousYear, 4, 26);
+      const previousPeriodEnd = new Date(previousYear, 4, 31);
+
+      // Fetch data directly from database
+      const currentData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, currentPeriodStart),
+          lte(railwayLoadingOperations.pDate, currentPeriodEnd)
+        ));
+
+      const previousData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, previousPeriodStart),
+          lte(railwayLoadingOperations.pDate, previousPeriodEnd)
+        ));
+
+      const currentDays = 6;
+      const previousDays = 6;
+      const stationComparison = generateStationComparison(currentData, previousData, currentDays, previousDays);
+
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-GB', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        });
+      };
+
+      const data = {
+        periods: {
+          current: `${formatDate(currentPeriodStart)} to ${formatDate(currentPeriodEnd)}`,
+          previous: `${formatDate(previousPeriodStart)} to ${formatDate(previousPeriodEnd)}`
+        },
+        data: stationComparison.sort((a, b) => b.currentMT - a.currentMT),
+        totals: stationComparison.reduce((acc, item) => ({
+          currentPeriod: {
+            rks: acc.currentPeriod.rks + item.currentRks,
+            wagons: acc.currentPeriod.wagons + item.currentWagon,
+            tonnage: acc.currentPeriod.tonnage + item.currentMT,
+            freight: acc.currentPeriod.freight + item.currentFreight,
+            avgPerDay: 0
+          },
+          previousPeriod: {
+            rks: acc.previousPeriod.rks + item.compareRks,
+            wagons: acc.previousPeriod.wagons + item.compareWagon,
+            tonnage: acc.previousPeriod.tonnage + item.compareMT,
+            freight: acc.previousPeriod.freight + item.compareFreight,
+            avgPerDay: 0
+          }
+        }), {
+          currentPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0, avgPerDay: 0 },
+          previousPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0, avgPerDay: 0 }
+        })
+      };
+
+      data.totals.currentPeriod.avgPerDay = data.totals.currentPeriod.rks / currentDays;
+      data.totals.previousPeriod.avgPerDay = data.totals.previousPeriod.rks / previousDays;
+
+      // Generate PDF
+      const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="station-comparative-loading-report.pdf"');
+      
+      doc.pipe(res);
+      generateStationComparativeLoadingPDF(doc, data);
+      doc.end();
+
+      console.log("Station comparative loading PDF generation completed");
+    } catch (error: any) {
+      console.error("Error generating station comparative loading PDF:", error);
       res.status(500).json({
         error: "Failed to generate PDF",
         details: error.message
@@ -2602,6 +2815,92 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({
         error: "Failed to generate station comparison",
         details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Station-wise comparative loading data endpoint for May 26-31 period
+  app.get("/api/station-comparative-loading", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    
+    try {
+      const currentYear = new Date().getFullYear();
+      const previousYear = currentYear - 1;
+      
+      // May 26-31 periods
+      const currentPeriodStart = new Date(currentYear, 4, 26); // May 26 current year
+      const currentPeriodEnd = new Date(currentYear, 4, 31);   // May 31 current year
+      const previousPeriodStart = new Date(previousYear, 4, 26); // May 26 previous year
+      const previousPeriodEnd = new Date(previousYear, 4, 31);   // May 31 previous year
+
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-GB', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        });
+      };
+
+      // Fetch current period data
+      const currentData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, currentPeriodStart),
+          lte(railwayLoadingOperations.pDate, currentPeriodEnd)
+        ));
+
+      // Fetch previous period data
+      const previousData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, previousPeriodStart),
+          lte(railwayLoadingOperations.pDate, previousPeriodEnd)
+        ));
+
+      const currentDays = 6; // May 26-31 = 6 days
+      const previousDays = 6; // May 26-31 = 6 days
+
+      const stationComparison = generateStationComparison(currentData, previousData, currentDays, previousDays);
+
+      const responseData = {
+        periods: {
+          current: `${formatDate(currentPeriodStart)} to ${formatDate(currentPeriodEnd)}`,
+          previous: `${formatDate(previousPeriodStart)} to ${formatDate(previousPeriodEnd)}`
+        },
+        data: stationComparison.sort((a, b) => b.currentMT - a.currentMT),
+        totals: stationComparison.reduce((acc, item) => ({
+          currentPeriod: {
+            rks: acc.currentPeriod.rks + item.currentRks,
+            wagons: acc.currentPeriod.wagons + item.currentWagon,
+            tonnage: acc.currentPeriod.tonnage + item.currentMT,
+            freight: acc.currentPeriod.freight + item.currentFreight,
+            avgPerDay: 0 // Will be calculated after reduce
+          },
+          previousPeriod: {
+            rks: acc.previousPeriod.rks + item.compareRks,
+            wagons: acc.previousPeriod.wagons + item.compareWagon,
+            tonnage: acc.previousPeriod.tonnage + item.compareMT,
+            freight: acc.previousPeriod.freight + item.compareFreight,
+            avgPerDay: 0 // Will be calculated after reduce
+          }
+        }), {
+          currentPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0, avgPerDay: 0 },
+          previousPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0, avgPerDay: 0 }
+        })
+      };
+
+      // Calculate avgPerDay for totals
+      responseData.totals.currentPeriod.avgPerDay = responseData.totals.currentPeriod.rks / currentDays;
+      responseData.totals.previousPeriod.avgPerDay = responseData.totals.previousPeriod.rks / previousDays;
+
+      res.json(responseData);
+    } catch (error: any) {
+      console.error("Error fetching station comparative loading data:", error);
+      res.status(500).json({
+        error: "Failed to fetch station comparative loading data",
+        details: error.message
       });
     }
   });
