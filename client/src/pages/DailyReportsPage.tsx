@@ -129,9 +129,9 @@ export default function DailyReportsPage() {
           {/* Report Configuration */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Report Type</Label>
+              <Label className="text-white font-medium">Report Type</Label>
               <Select value={reportType} onValueChange={setReportType}>
-                <SelectTrigger>
+                <SelectTrigger className="bg-blue-900/20 border-white/30 text-white">
                   <SelectValue placeholder="Select report type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -147,17 +147,17 @@ export default function DailyReportsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Current Period */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Current Period</h3>
+              <h3 className="text-lg font-semibold text-white">Current Period</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>From Date</Label>
+                  <Label className="text-white font-medium">From Date</Label>
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
                         variant="outline"
                         className={cn(
-                          "w-full justify-start text-left font-normal",
-                          !currentPeriod.from && "text-muted-foreground"
+                          "w-full justify-start text-left font-normal bg-blue-900/20 border-white/30 text-white hover:bg-blue-900/30",
+                          !currentPeriod.from && "text-white/60"
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
