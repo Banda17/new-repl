@@ -398,8 +398,7 @@ export default function DataSubmissionPage() {
       </Card>
 
       {/* Railway Loading Operations Section */}
-      <div className="mt-8">
-        <Card>
+      <Card>
         <CardHeader>
           <CardTitle>Railway Loading Operations</CardTitle>
           <CardDescription>
@@ -732,8 +731,7 @@ export default function DataSubmissionPage() {
             </div>
           </div>
         </CardContent>
-        </Card>
-      </div>
+      </Card>
     </div>
   );
 }
