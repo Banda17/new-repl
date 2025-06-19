@@ -49,13 +49,13 @@ function Navigation() {
   };
 
   return (
-    <nav className="bg-[#1a365d] text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-lg sticky top-0 z-50">
+    <nav className="backdrop-blur-lg bg-blue-900/20 border-b border-white/20 text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-xl sticky top-0 z-50">
       <div className="container mx-auto flex flex-nowrap gap-3 sm:gap-4 items-center min-w-max">
         {/* Main Dashboard */}
         <Button 
           variant="ghost" 
           onClick={() => navigate("/dashboard")}
-          className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/dashboard" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+          className={`text-white hover:bg-blue-500/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 backdrop-blur-sm ${location === "/dashboard" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
         >
           <Activity className="w-4 h-4 mr-2" />
           Operating Dashboard
@@ -65,7 +65,7 @@ function Navigation() {
         <Button 
           variant="ghost" 
           onClick={() => navigate("/goods")}
-          className={`text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 ${location === "/goods" ? "bg-white/25 font-bold shadow-sm" : ""}`}
+          className={`text-white hover:bg-blue-500/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 backdrop-blur-sm ${location === "/goods" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
         >
           <Package2 className="w-4 h-4 mr-2" />
           Goods
@@ -191,67 +191,81 @@ function App() {
   }
 
   return (
-    <div>
-      <SCRLogo />
-      <Navigation />
-      <Switch>
-        <Route path="/">
-          {() => <DetentionForm />}
-        </Route>
-        <Route path="/dashboard">
-          {() => <DashboardPage />}
-        </Route>
-        <Route path="/goods">
-          {() => <GoodsTabPage />}
-        </Route>
-        <Route path="/coaching">
-          {() => <CoachingTabPage />}
-        </Route>
-        <Route path="/planning">
-          {() => <PlanningTabPage />}
-        </Route>
-        <Route path="/railway-reports">
-          {() => <RailwayReportsPage />}
-        </Route>
-        <Route path="/daily-reports">
-          {() => <DailyReportsPage />}
-        </Route>
-        <Route path="/all-entries">
-          {() => <AllEntriesPage />}
-        </Route>
-        <Route path="/excel-upload">
-          {() => <ExcelUploadPage />}
-        </Route>
-        <Route path="/station-comparative">
-          {() => <StationComparativePage />}
-        </Route>
-        <Route path="/historical">
-          {() => <HistoricalRecords />}
-        </Route>
-        <Route path="/upload">
-          {() => <DataUploadPage />}
-        </Route>
-        <Route path="/auth">
-          {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
-        </Route>
-        <Route>
-          {() => <NotFound />}
-        </Route>
-      </Switch>
+    <div 
+      className="min-h-screen relative"
+      style={{
+        backgroundImage: `url(/attached_assets/newindianexpress_2025-01-17_7zra51ol_Vijayawada_1750328706751.jpg)`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      {/* Background overlay */}
+      <div className="absolute inset-0 bg-black/40"></div>
+      
+      <div className="relative z-10">
+        <SCRLogo />
+        <Navigation />
+        <Switch>
+          <Route path="/">
+            {() => <DetentionForm />}
+          </Route>
+          <Route path="/dashboard">
+            {() => <DashboardPage />}
+          </Route>
+          <Route path="/goods">
+            {() => <GoodsTabPage />}
+          </Route>
+          <Route path="/coaching">
+            {() => <CoachingTabPage />}
+          </Route>
+          <Route path="/planning">
+            {() => <PlanningTabPage />}
+          </Route>
+          <Route path="/railway-reports">
+            {() => <RailwayReportsPage />}
+          </Route>
+          <Route path="/daily-reports">
+            {() => <DailyReportsPage />}
+          </Route>
+          <Route path="/all-entries">
+            {() => <AllEntriesPage />}
+          </Route>
+          <Route path="/excel-upload">
+            {() => <ExcelUploadPage />}
+          </Route>
+          <Route path="/station-comparative">
+            {() => <StationComparativePage />}
+          </Route>
+          <Route path="/historical">
+            {() => <HistoricalRecords />}
+          </Route>
+          <Route path="/upload">
+            {() => <DataUploadPage />}
+          </Route>
+          <Route path="/auth">
+            {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
+          </Route>
+          <Route>
+            {() => <NotFound />}
+          </Route>
+        </Switch>
+      </div>
     </div>
   );
 }
 
 function NotFound() {
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md mx-4">
+    <div className="min-h-screen w-full flex items-center justify-center p-4">
+      <Card className="w-full max-w-md mx-4 backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
         <CardContent className="pt-6">
           <div className="flex mb-4 gap-2">
-            <AlertCircle className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl font-bold text-gray-900">404 Page Not Found</h1>
+            <AlertCircle className="h-8 w-8 text-red-400" />
+            <h1 className="text-2xl font-bold text-white">404 Page Not Found</h1>
           </div>
-          <p className="mt-4 text-sm text-gray-600">
+          <p className="mt-4 text-sm text-white/80">
             The page you're looking for doesn't exist.
           </p>
         </CardContent>
