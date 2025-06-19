@@ -232,15 +232,20 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
         yPosition = 50;
       }
 
+      // Safely handle potentially undefined/null values
+      const safeWagons = Number(item.totalWagons) || 0;
+      const safeTonnage = Number(item.totalTonnage) || 0;
+      const safeFreight = Number(item.totalFreight) || 0;
+
       const values = [
-        item.commodity,
-        item.totalWagons.toLocaleString(),
-        (item.totalTonnage / 1000000).toFixed(2),
-        `₹${(item.totalFreight / 10000000).toFixed(1)}`
+        String(item.commodity || 'N/A'),
+        safeWagons.toLocaleString(),
+        (safeTonnage / 1000000).toFixed(2),
+        `₹${(safeFreight / 10000000).toFixed(1)}`
       ];
 
       values.forEach((value, index) => {
-        doc.text(value, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+        doc.text(String(value), 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
       });
       
       yPosition += 15;
@@ -254,7 +259,8 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
       yPosition += 30;
     }
 
-    doc.fontSize(16).text("Station-wise Loading Summary", yPosition, { underline: true });
+    doc.fontSize(16).text("Station-wise Loading Summary", 50, yPosition);
+    doc.moveTo(50, yPosition + 18).lineTo(250, yPosition + 18).stroke();
     yPosition += 30;
     
     const stationHeaders = ['Station', 'Total Wagons', 'Total Tonnage (MT)', 'Total Freight (₹ Cr)'];
@@ -273,15 +279,20 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
         yPosition = 50;
       }
 
+      // Safely handle potentially undefined/null values
+      const safeWagons = Number(item.totalWagons) || 0;
+      const safeTonnage = Number(item.totalTonnage) || 0;
+      const safeFreight = Number(item.totalFreight) || 0;
+
       const values = [
-        item.station,
-        item.totalWagons.toLocaleString(),
-        (item.totalTonnage / 1000000).toFixed(2),
-        `₹${(item.totalFreight / 10000000).toFixed(1)}`
+        String(item.station || 'N/A'),
+        safeWagons.toLocaleString(),
+        (safeTonnage / 1000000).toFixed(2),
+        `₹${(safeFreight / 10000000).toFixed(1)}`
       ];
 
       values.forEach((value, index) => {
-        doc.text(value, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+        doc.text(String(value), 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
       });
       
       yPosition += 15;
