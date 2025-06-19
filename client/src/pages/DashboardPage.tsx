@@ -403,20 +403,20 @@ export default function DashboardPage() {
                       data={prepareCommodityChartData()}
                       margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff30" />
                       <XAxis 
                         dataKey="year" 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tick={{ fill: '#374151', fontWeight: 500 }}
+                        tick={{ fill: '#ffffff', fontWeight: 500 }}
                       />
                       <YAxis 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={formatYAxisLabel}
-                        tick={{ fill: '#374151' }}
+                        tick={{ fill: '#ffffff' }}
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Legend 
@@ -485,20 +485,20 @@ export default function DashboardPage() {
                       data={prepareStationChartData()}
                       margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                      <CartesianGrid strokeDasharray="3 3" stroke="#ffffff30" />
                       <XAxis 
                         dataKey="year" 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
-                        tick={{ fill: '#374151', fontWeight: 500 }}
+                        tick={{ fill: '#ffffff', fontWeight: 500 }}
                       />
                       <YAxis 
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
                         tickFormatter={formatYAxisLabel}
-                        tick={{ fill: '#374151' }}
+                        tick={{ fill: '#ffffff' }}
                       />
                       <Tooltip content={<CustomTooltip />} />
                       <Legend 
@@ -522,19 +522,19 @@ export default function DashboardPage() {
         </TabsContent>
 
         <TabsContent value="tables" className="space-y-6">
-          <Card>
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle>Commodity-wise Comparative Loading Particulars</CardTitle>
+                  <CardTitle className="text-white text-xl font-bold">Commodity-wise Comparative Loading Particulars</CardTitle>
                   {comparativeData && (
-                    <div className="text-sm text-muted-foreground mt-2">
+                    <div className="text-sm text-white/90 mt-2">
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <span className="font-medium">Current Period:</span> {comparativeData.periods.current}
+                          <span className="font-medium text-white">Current Period:</span> <span className="text-white/90">{comparativeData.periods.current}</span>
                         </div>
                         <div>
-                          <span className="font-medium">Previous Period:</span> {comparativeData.periods.previous}
+                          <span className="font-medium text-white">Previous Period:</span> <span className="text-white/90">{comparativeData.periods.previous}</span>
                         </div>
                       </div>
                     </div>
@@ -561,39 +561,39 @@ export default function DashboardPage() {
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50">
+                      <TableRow className="bg-white/10 border-white/20">
+                        <TableHead rowSpan={2} className="border border-white/30 text-center font-bold bg-blue-900/30 text-white">
                           Commodity
                         </TableHead>
-                        <TableHead colSpan={5} className="border text-center font-bold bg-green-50">
+                        <TableHead colSpan={5} className="border border-white/30 text-center font-bold bg-green-900/30 text-white">
                           {comparativeData.periods.current}
                         </TableHead>
-                        <TableHead colSpan={5} className="border text-center font-bold bg-yellow-50">
+                        <TableHead colSpan={5} className="border border-white/30 text-center font-bold bg-yellow-900/30 text-white">
                           {comparativeData.periods.previous}
                         </TableHead>
-                        <TableHead colSpan={2} className="border text-center font-bold bg-red-50">
+                        <TableHead colSpan={2} className="border border-white/30 text-center font-bold bg-red-900/30 text-white">
                           Change
                         </TableHead>
                       </TableRow>
-                      <TableRow className="bg-muted/30">
-                        <TableHead className="border text-center text-xs bg-green-50">Rks</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Avg/Day</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Million MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Freight (₹)</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Million MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Freight (₹)</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50">in Million MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
+                      <TableRow className="bg-white/5 border-white/20">
+                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Rks</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Avg/Day</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Wagons</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Million MT</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Freight (₹)</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Rks</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Avg/Day</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Wagons</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Million MT</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Freight (₹)</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-red-900/20 text-white">in Million MT</TableHead>
+                        <TableHead className="border border-white/30 text-center text-xs bg-red-900/20 text-white">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {comparativeData.data.map((row, index) => (
-                        <TableRow key={row.commodity} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-                          <TableCell className="border font-medium text-left pl-3">
+                        <TableRow key={row.commodity} className={index % 2 === 0 ? "bg-white/10 border-white/20" : "bg-white/5 border-white/20"}>
+                          <TableCell className="border border-white/30 font-medium text-left pl-3 text-white">
                             {row.commodity}
                           </TableCell>
                           
