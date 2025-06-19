@@ -332,7 +332,7 @@ export default function DashboardPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-blue-900/20 backdrop-blur-lg border border-white/20">
+        <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30">
           <TabsTrigger value="charts" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Charts
@@ -345,9 +345,9 @@ export default function DashboardPage() {
 
         <TabsContent value="charts" className="space-y-6">
           {/* Commodity Loading Chart */}
-          <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between text-white">
+              <CardTitle className="flex items-center justify-between text-white text-lg font-bold">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
                   Yearly Commodity Loading Comparison (MT)
@@ -439,9 +439,9 @@ export default function DashboardPage() {
           </Card>
 
           {/* Station Loading Chart */}
-          <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between text-white">
+              <CardTitle className="flex items-center justify-between text-white text-lg font-bold">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
                   Yearly Station Loading Comparison (MT)

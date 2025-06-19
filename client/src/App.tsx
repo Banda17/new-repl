@@ -49,7 +49,7 @@ function Navigation() {
   };
 
   return (
-    <nav className="backdrop-blur-lg bg-blue-900/20 border-b border-white/20 text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-xl sticky top-0 z-50">
+    <nav className="backdrop-blur-lg bg-blue-900/30 border-b border-white/30 text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-xl sticky top-0 z-50">
       <div className="container mx-auto flex flex-nowrap gap-3 sm:gap-4 items-center min-w-max">
         {/* Main Dashboard */}
         <Button 
