@@ -588,24 +588,45 @@ export function registerRoutes(app: Express): Server {
 
       const commodityComparison = generateCommodityComparison(currentData, previousData, currentDays, previousDays);
 
+      // Transform the data to match the expected structure for PDF generation
+      const transformedData = commodityComparison.map(item => ({
+        commodity: item.commodity,
+        currentPeriod: {
+          rks: item.currentRks,
+          avgPerDay: item.currentAvgDay,
+          wagons: item.currentWagon,
+          tonnage: item.currentMT,
+          freight: item.currentFreight
+        },
+        previousPeriod: {
+          rks: item.compareRks,
+          avgPerDay: item.compareAvgDay,
+          wagons: item.compareWagon,
+          tonnage: item.compareMT,
+          freight: item.compareFreight
+        },
+        changeInMT: item.variationUnits,
+        changeInPercentage: item.variationPercent
+      }));
+
       const data = {
         periods: {
           current: `${formatDate(currentPeriodStart)} to ${formatDate(currentPeriodEnd)}`,
           previous: `${formatDate(previousPeriodStart)} to ${formatDate(previousPeriodEnd)}`
         },
-        data: commodityComparison,
-        totals: commodityComparison.reduce((acc, item) => ({
+        data: transformedData,
+        totals: transformedData.reduce((acc, item) => ({
           currentPeriod: {
-            rks: acc.currentPeriod.rks + item.currentRks,
-            wagons: acc.currentPeriod.wagons + item.currentWagon,
-            tonnage: acc.currentPeriod.tonnage + item.currentMT,
-            freight: acc.currentPeriod.freight + item.currentFreight
+            rks: acc.currentPeriod.rks + item.currentPeriod.rks,
+            wagons: acc.currentPeriod.wagons + item.currentPeriod.wagons,
+            tonnage: acc.currentPeriod.tonnage + item.currentPeriod.tonnage,
+            freight: acc.currentPeriod.freight + item.currentPeriod.freight
           },
           previousPeriod: {
-            rks: acc.previousPeriod.rks + item.compareRks,
-            wagons: acc.previousPeriod.wagons + item.compareWagon,
-            tonnage: acc.previousPeriod.tonnage + item.compareMT,
-            freight: acc.previousPeriod.freight + item.compareFreight
+            rks: acc.previousPeriod.rks + item.previousPeriod.rks,
+            wagons: acc.previousPeriod.wagons + item.previousPeriod.wagons,
+            tonnage: acc.previousPeriod.tonnage + item.previousPeriod.tonnage,
+            freight: acc.previousPeriod.freight + item.previousPeriod.freight
           }
         }), {
           currentPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0 },
