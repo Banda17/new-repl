@@ -768,47 +768,47 @@ export default function DashboardPage() {
                     </TableHeader>
                     <TableBody>
                       {stationComparativeData.data.map((row, index) => {
-                        const variationUnits = row.currentMT - row.compareMT;
-                        const variationPercentage = row.compareMT > 0 ? ((variationUnits / row.compareMT) * 100) : (row.currentMT > 0 ? 100 : 0);
+                        const variationUnits = (row.currentMT || 0) - (row.compareMT || 0);
+                        const variationPercentage = (row.compareMT || 0) > 0 ? ((variationUnits / row.compareMT) * 100) : ((row.currentMT || 0) > 0 ? 100 : 0);
                         
                         return (
                           <TableRow key={row.station} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
                             <TableCell className="border font-medium text-left pl-3">
-                              {row.station}
+                              {row.station || 'N/A'}
                             </TableCell>
                             
                             {/* Current Period Data */}
                             <TableCell className="border text-center text-sm">
-                              {row.currentRks}
+                              {row.currentRks || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.currentAvgPerDay.toFixed(2)}
+                              {(row.currentAvgPerDay || 0).toFixed(2)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.currentWagon}
+                              {row.currentWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {row.currentMT.toFixed(3)}
+                              {(row.currentMT || 0).toFixed(3)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.currentFreight.toFixed(2)}
+                              {(row.currentFreight || 0).toFixed(2)}
                             </TableCell>
                             
                             {/* Previous Period Data */}
                             <TableCell className="border text-center text-sm">
-                              {row.compareRks}
+                              {row.compareRks || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.compareAvgPerDay.toFixed(2)}
+                              {(row.compareAvgPerDay || 0).toFixed(2)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.compareWagon}
+                              {row.compareWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {row.compareMT.toFixed(3)}
+                              {(row.compareMT || 0).toFixed(3)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {row.compareFreight.toFixed(2)}
+                              {(row.compareFreight || 0).toFixed(2)}
                             </TableCell>
                             
                             {/* Variation Data */}
@@ -830,48 +830,48 @@ export default function DashboardPage() {
                         
                         {/* Current Period Totals */}
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.currentPeriod.rks}
+                          {stationComparativeData.totals.currentPeriod.rks || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.currentPeriod.avgPerDay.toFixed(2)}
+                          {(stationComparativeData.totals.currentPeriod.avgPerDay || 0).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.currentPeriod.wagons}
+                          {stationComparativeData.totals.currentPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.currentPeriod.tonnage.toFixed(3)}
+                          {(stationComparativeData.totals.currentPeriod.tonnage || 0).toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.currentPeriod.freight.toFixed(2)}
+                          {(stationComparativeData.totals.currentPeriod.freight || 0).toFixed(2)}
                         </TableCell>
                         
                         {/* Previous Period Totals */}
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.previousPeriod.rks}
+                          {stationComparativeData.totals.previousPeriod.rks || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.previousPeriod.avgPerDay.toFixed(2)}
+                          {(stationComparativeData.totals.previousPeriod.avgPerDay || 0).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.previousPeriod.wagons}
+                          {stationComparativeData.totals.previousPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.previousPeriod.tonnage.toFixed(3)}
+                          {(stationComparativeData.totals.previousPeriod.tonnage || 0).toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {stationComparativeData.totals.previousPeriod.freight.toFixed(2)}
+                          {(stationComparativeData.totals.previousPeriod.freight || 0).toFixed(2)}
                         </TableCell>
                         
                         {/* Total Variation */}
                         <TableCell className={`border text-center font-bold text-lg ${
-                          (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
+                          ((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {(stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage).toFixed(3)}
+                          {((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)).toFixed(3)}
                         </TableCell>
                         <TableCell className={`border text-center font-bold text-lg ${
-                          ((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / stationComparativeData.totals.previousPeriod.tonnage * 100) >= 0 ? 'text-green-600' : 'text-red-600'
+                          (((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / (stationComparativeData.totals.previousPeriod.tonnage || 1) * 100) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / stationComparativeData.totals.previousPeriod.tonnage * 100).toFixed(2)}
+                          {(((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / (stationComparativeData.totals.previousPeriod.tonnage || 1) * 100).toFixed(2)}
                         </TableCell>
                       </TableRow>
                     </TableBody>
