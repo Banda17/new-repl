@@ -118,10 +118,10 @@ export default function DailyReportsPage() {
 
   return (
     <div className="container mx-auto p-6 space-y-6">
-      <Card>
+      <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">Daily Comparative Reports</CardTitle>
-          <p className="text-muted-foreground">
+          <CardTitle className="text-2xl font-bold text-white">Daily Comparative Reports</CardTitle>
+          <p className="text-white/80">
             Generate comparative loading reports between two periods
           </p>
         </CardHeader>
