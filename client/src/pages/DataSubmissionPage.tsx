@@ -219,7 +219,7 @@ export default function DataSubmissionPage() {
   };
 
   return (
-    <div className="container mx-auto py-10">
+    <div className="container mx-auto py-10 space-y-8">
       <Card>
         <CardHeader>
           <CardTitle>Submit Detention Data</CardTitle>
@@ -398,7 +398,8 @@ export default function DataSubmissionPage() {
       </Card>
 
       {/* Railway Loading Operations Section */}
-      <Card>
+      <div className="mt-8">
+        <Card>
         <CardHeader>
           <CardTitle>Railway Loading Operations</CardTitle>
           <CardDescription>
@@ -731,7 +732,8 @@ export default function DataSubmissionPage() {
             </div>
           </div>
         </CardContent>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }
