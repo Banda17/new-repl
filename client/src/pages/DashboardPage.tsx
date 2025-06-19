@@ -53,6 +53,43 @@ interface YearlyStationData {
   totalFreight: number;
 }
 
+// Interface for station comparative data (May 26-31)
+interface StationComparativeData {
+  periods: {
+    current: string;
+    previous: string;
+  };
+  data: Array<{
+    station: string;
+    currentRks: number;
+    currentAvgPerDay: number;
+    currentWagon: number;
+    currentMT: number;
+    currentFreight: number;
+    compareRks: number;
+    compareAvgPerDay: number;
+    compareWagon: number;
+    compareMT: number;
+    compareFreight: number;
+  }>;
+  totals: {
+    currentPeriod: {
+      rks: number;
+      wagons: number;
+      tonnage: number;
+      freight: number;
+      avgPerDay: number;
+    };
+    previousPeriod: {
+      rks: number;
+      wagons: number;
+      tonnage: number;
+      freight: number;
+      avgPerDay: number;
+    };
+  };
+}
+
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("charts");
   const [showAllCommodities, setShowAllCommodities] = useState(false);
@@ -61,6 +98,12 @@ export default function DashboardPage() {
   // Fetch weekly comparative loading data for Tables tab
   const { data: comparativeData, isLoading: isLoadingComparative } = useQuery<ComparativeLoadingData>({
     queryKey: ["/api/comparative-loading"],
+    enabled: activeTab === "tables", // Only fetch when Tables tab is active
+  });
+
+  // Fetch station comparative loading data for Tables tab (May 26-31)
+  const { data: stationComparativeData, isLoading: isLoadingStationComparative } = useQuery<StationComparativeData>({
+    queryKey: ["/api/station-comparative-loading"],
     enabled: activeTab === "tables", // Only fetch when Tables tab is active
   });
 
@@ -121,6 +164,25 @@ export default function DashboardPage() {
       const link = document.createElement('a');
       link.href = url;
       link.download = 'yearly-comparison-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+    }
+  };
+
+  const exportStationComparativePDF = async () => {
+    try {
+      const response = await fetch('/api/exports/station-comparative-loading-pdf');
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'station-comparative-loading-report.pdf';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -635,6 +697,191 @@ export default function DashboardPage() {
                   <div className="text-center">
                     <Table2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No comparative loading data available</p>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Station Comparative Loading Table (May 26-31) */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Table2 className="h-5 w-5" />
+                  Station wise Comparative Loading (May 26-31)
+                </div>
+                <Button
+                  onClick={exportStationComparativePDF}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </CardTitle>
+              {stationComparativeData && (
+                <p className="text-sm text-muted-foreground">
+                  Comparing {stationComparativeData.periods.current} vs {stationComparativeData.periods.previous}
+                </p>
+              )}
+            </CardHeader>
+            <CardContent>
+              {isLoadingStationComparative ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  <p className="ml-3 text-muted-foreground">Loading station comparative data...</p>
+                </div>
+              ) : stationComparativeData ? (
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50">
+                          Station
+                        </TableHead>
+                        <TableHead colSpan={5} className="border text-center font-bold bg-green-50">
+                          {stationComparativeData.periods.current}
+                        </TableHead>
+                        <TableHead colSpan={5} className="border text-center font-bold bg-yellow-50">
+                          {stationComparativeData.periods.previous}
+                        </TableHead>
+                        <TableHead colSpan={2} className="border text-center font-bold bg-red-50">
+                          Variation
+                        </TableHead>
+                      </TableRow>
+                      <TableRow className="bg-muted/30">
+                        <TableHead className="border text-center text-xs bg-green-50">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Wagon</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Freight</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Wagon</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Freight</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50">in Units</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {stationComparativeData.data.map((row, index) => {
+                        const variationUnits = row.currentMT - row.compareMT;
+                        const variationPercentage = row.compareMT > 0 ? ((variationUnits / row.compareMT) * 100) : (row.currentMT > 0 ? 100 : 0);
+                        
+                        return (
+                          <TableRow key={row.station} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                            <TableCell className="border font-medium text-left pl-3">
+                              {row.station}
+                            </TableCell>
+                            
+                            {/* Current Period Data */}
+                            <TableCell className="border text-center text-sm">
+                              {row.currentRks}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.currentAvgPerDay.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.currentWagon}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm font-medium">
+                              {row.currentMT.toFixed(3)}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.currentFreight.toFixed(2)}
+                            </TableCell>
+                            
+                            {/* Previous Period Data */}
+                            <TableCell className="border text-center text-sm">
+                              {row.compareRks}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.compareAvgPerDay.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.compareWagon}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm font-medium">
+                              {row.compareMT.toFixed(3)}
+                            </TableCell>
+                            <TableCell className="border text-center text-sm">
+                              {row.compareFreight.toFixed(2)}
+                            </TableCell>
+                            
+                            {/* Variation Data */}
+                            <TableCell className={`border text-center text-sm font-medium ${variationUnits >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {variationUnits.toFixed(3)}
+                            </TableCell>
+                            <TableCell className={`border text-center text-sm font-bold ${variationPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {variationPercentage.toFixed(2)}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                      
+                      {/* Total Row */}
+                      <TableRow className="bg-blue-100 border-t-2 border-blue-300 font-bold">
+                        <TableCell className="border font-bold text-left pl-3 bg-blue-200">
+                          Total
+                        </TableCell>
+                        
+                        {/* Current Period Totals */}
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.currentPeriod.rks}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.currentPeriod.avgPerDay.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.currentPeriod.wagons}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.currentPeriod.tonnage.toFixed(3)}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.currentPeriod.freight.toFixed(2)}
+                        </TableCell>
+                        
+                        {/* Previous Period Totals */}
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.previousPeriod.rks}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.previousPeriod.avgPerDay.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.previousPeriod.wagons}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.previousPeriod.tonnage.toFixed(3)}
+                        </TableCell>
+                        <TableCell className="border text-center font-bold">
+                          {stationComparativeData.totals.previousPeriod.freight.toFixed(2)}
+                        </TableCell>
+                        
+                        {/* Total Variation */}
+                        <TableCell className={`border text-center font-bold text-lg ${
+                          (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {(stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage).toFixed(3)}
+                        </TableCell>
+                        <TableCell className={`border text-center font-bold text-lg ${
+                          ((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / stationComparativeData.totals.previousPeriod.tonnage * 100) >= 0 ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                          {((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / stationComparativeData.totals.previousPeriod.tonnage * 100).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="flex items-center justify-center h-64 text-muted-foreground">
+                  <div className="text-center">
+                    <Table2 className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No station comparative data available</p>
                   </div>
                 </div>
               )}
