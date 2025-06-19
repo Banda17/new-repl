@@ -755,14 +755,14 @@ export default function DashboardPage() {
                         <TableHead className="border text-center text-xs bg-green-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50">Wagon</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50">Freight</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50">Freight (₹)</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Wagon</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">MT</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Freight</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50">in Units</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">Freight (₹)</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50">in Million MT</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -788,10 +788,10 @@ export default function DashboardPage() {
                               {row.currentWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {(row.currentMT || 0).toFixed(3)}
+                              {((row.currentMT || 0) / 1000000).toFixed(2)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {(row.currentFreight || 0).toFixed(2)}
+                              ₹{formatNumber(row.currentFreight || 0)}
                             </TableCell>
                             
                             {/* Previous Period Data */}
@@ -805,15 +805,15 @@ export default function DashboardPage() {
                               {row.compareWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {(row.compareMT || 0).toFixed(3)}
+                              {((row.compareMT || 0) / 1000000).toFixed(2)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
-                              {(row.compareFreight || 0).toFixed(2)}
+                              ₹{formatNumber(row.compareFreight || 0)}
                             </TableCell>
                             
                             {/* Variation Data */}
                             <TableCell className={`border text-center text-sm font-medium ${variationUnits >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {variationUnits.toFixed(3)}
+                              {(variationUnits / 1000000).toFixed(2)}
                             </TableCell>
                             <TableCell className={`border text-center text-sm font-bold ${variationPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {variationPercentage.toFixed(2)}
@@ -839,10 +839,10 @@ export default function DashboardPage() {
                           {stationComparativeData.totals.currentPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {(stationComparativeData.totals.currentPeriod.tonnage || 0).toFixed(3)}
+                          {((stationComparativeData.totals.currentPeriod.tonnage || 0) / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {(stationComparativeData.totals.currentPeriod.freight || 0).toFixed(2)}
+                          ₹{formatNumber(stationComparativeData.totals.currentPeriod.freight || 0)}
                         </TableCell>
                         
                         {/* Previous Period Totals */}
@@ -856,17 +856,17 @@ export default function DashboardPage() {
                           {stationComparativeData.totals.previousPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {(stationComparativeData.totals.previousPeriod.tonnage || 0).toFixed(3)}
+                          {((stationComparativeData.totals.previousPeriod.tonnage || 0) / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {(stationComparativeData.totals.previousPeriod.freight || 0).toFixed(2)}
+                          ₹{formatNumber(stationComparativeData.totals.previousPeriod.freight || 0)}
                         </TableCell>
                         
                         {/* Total Variation */}
                         <TableCell className={`border text-center font-bold text-lg ${
                           ((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)).toFixed(3)}
+                          {(((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / 1000000).toFixed(2)}
                         </TableCell>
                         <TableCell className={`border text-center font-bold text-lg ${
                           (((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / (stationComparativeData.totals.previousPeriod.tonnage || 1) * 100) >= 0 ? 'text-green-600' : 'text-red-600'
