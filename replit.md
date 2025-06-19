@@ -95,6 +95,12 @@ The system follows a modern full-stack architecture with clear separation of con
   - Added PDF export functionality matching the format of user's reference document
   - Integrated navigation link in Operations dropdown menu
   - Implemented proper data validation and numeric safety handling
+- June 19, 2025. Implemented glassy login page design:
+  - Added Vijayawada railway station image as full-screen background
+  - Created glassmorphism effect with backdrop-blur and semi-transparent elements
+  - Updated all text and form elements to white for visibility
+  - Enhanced UI with professional railway operations branding
+  - Added static file serving for attached assets in server configuration
 
 ## User Preferences
 
