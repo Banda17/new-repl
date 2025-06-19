@@ -101,6 +101,12 @@ The system follows a modern full-stack architecture with clear separation of con
   - Updated all text and form elements to white for visibility
   - Enhanced UI with professional railway operations branding
   - Added static file serving for attached assets in server configuration
+- June 19, 2025. Enhanced dashboard readability with hybrid glassmorphic design:
+  - Fixed chart text colors to white for better visibility against glassmorphic backgrounds
+  - Updated chart axes, grid lines, and legends with white/transparent styling
+  - Implemented clean white table backgrounds with dark text for optimal readability
+  - Maintained glassmorphic card containers while ensuring data tables remain highly readable
+  - Balanced aesthetic appeal with practical usability for data analysis
 
 ## User Preferences
 

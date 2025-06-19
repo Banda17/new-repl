@@ -558,92 +558,92 @@ export default function DashboardPage() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
               ) : comparativeData ? (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto bg-white rounded-lg">
                   <Table>
                     <TableHeader>
-                      <TableRow className="bg-white/10 border-white/20">
-                        <TableHead rowSpan={2} className="border border-white/30 text-center font-bold bg-blue-900/30 text-white">
+                      <TableRow className="bg-gray-50">
+                        <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50 text-gray-800">
                           Commodity
                         </TableHead>
-                        <TableHead colSpan={5} className="border border-white/30 text-center font-bold bg-green-900/30 text-white">
+                        <TableHead colSpan={5} className="border text-center font-bold bg-green-50 text-gray-800">
                           {comparativeData.periods.current}
                         </TableHead>
-                        <TableHead colSpan={5} className="border border-white/30 text-center font-bold bg-yellow-900/30 text-white">
+                        <TableHead colSpan={5} className="border text-center font-bold bg-yellow-50 text-gray-800">
                           {comparativeData.periods.previous}
                         </TableHead>
-                        <TableHead colSpan={2} className="border border-white/30 text-center font-bold bg-red-900/30 text-white">
+                        <TableHead colSpan={2} className="border text-center font-bold bg-red-50 text-gray-800">
                           Change
                         </TableHead>
                       </TableRow>
-                      <TableRow className="bg-white/5 border-white/20">
-                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Rks</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Avg/Day</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Wagons</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Million MT</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-green-900/20 text-white">Freight (₹)</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Rks</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Avg/Day</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Wagons</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Million MT</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-yellow-900/20 text-white">Freight (₹)</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-red-900/20 text-white">in Million MT</TableHead>
-                        <TableHead className="border border-white/30 text-center text-xs bg-red-900/20 text-white">in %age</TableHead>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Freight (₹)</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Freight (₹)</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {comparativeData.data.map((row, index) => (
-                        <TableRow key={row.commodity} className={index % 2 === 0 ? "bg-white/10 border-white/20" : "bg-white/5 border-white/20"}>
-                          <TableCell className="border border-white/30 font-medium text-left pl-3 text-white">
+                        <TableRow key={row.commodity} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <TableCell className="border font-medium text-left pl-3 text-gray-800">
                             {row.commodity}
                           </TableCell>
                           
                           {/* Current Period Data */}
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {formatNumber(row.currentPeriod.rks)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {(row.currentPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {formatNumber(row.currentPeriod.wagons)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm font-medium text-white">
+                          <TableCell className="border text-center text-sm font-medium text-gray-700">
                             {(row.currentPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             ₹{formatNumber(row.currentPeriod.freight)}
                           </TableCell>
                           
                           {/* Previous Period Data */}
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {formatNumber(row.previousPeriod.rks)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {(row.previousPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             {formatNumber(row.previousPeriod.wagons)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm font-medium text-white">
+                          <TableCell className="border text-center text-sm font-medium text-gray-700">
                             {(row.previousPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border border-white/30 text-center text-sm text-white">
+                          <TableCell className="border text-center text-sm text-gray-700">
                             ₹{formatNumber(row.previousPeriod.freight)}
                           </TableCell>
                           
                           {/* Change Data */}
-                          <TableCell className={`border border-white/30 text-center text-sm font-medium text-white ${getChangeColor(row.changeInMT)}`}>
+                          <TableCell className={`border text-center text-sm font-medium ${getChangeColor(row.changeInMT)}`}>
                             {row.changeInMT > 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className={`border border-white/30 text-center text-sm font-bold text-white ${getChangeColor(row.changeInPercentage)}`}>
+                          <TableCell className={`border text-center text-sm font-bold ${getChangeColor(row.changeInPercentage)}`}>
                             {row.changeInPercentage > 0 ? '+' : ''}{row.changeInPercentage}%
                           </TableCell>
                         </TableRow>
                       ))}
                       
                       {/* Total Row */}
-                      <TableRow className="bg-blue-900/40 border-t-2 border-white/50 font-bold">
-                        <TableCell className="border border-white/30 font-bold text-left pl-3 bg-blue-900/50 text-white">
+                      <TableRow className="bg-blue-100 border-t-2 border-blue-300 font-bold">
+                        <TableCell className="border font-bold text-left pl-3 bg-blue-200 text-gray-800">
                           TOTAL
                         </TableCell>
                         
