@@ -128,15 +128,6 @@ function Navigation() {
         </DropdownMenu>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
-          {user?.isAdmin && (
-            <Button 
-              variant="ghost"
-              onClick={() => navigate("/auth")}
-              className="text-white/90 hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4"
-            >
-              Users
-            </Button>
-          )}
           <Button 
             variant="ghost"
             onClick={handleLogout}
@@ -206,9 +197,7 @@ function App() {
         <Route path="/upload">
           {() => <DataUploadPage />}
         </Route>
-        <Route path="/auth">
-          {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
-        </Route>
+
         <Route>
           {() => <NotFound />}
         </Route>
