@@ -358,7 +358,7 @@ export default function DashboardPage() {
                     size="sm"
                     onClick={exportYearlyComparisonPDF}
                     disabled={!commodityData || !stationData}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
                   >
                     <Download className="h-4 w-4" />
                     Export PDF
@@ -367,7 +367,7 @@ export default function DashboardPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowAllCommodities(!showAllCommodities)}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
                   >
                     {showAllCommodities ? (
                       <>
@@ -450,7 +450,7 @@ export default function DashboardPage() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowAllStations(!showAllStations)}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
                 >
                   {showAllStations ? (
                     <>
@@ -465,7 +465,7 @@ export default function DashboardPage() {
                   )}
                 </Button>
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white/80">
                 {showAllStations 
                   ? "Displaying all stations sorted by total tonnage" 
                   : "Displaying top 5 stations by total tonnage. Click 'Show All' to see more."
@@ -476,7 +476,7 @@ export default function DashboardPage() {
               {isLoadingStations ? (
                 <div className="h-96 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <p className="ml-3 text-muted-foreground">Loading station data...</p>
+                  <p className="ml-3 text-white/80">Loading station data...</p>
                 </div>
               ) : (
                 <div className="h-96">
