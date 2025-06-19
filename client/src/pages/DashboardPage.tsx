@@ -703,13 +703,13 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
 
-          {/* Station Comparative Loading Table (May 26-31) */}
+          {/* Station Comparative Loading Table */}
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Table2 className="h-5 w-5" />
-                  Station wise Comparative Loading (May 26-31)
+                  Station wise Comparative Loading
                 </div>
                 <Button
                   onClick={exportStationComparativePDF}

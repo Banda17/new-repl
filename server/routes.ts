@@ -2819,29 +2819,63 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Station-wise comparative loading data endpoint for May 26-31 period
+  // Station-wise comparative loading data endpoint (same period as commodity comparative)
   app.get("/api/station-comparative-loading", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
     }
     
     try {
-      const currentYear = new Date().getFullYear();
+      // Use exact same logic as commodity comparative endpoint
+      const today = new Date();
+      const currentYear = today.getFullYear();
       const previousYear = currentYear - 1;
+      const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
       
-      // May 26-31 periods
-      const currentPeriodStart = new Date(currentYear, 4, 26); // May 26 current year
-      const currentPeriodEnd = new Date(currentYear, 4, 31);   // May 31 current year
-      const previousPeriodStart = new Date(previousYear, 4, 26); // May 26 previous year
-      const previousPeriodEnd = new Date(previousYear, 4, 31);   // May 31 previous year
+      let currentPeriodStart: Date;
+      let currentPeriodEnd: Date;
+      
+      // Same weekly pattern as commodity comparative:
+      // - On Monday: show previous week (Monday to Sunday)
+      // - On Tuesday-Sunday: show current week Monday to previous day
+      if (currentDay === 1) { // Monday
+        // Show previous week (Monday to Sunday)
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() - 7); // Previous Monday
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous Sunday
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      } else {
+        // Show current week Monday to previous day
+        const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() + mondayOffset);
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous day
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      }
+      
+      // Calculate the same period in previous year
+      const previousPeriodStart = new Date(previousYear, currentPeriodStart.getMonth(), currentPeriodStart.getDate());
+      const previousPeriodEnd = new Date(previousYear, currentPeriodEnd.getMonth(), currentPeriodEnd.getDate());
 
+      // Format dates for period labels (same as commodity comparative)
       const formatDate = (date: Date) => {
-        return date.toLocaleDateString('en-GB', { 
-          day: '2-digit', 
+        return date.toLocaleDateString('en-GB', {
+          day: '2-digit',
           month: '2-digit', 
-          year: 'numeric' 
-        });
+          year: 'numeric'
+        }).replace(/\//g, '-');
       };
+      
+      const currentPeriodStartFormatted = formatDate(currentPeriodStart);
+      const currentPeriodEndFormatted = formatDate(currentPeriodEnd);
+      const previousPeriodStartFormatted = formatDate(previousPeriodStart);
+      const previousPeriodEndFormatted = formatDate(previousPeriodEnd);
 
       // Fetch current period data
       const currentData = await db.select()
@@ -2859,15 +2893,16 @@ export function registerRoutes(app: Express): Server {
           lte(railwayLoadingOperations.pDate, previousPeriodEnd)
         ));
 
-      const currentDays = 6; // May 26-31 = 6 days
-      const previousDays = 6; // May 26-31 = 6 days
+      // Calculate days in period
+      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1; // May 26-31 = 6 days
 
       const stationComparison = generateStationComparison(currentData, previousData, currentDays, previousDays);
 
       const responseData = {
         periods: {
-          current: `${formatDate(currentPeriodStart)} to ${formatDate(currentPeriodEnd)}`,
-          previous: `${formatDate(previousPeriodStart)} to ${formatDate(previousPeriodEnd)}`
+          current: `${currentPeriodStartFormatted} to ${currentPeriodEndFormatted}`,
+          previous: `${previousPeriodStartFormatted} to ${previousPeriodEndFormatted}`
         },
         data: stationComparison.sort((a, b) => b.currentMT - a.currentMT),
         totals: stationComparison.reduce((acc, item) => ({
