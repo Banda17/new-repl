@@ -383,7 +383,7 @@ export default function DashboardPage() {
                   </Button>
                 </div>
               </CardTitle>
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-white/80">
                 {showAllCommodities 
                   ? "Displaying all commodities sorted by total tonnage" 
                   : "Displaying top 5 commodities by total tonnage. Click 'Show All' to see more."
@@ -394,7 +394,7 @@ export default function DashboardPage() {
               {isLoadingCommodities ? (
                 <div className="h-96 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                  <p className="ml-3 text-muted-foreground">Loading commodity data...</p>
+                  <p className="ml-3 text-white/80">Loading commodity data...</p>
                 </div>
               ) : (
                 <div className="h-96">
