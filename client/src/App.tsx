@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import AuthPage from "./pages/AuthPage";
+import Landing from "./pages/Landing";
 import DetentionForm from "./pages/DetentionForm";
 import HistoricalRecords from "./pages/HistoricalRecords";
 import DashboardPage from "./pages/DashboardPage";
@@ -17,7 +17,7 @@ import GoodsTabPage from "./pages/GoodsTabPage";
 import CoachingTabPage from "./pages/CoachingTabPage";
 import PlanningTabPage from "./pages/PlanningTabPage";
 import DataUploadPage from "./pages/DataUploadPage";
-import { useUser } from "./hooks/use-user";
+import { useAuth } from "./hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,23 +29,11 @@ import StationComparativePage from "./pages/StationComparativePage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
-  const { logout, user } = useUser();
+  const { isAuthenticated, user } = useAuth();
   const { toast } = useToast();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      toast({
-        title: "Success",
-        description: "You have been logged out successfully",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const handleLogout = () => {
+    window.location.href = "/api/logout";
   };
 
   return (
@@ -163,20 +151,7 @@ function Navigation() {
 }
 
 function App() {
-  const { user, isLoading } = useUser();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    const prefetchDetentionData = async () => {
-      //  Implementation to prefetch detention data here.  This will depend on your data fetching mechanism.
-      // Example using react-query:
-      // await queryClient.prefetchQuery(['detentions'], fetchDetentionData);
-    };
-
-    if (user) { //Only prefetch if user is logged in
-      prefetchDetentionData();
-    }
-  }, [user, queryClient]);
+  const { user, isLoading, isAuthenticated } = useAuth();
 
   if (isLoading) {
     return (
@@ -186,8 +161,8 @@ function App() {
     );
   }
 
-  if (!user) {
-    return <AuthPage />;
+  if (!isAuthenticated) {
+    return <Landing />;
   }
 
   return (
