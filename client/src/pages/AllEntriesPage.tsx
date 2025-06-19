@@ -195,8 +195,8 @@ export default function AllEntriesPage() {
     <div className="container mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">All Railway Loading Operations</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-3xl font-bold tracking-tight text-white">All Railway Loading Operations</h1>
+          <p className="text-white/80">
             View and search through all railway loading operation entries
           </p>
         </div>
@@ -217,10 +217,10 @@ export default function AllEntriesPage() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
         <CardHeader>
-          <CardTitle>Filters & Search</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-white">Filters & Search</CardTitle>
+          <CardDescription className="text-white/80">
             Filter and search through {totalRecords.toLocaleString()} total records
           </CardDescription>
         </CardHeader>

@@ -327,12 +327,12 @@ export default function DashboardPage() {
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center gap-2 mb-4">
-        <Activity className="h-6 w-6" />
-        <h1 className="text-2xl font-bold">Operating Dashboard</h1>
+        <Activity className="h-6 w-6 text-white" />
+        <h1 className="text-2xl font-bold text-white">Operating Dashboard</h1>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 bg-blue-900/20 backdrop-blur-lg border border-white/20">
           <TabsTrigger value="charts" className="flex items-center gap-2">
             <BarChart3 className="h-4 w-4" />
             Charts
@@ -345,9 +345,9 @@ export default function DashboardPage() {
 
         <TabsContent value="charts" className="space-y-6">
           {/* Commodity Loading Chart */}
-          <Card>
+          <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
                   Yearly Commodity Loading Comparison (MT)
@@ -439,9 +439,9 @@ export default function DashboardPage() {
           </Card>
 
           {/* Station Loading Chart */}
-          <Card>
+          <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex items-center justify-between text-white">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-5 w-5" />
                   Yearly Station Loading Comparison (MT)
