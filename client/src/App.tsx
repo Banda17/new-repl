@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Landing from "./pages/Landing";
+import AuthPage from "./pages/AuthPage";
 import DetentionForm from "./pages/DetentionForm";
 import HistoricalRecords from "./pages/HistoricalRecords";
 import DashboardPage from "./pages/DashboardPage";
@@ -17,7 +17,7 @@ import GoodsTabPage from "./pages/GoodsTabPage";
 import CoachingTabPage from "./pages/CoachingTabPage";
 import PlanningTabPage from "./pages/PlanningTabPage";
 import DataUploadPage from "./pages/DataUploadPage";
-import { useAuth } from "./hooks/useAuth";
+import { useUser } from "./hooks/use-user";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -29,11 +29,23 @@ import StationComparativePage from "./pages/StationComparativePage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
-  const { isAuthenticated, user } = useAuth();
+  const { logout, user } = useUser();
   const { toast } = useToast();
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Success",
+        description: "You have been logged out successfully",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -128,6 +140,15 @@ function Navigation() {
         </DropdownMenu>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-4">
+          {user?.isAdmin && (
+            <Button 
+              variant="ghost"
+              onClick={() => navigate("/auth")}
+              className="text-white/90 hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4"
+            >
+              Users
+            </Button>
+          )}
           <Button 
             variant="ghost"
             onClick={handleLogout}
@@ -142,7 +163,20 @@ function Navigation() {
 }
 
 function App() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading } = useUser();
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    const prefetchDetentionData = async () => {
+      //  Implementation to prefetch detention data here.  This will depend on your data fetching mechanism.
+      // Example using react-query:
+      // await queryClient.prefetchQuery(['detentions'], fetchDetentionData);
+    };
+
+    if (user) { //Only prefetch if user is logged in
+      prefetchDetentionData();
+    }
+  }, [user, queryClient]);
 
   if (isLoading) {
     return (
@@ -152,8 +186,8 @@ function App() {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Landing />;
+  if (!user) {
+    return <AuthPage />;
   }
 
   return (
@@ -197,7 +231,9 @@ function App() {
         <Route path="/upload">
           {() => <DataUploadPage />}
         </Route>
-
+        <Route path="/auth">
+          {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
+        </Route>
         <Route>
           {() => <NotFound />}
         </Route>

@@ -5,8 +5,7 @@ import { detentions, interchangeData } from "@db/schema";
 import PDFDocument from "pdfkit";
 import { format as formatDate, parse } from "date-fns"; //Import parse function
 import { eq, and, gte, lte, desc } from "drizzle-orm";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { storage } from "./storage";
+import { setupAuth } from "./auth";
 import { createSheetDataTransformer } from "./services/sheets";
 import bodyParser from "body-parser";
 import multer from "multer";
@@ -487,21 +486,9 @@ function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
   }
 }
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
-    try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
-    }
-  });
+export function registerRoutes(app: Express): Server {
+  // Setup authentication routes and middleware
+  setupAuth(app);
 
   // Configure body parser with increased limits for report generation
   app.use(bodyParser.json({ limit: '100mb' }));
