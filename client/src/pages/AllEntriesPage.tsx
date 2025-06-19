@@ -201,6 +201,10 @@ export default function AllEntriesPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Button variant="outline" onClick={exportAllEntriesPDF}>
+            <FileTextIcon className="w-4 h-4 mr-2" />
+            Export PDF
+          </Button>
           <Button variant="outline" onClick={() => handleExport('csv')}>
             <DownloadIcon className="w-4 h-4 mr-2" />
             Export CSV

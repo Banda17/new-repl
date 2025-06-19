@@ -549,16 +549,69 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).send("Not authenticated");
       }
 
-      // Fetch comparative loading data
-      const response = await fetch(`${req.protocol}://${req.get('host')}/api/comparative-loading`, {
-        headers: { 'Cookie': req.headers.cookie || '' }
-      });
+      // Generate comparative loading data directly from database
+      const currentDate = new Date();
+      const currentYear = currentDate.getFullYear();
+      const previousYear = currentYear - 1;
       
-      if (!response.ok) {
-        throw new Error('Failed to fetch comparative loading data');
-      }
-      
-      const data = await response.json();
+      const currentPeriodStart = new Date(currentYear, 5, 16); // June 16 current year
+      const currentPeriodEnd = new Date(currentYear, 5, 18);   // June 18 current year
+      const previousPeriodStart = new Date(previousYear, 5, 16); // June 16 previous year
+      const previousPeriodEnd = new Date(previousYear, 5, 18);   // June 18 previous year
+
+      const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-GB', { 
+          day: '2-digit', 
+          month: '2-digit', 
+          year: 'numeric' 
+        });
+      };
+
+      // Fetch current period data
+      const currentData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, currentPeriodStart),
+          lte(railwayLoadingOperations.pDate, currentPeriodEnd)
+        ));
+
+      // Fetch previous period data
+      const previousData = await db.select()
+        .from(railwayLoadingOperations)
+        .where(and(
+          gte(railwayLoadingOperations.pDate, previousPeriodStart),
+          lte(railwayLoadingOperations.pDate, previousPeriodEnd)
+        ));
+
+      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+
+      const commodityComparison = generateCommodityComparison(currentData, previousData, currentDays, previousDays);
+
+      const data = {
+        periods: {
+          current: `${formatDate(currentPeriodStart)} to ${formatDate(currentPeriodEnd)}`,
+          previous: `${formatDate(previousPeriodStart)} to ${formatDate(previousPeriodEnd)}`
+        },
+        data: commodityComparison,
+        totals: commodityComparison.reduce((acc, item) => ({
+          currentPeriod: {
+            rks: acc.currentPeriod.rks + item.currentRks,
+            wagons: acc.currentPeriod.wagons + item.currentWagon,
+            tonnage: acc.currentPeriod.tonnage + item.currentMT,
+            freight: acc.currentPeriod.freight + item.currentFreight
+          },
+          previousPeriod: {
+            rks: acc.previousPeriod.rks + item.compareRks,
+            wagons: acc.previousPeriod.wagons + item.compareWagon,
+            tonnage: acc.previousPeriod.tonnage + item.compareMT,
+            freight: acc.previousPeriod.freight + item.compareFreight
+          }
+        }), {
+          currentPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0 },
+          previousPeriod: { rks: 0, wagons: 0, tonnage: 0, freight: 0 }
+        })
+      };
 
       // Generate PDF
       const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
@@ -584,22 +637,29 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).send("Not authenticated");
       }
 
-      // Fetch both commodity and station data
-      const [commodityResponse, stationResponse] = await Promise.all([
-        fetch(`${req.protocol}://${req.get('host')}/api/yearly-loading-commodities`, {
-          headers: { 'Cookie': req.headers.cookie || '' }
-        }),
-        fetch(`${req.protocol}://${req.get('host')}/api/yearly-loading-stations`, {
-          headers: { 'Cookie': req.headers.cookie || '' }
-        })
-      ]);
+      // Fetch yearly commodity data directly from database
+      const commodityData = await db.select({
+        year: sql<string>`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})::text`,
+        commodity: railwayLoadingOperations.commodity,
+        totalTonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`,
+        totalWagons: sql<number>`SUM(${railwayLoadingOperations.wagons})`,
+        totalFreight: sql<number>`SUM(${railwayLoadingOperations.freight})`
+      })
+      .from(railwayLoadingOperations)
+      .groupBy(sql`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})`, railwayLoadingOperations.commodity)
+      .orderBy(sql`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})`, railwayLoadingOperations.commodity);
 
-      if (!commodityResponse.ok || !stationResponse.ok) {
-        throw new Error('Failed to fetch yearly comparison data');
-      }
-
-      const commodityData = await commodityResponse.json();
-      const stationData = await stationResponse.json();
+      // Fetch yearly station data directly from database
+      const stationData = await db.select({
+        year: sql<string>`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})::text`,
+        station: railwayLoadingOperations.station,
+        totalTonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`,
+        totalWagons: sql<number>`SUM(${railwayLoadingOperations.wagons})`,
+        totalFreight: sql<number>`SUM(${railwayLoadingOperations.freight})`
+      })
+      .from(railwayLoadingOperations)
+      .groupBy(sql`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})`, railwayLoadingOperations.station)
+      .orderBy(sql`EXTRACT(YEAR FROM ${railwayLoadingOperations.pDate})`, railwayLoadingOperations.station);
 
       // Generate PDF
       const doc = new PDFDocument({ margin: 30 });
