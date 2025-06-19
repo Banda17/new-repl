@@ -602,7 +602,7 @@ export default function DashboardPage() {
                             {formatNumber(row.currentPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
-                            {formatNumber(row.currentPeriod.avgPerDay)}
+                            {(row.currentPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
                             {formatNumber(row.currentPeriod.wagons)}
@@ -619,7 +619,7 @@ export default function DashboardPage() {
                             {formatNumber(row.previousPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
-                            {formatNumber(row.previousPeriod.avgPerDay)}
+                            {(row.previousPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
                           <TableCell className="border text-center text-sm">
                             {formatNumber(row.previousPeriod.wagons)}
@@ -652,7 +652,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.currentPeriod.rks)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {formatNumber(comparativeData.totals.currentPeriod.avgPerDay)}
+                          {(comparativeData.totals.currentPeriod.avgPerDay || 0).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           {formatNumber(comparativeData.totals.currentPeriod.wagons)}
@@ -669,7 +669,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.previousPeriod.rks)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {formatNumber(comparativeData.totals.previousPeriod.avgPerDay)}
+                          {(comparativeData.totals.previousPeriod.avgPerDay || 0).toFixed(2)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           {formatNumber(comparativeData.totals.previousPeriod.wagons)}
