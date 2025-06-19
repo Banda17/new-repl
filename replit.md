@@ -89,6 +89,12 @@ The system follows a modern full-stack architecture with clear separation of con
   - Created backend PDF generation functions using PDFKit library
   - Fixed authentication issues by implementing direct database queries for PDF exports
   - Added three new API endpoints: /api/exports/comparative-loading-pdf, /api/exports/yearly-comparison-pdf, /api/exports/all-entries-pdf
+- June 19, 2025. Added station-wise comparative loading report for May 26-31 period:
+  - Created new API endpoint /api/station-comparative-loading for specific date range comparison
+  - Built dedicated StationComparativePage component with detailed tabular display
+  - Added PDF export functionality matching the format of user's reference document
+  - Integrated navigation link in Operations dropdown menu
+  - Implemented proper data validation and numeric safety handling
 
 ## User Preferences
 

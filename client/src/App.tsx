@@ -222,6 +222,9 @@ function App() {
         <Route path="/excel-upload">
           {() => <ExcelUploadPage />}
         </Route>
+        <Route path="/station-comparative">
+          {() => <StationComparativePage />}
+        </Route>
         <Route path="/historical">
           {() => <HistoricalRecords />}
         </Route>
