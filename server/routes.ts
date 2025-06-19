@@ -2251,7 +2251,7 @@ export function registerRoutes(app: Express): Server {
       const currentPeriodData = await db.execute(sql`
         SELECT 
           commodity,
-          COUNT(DISTINCT CONCAT(rr_date, '-', rr_no_from, '-', rr_no_to)) as rks,
+          COUNT(*) as rks,
           COUNT(*) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
@@ -2261,9 +2261,6 @@ export function registerRoutes(app: Express): Server {
           AND p_date <= ${currentPeriodEnd.toISOString().split('T')[0]}
           AND commodity IS NOT NULL
           AND commodity != ''
-          AND rr_date IS NOT NULL
-          AND rr_no_from IS NOT NULL
-          AND rr_no_to IS NOT NULL
         GROUP BY commodity
         ORDER BY total_tonnage DESC
       `);
@@ -2272,7 +2269,7 @@ export function registerRoutes(app: Express): Server {
       const previousPeriodData = await db.execute(sql`
         SELECT 
           commodity,
-          COUNT(DISTINCT CONCAT(rr_date, '-', rr_no_from, '-', rr_no_to)) as rks,
+          COUNT(*) as rks,
           COUNT(*) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
@@ -2282,9 +2279,6 @@ export function registerRoutes(app: Express): Server {
           AND p_date <= ${previousPeriodEnd.toISOString().split('T')[0]}
           AND commodity IS NOT NULL
           AND commodity != ''
-          AND rr_date IS NOT NULL
-          AND rr_no_from IS NOT NULL
-          AND rr_no_to IS NOT NULL
         GROUP BY commodity
       `);
       
