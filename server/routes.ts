@@ -3383,12 +3383,12 @@ function generateDailyReportPDF(doc: typeof PDFDocument, currentData: any[], com
   stationData.forEach((row) => {
     doc.text(row.station, 50, y, { width: 30 });
     doc.text(row.currentRks.toString(), 85, y, { width: 30 });
-    doc.text(row.currentAvgDay.toString(), 120, y, { width: 30 });
+    doc.text(row.currentAvgPerDay.toString(), 120, y, { width: 30 });
     doc.text(row.currentWagon.toString(), 155, y, { width: 30 });
     doc.text(row.currentMT.toString(), 190, y, { width: 30 });
     doc.text(row.currentFreight.toString(), 225, y, { width: 30 });
     doc.text(row.compareRks.toString(), 260, y, { width: 30 });
-    doc.text(row.compareAvgDay.toString(), 295, y, { width: 30 });
+    doc.text(row.compareAvgPerDay.toString(), 295, y, { width: 30 });
     doc.text(row.compareWagon.toString(), 330, y, { width: 30 });
     doc.text(row.compareMT.toString(), 365, y, { width: 30 });
     doc.text(row.compareFreight.toString(), 400, y, { width: 30 });
