@@ -2252,7 +2252,7 @@ export function registerRoutes(app: Express): Server {
         SELECT 
           commodity,
           COUNT(*) as rks,
-          COUNT(*) as total_wagons,
+          SUM(wagons) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
           SUM(freight) as total_freight
@@ -2270,7 +2270,7 @@ export function registerRoutes(app: Express): Server {
         SELECT 
           commodity,
           COUNT(*) as rks,
-          COUNT(*) as total_wagons,
+          SUM(wagons) as total_wagons,
           SUM(units) as total_units,
           SUM(tonnage) as total_tonnage,
           SUM(freight) as total_freight
@@ -2289,7 +2289,7 @@ export function registerRoutes(app: Express): Server {
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInCurrentPeriod > 0 ? Math.round((Number(row.rks) || 0) / daysInCurrentPeriod * 100) / 100 : 0,
+          avgPerDay: daysInCurrentPeriod > 0 ? (Number(row.rks) || 0) / daysInCurrentPeriod : 0,
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
@@ -2302,7 +2302,7 @@ export function registerRoutes(app: Express): Server {
         previousMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInPreviousPeriod > 0 ? Math.round((Number(row.rks) || 0) / daysInPreviousPeriod * 100) / 100 : 0,
+          avgPerDay: daysInPreviousPeriod > 0 ? (Number(row.rks) || 0) / daysInPreviousPeriod : 0,
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
