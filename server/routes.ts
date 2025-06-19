@@ -141,6 +141,219 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
   }
 }
 
+function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
+  try {
+    doc.fontSize(20).text("Comparative Loading Analysis Report", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
+    doc.fontSize(10).text(`Period: ${data.periods.current} vs ${data.periods.previous}`, { align: "right" });
+    doc.moveDown(2);
+
+    // Table headers
+    const headers = ['Commodity', 'Current RKS', 'Current Avg/Day', 'Current Wagons', 'Current MT', 'Current Freight (₹)', 
+                    'Previous RKS', 'Previous Avg/Day', 'Previous Wagons', 'Previous MT', 'Previous Freight (₹)', 'Change %'];
+    
+    doc.fontSize(8);
+    let yPosition = doc.y;
+    const columnWidth = 45;
+    
+    // Draw headers
+    headers.forEach((header, index) => {
+      doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+    });
+    
+    yPosition += 20;
+    doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
+    yPosition += 5;
+
+    // Draw data rows
+    data.data.forEach((row: any, rowIndex: number) => {
+      if (yPosition > 700) {
+        doc.addPage();
+        yPosition = 50;
+      }
+
+      const values = [
+        row.commodity,
+        row.currentPeriod.rks.toString(),
+        row.currentPeriod.avgPerDay.toFixed(2),
+        row.currentPeriod.wagons.toString(),
+        (row.currentPeriod.tonnage / 1000000).toFixed(2),
+        `₹${(row.currentPeriod.freight / 10000000).toFixed(1)}Cr`,
+        row.previousPeriod.rks.toString(),
+        row.previousPeriod.avgPerDay.toFixed(2),
+        row.previousPeriod.wagons.toString(),
+        (row.previousPeriod.tonnage / 1000000).toFixed(2),
+        `₹${(row.previousPeriod.freight / 10000000).toFixed(1)}Cr`,
+        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage.toFixed(1)}%`
+      ];
+
+      values.forEach((value, index) => {
+        doc.text(value, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+      });
+      
+      yPosition += 15;
+    });
+
+    console.log("Comparative loading PDF generation completed");
+  } catch (error) {
+    console.error("Error in generateComparativeLoadingPDF:", error);
+    throw error;
+  }
+}
+
+function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any[], stationData: any[]) {
+  try {
+    doc.fontSize(20).text("Yearly Comparison Report", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
+    doc.moveDown(2);
+
+    // Commodity Summary
+    doc.fontSize(16).text("Commodity-wise Loading Summary", { underline: true });
+    doc.moveDown();
+    
+    const commodityHeaders = ['Commodity', 'Total Wagons', 'Total Tonnage (MT)', 'Total Freight (₹ Cr)'];
+    doc.fontSize(10);
+    let yPosition = doc.y;
+    const colWidth = 120;
+    
+    commodityHeaders.forEach((header, index) => {
+      doc.text(header, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+    });
+    
+    yPosition += 20;
+    doc.moveTo(50, yPosition).lineTo(530, yPosition).stroke();
+    yPosition += 5;
+
+    commodityData.forEach((item: any) => {
+      if (yPosition > 700) {
+        doc.addPage();
+        yPosition = 50;
+      }
+
+      const values = [
+        item.commodity,
+        item.totalWagons.toLocaleString(),
+        (item.totalTonnage / 1000000).toFixed(2),
+        `₹${(item.totalFreight / 10000000).toFixed(1)}`
+      ];
+
+      values.forEach((value, index) => {
+        doc.text(value, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+      });
+      
+      yPosition += 15;
+    });
+
+    // Station Summary
+    if (yPosition > 600) {
+      doc.addPage();
+      yPosition = 50;
+    } else {
+      yPosition += 30;
+    }
+
+    doc.fontSize(16).text("Station-wise Loading Summary", yPosition, { underline: true });
+    yPosition += 30;
+    
+    const stationHeaders = ['Station', 'Total Wagons', 'Total Tonnage (MT)', 'Total Freight (₹ Cr)'];
+    
+    stationHeaders.forEach((header, index) => {
+      doc.text(header, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+    });
+    
+    yPosition += 20;
+    doc.moveTo(50, yPosition).lineTo(530, yPosition).stroke();
+    yPosition += 5;
+
+    stationData.forEach((item: any) => {
+      if (yPosition > 700) {
+        doc.addPage();
+        yPosition = 50;
+      }
+
+      const values = [
+        item.station,
+        item.totalWagons.toLocaleString(),
+        (item.totalTonnage / 1000000).toFixed(2),
+        `₹${(item.totalFreight / 10000000).toFixed(1)}`
+      ];
+
+      values.forEach((value, index) => {
+        doc.text(value, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+      });
+      
+      yPosition += 15;
+    });
+
+    console.log("Yearly comparison PDF generation completed");
+  } catch (error) {
+    console.error("Error in generateYearlyComparisonPDF:", error);
+    throw error;
+  }
+}
+
+function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
+  try {
+    doc.fontSize(20).text("Railway Loading Operations - All Entries", { align: "center" });
+    doc.moveDown();
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
+    doc.fontSize(10).text(`Total Records: ${entries.length}`, { align: "right" });
+    doc.moveDown(2);
+
+    const headers = ['Date', 'Station', 'Commodity', 'Wagons', 'Tonnage', 'Freight (₹)', 'RR No.'];
+    doc.fontSize(8);
+    let yPosition = doc.y;
+    const columnWidth = 75;
+    
+    // Draw headers
+    headers.forEach((header, index) => {
+      doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+    });
+    
+    yPosition += 20;
+    doc.moveTo(50, yPosition).lineTo(575, yPosition).stroke();
+    yPosition += 5;
+
+    entries.forEach((entry: any) => {
+      if (yPosition > 700) {
+        doc.addPage();
+        yPosition = 50;
+        
+        // Redraw headers on new page
+        headers.forEach((header, index) => {
+          doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+        });
+        yPosition += 20;
+        doc.moveTo(50, yPosition).lineTo(575, yPosition).stroke();
+        yPosition += 5;
+      }
+
+      const values = [
+        new Date(entry.pDate).toLocaleDateString(),
+        entry.station,
+        entry.commodity,
+        entry.wagons.toString(),
+        entry.tonnage.toLocaleString(),
+        `₹${(entry.freight / 100000).toFixed(1)}L`,
+        `${entry.rrNoFrom}-${entry.rrNoTo}`
+      ];
+
+      values.forEach((value, index) => {
+        doc.text(value, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+      });
+      
+      yPosition += 12;
+    });
+
+    console.log("All entries PDF generation completed");
+  } catch (error) {
+    console.error("Error in generateAllEntriesPDF:", error);
+    throw error;
+  }
+}
+
 export function registerRoutes(app: Express): Server {
   // Setup authentication routes and middleware
   setupAuth(app);
@@ -324,6 +537,118 @@ export function registerRoutes(app: Express): Server {
       console.error("Error creating loading operation:", error);
       res.status(500).json({
         error: "Failed to create loading operation",
+        details: error.message
+      });
+    }
+  });
+
+  // PDF Export Endpoints for Tables and Reports
+  app.get("/api/exports/comparative-loading-pdf", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      // Fetch comparative loading data
+      const response = await fetch(`${req.protocol}://${req.get('host')}/api/comparative-loading`, {
+        headers: { 'Cookie': req.headers.cookie || '' }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch comparative loading data');
+      }
+      
+      const data = await response.json();
+
+      // Generate PDF
+      const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="comparative-loading-report.pdf"');
+      
+      doc.pipe(res);
+      generateComparativeLoadingPDF(doc, data);
+      doc.end();
+
+    } catch (error: any) {
+      console.error("Error generating comparative loading PDF:", error);
+      res.status(500).json({
+        error: "Failed to generate PDF",
+        details: error.message
+      });
+    }
+  });
+
+  app.get("/api/exports/yearly-comparison-pdf", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      // Fetch both commodity and station data
+      const [commodityResponse, stationResponse] = await Promise.all([
+        fetch(`${req.protocol}://${req.get('host')}/api/yearly-loading-commodities`, {
+          headers: { 'Cookie': req.headers.cookie || '' }
+        }),
+        fetch(`${req.protocol}://${req.get('host')}/api/yearly-loading-stations`, {
+          headers: { 'Cookie': req.headers.cookie || '' }
+        })
+      ]);
+
+      if (!commodityResponse.ok || !stationResponse.ok) {
+        throw new Error('Failed to fetch yearly comparison data');
+      }
+
+      const commodityData = await commodityResponse.json();
+      const stationData = await stationResponse.json();
+
+      // Generate PDF
+      const doc = new PDFDocument({ margin: 30 });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'attachment; filename="yearly-comparison-report.pdf"');
+      
+      doc.pipe(res);
+      generateYearlyComparisonPDF(doc, commodityData, stationData);
+      doc.end();
+
+    } catch (error: any) {
+      console.error("Error generating yearly comparison PDF:", error);
+      res.status(500).json({
+        error: "Failed to generate PDF",
+        details: error.message
+      });
+    }
+  });
+
+  app.get("/api/exports/all-entries-pdf", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      const { page = 1, limit = 1000 } = req.query;
+      const offset = (Number(page) - 1) * Number(limit);
+
+      // Fetch railway loading operations data
+      const entries = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .orderBy(desc(railwayLoadingOperations.pDate))
+        .limit(Number(limit))
+        .offset(offset);
+
+      // Generate PDF
+      const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="railway-entries-page-${page}.pdf"`);
+      
+      doc.pipe(res);
+      generateAllEntriesPDF(doc, entries);
+      doc.end();
+
+    } catch (error: any) {
+      console.error("Error generating all entries PDF:", error);
+      res.status(500).json({
+        error: "Failed to generate PDF",
         details: error.message
       });
     }
@@ -2286,7 +2611,7 @@ export function registerRoutes(app: Express): Server {
       const currentMap = new Map();
       currentPeriodData.rows.forEach(row => {
         const daysInCurrentPeriod = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-        console.log(`Current period - ${row.commodity}: rks=${row.rks}, wagons=${row.total_wagons}, tonnage=${row.total_tonnage}`);
+
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
