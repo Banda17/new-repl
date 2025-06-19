@@ -97,7 +97,7 @@ export default function AuthPage() {
       {/* Background overlay for better readability */}
       <div className="absolute inset-0 bg-black/30"></div>
       
-      <Card className="w-full max-w-md relative z-10 backdrop-blur-md bg-white/10 border-white/20 shadow-2xl">
+      <Card className="w-full max-w-md relative z-10 backdrop-blur-lg bg-blue-500/5 border-white/15 shadow-2xl">
         <CardHeader className="space-y-2">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl text-white font-bold">
             {isRegistering ? "Register New User" : "Railway Operations Login"}
@@ -127,7 +127,7 @@ export default function AuthPage() {
                 }
                 required
                 minLength={3}
-                className={`h-11 sm:h-10 text-base sm:text-sm bg-white/20 border-white/30 text-white placeholder:text-white/70 backdrop-blur-sm ${isRegistering ? "border-white/50" : ""}`}
+                className={`h-11 sm:h-10 text-base sm:text-sm bg-blue-500/10 border-white/20 text-white placeholder:text-white/70 backdrop-blur-sm ${isRegistering ? "border-white/30" : ""}`}
               />
               {isRegistering && (
                 <p className="text-xs sm:text-sm text-white/80">
@@ -145,7 +145,7 @@ export default function AuthPage() {
                 }
                 required
                 minLength={6}
-                className={`h-11 sm:h-10 text-base sm:text-sm bg-white/20 border-white/30 text-white placeholder:text-white/70 backdrop-blur-sm ${isRegistering ? "border-white/50" : ""}`}
+                className={`h-11 sm:h-10 text-base sm:text-sm bg-blue-500/10 border-white/20 text-white placeholder:text-white/70 backdrop-blur-sm ${isRegistering ? "border-white/30" : ""}`}
               />
               {isRegistering && (
                 <div className="space-y-2 sm:space-y-1">
@@ -160,7 +160,7 @@ export default function AuthPage() {
               )}
             </div>
             {isRegistering && (
-              <div className="rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 p-4 sm:p-3">
+              <div className="rounded-lg bg-blue-500/10 backdrop-blur-sm border border-white/15 p-4 sm:p-3">
                 <p className="text-sm sm:text-xs text-white/90">
                   Creating a new user account. This user will have regular (non-admin) access to the system.
                 </p>
@@ -170,7 +170,7 @@ export default function AuthPage() {
           <CardFooter className="flex flex-col space-y-3 sm:space-y-2 p-4 sm:p-6">
             <Button
               type="submit"
-              className="w-full h-11 sm:h-10 text-base sm:text-sm bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm font-semibold"
+              className="w-full h-11 sm:h-10 text-base sm:text-sm bg-blue-500/15 hover:bg-blue-500/25 border-white/20 text-white backdrop-blur-sm font-semibold"
               disabled={isLoading || authLoading}
             >
               {isLoading ? "Processing..." : isRegistering ? "Register User" : "Login"}
@@ -179,7 +179,7 @@ export default function AuthPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-11 sm:h-10 text-base sm:text-sm bg-transparent hover:bg-white/10 border-white/30 text-white backdrop-blur-sm"
+                className="w-full h-11 sm:h-10 text-base sm:text-sm bg-transparent hover:bg-blue-500/15 border-white/20 text-white backdrop-blur-sm"
                 onClick={() => {
                   setIsRegistering(!isRegistering);
                   setFormData({ username: "", password: "", isAdmin: false });
