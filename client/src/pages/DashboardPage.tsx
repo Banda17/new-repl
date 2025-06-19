@@ -598,52 +598,52 @@ export default function DashboardPage() {
                           </TableCell>
                           
                           {/* Current Period Data */}
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {formatNumber(row.currentPeriod.rks)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {(row.currentPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {formatNumber(row.currentPeriod.wagons)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm font-medium">
+                          <TableCell className="border border-white/30 text-center text-sm font-medium text-white">
                             {(row.currentPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             ₹{formatNumber(row.currentPeriod.freight)}
                           </TableCell>
                           
                           {/* Previous Period Data */}
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {formatNumber(row.previousPeriod.rks)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {(row.previousPeriod.avgPerDay || 0).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             {formatNumber(row.previousPeriod.wagons)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm font-medium">
+                          <TableCell className="border border-white/30 text-center text-sm font-medium text-white">
                             {(row.previousPeriod.tonnage / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className="border text-center text-sm">
+                          <TableCell className="border border-white/30 text-center text-sm text-white">
                             ₹{formatNumber(row.previousPeriod.freight)}
                           </TableCell>
                           
                           {/* Change Data */}
-                          <TableCell className={`border text-center text-sm font-medium ${getChangeColor(row.changeInMT)}`}>
+                          <TableCell className={`border border-white/30 text-center text-sm font-medium text-white ${getChangeColor(row.changeInMT)}`}>
                             {row.changeInMT > 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(2)}
                           </TableCell>
-                          <TableCell className={`border text-center text-sm font-bold ${getChangeColor(row.changeInPercentage)}`}>
+                          <TableCell className={`border border-white/30 text-center text-sm font-bold text-white ${getChangeColor(row.changeInPercentage)}`}>
                             {row.changeInPercentage > 0 ? '+' : ''}{row.changeInPercentage}%
                           </TableCell>
                         </TableRow>
                       ))}
                       
                       {/* Total Row */}
-                      <TableRow className="bg-blue-100 border-t-2 border-blue-300 font-bold">
-                        <TableCell className="border font-bold text-left pl-3 bg-blue-200">
+                      <TableRow className="bg-blue-900/40 border-t-2 border-white/50 font-bold">
+                        <TableCell className="border border-white/30 font-bold text-left pl-3 bg-blue-900/50 text-white">
                           TOTAL
                         </TableCell>
                         
