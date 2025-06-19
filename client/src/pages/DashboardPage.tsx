@@ -333,11 +333,11 @@ export default function DashboardPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30">
-          <TabsTrigger value="charts" className="flex items-center gap-2">
+          <TabsTrigger value="charts" className="flex items-center gap-2 text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white">
             <BarChart3 className="h-4 w-4" />
             Charts
           </TabsTrigger>
-          <TabsTrigger value="tables" className="flex items-center gap-2">
+          <TabsTrigger value="tables" className="flex items-center gap-2 text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white">
             <Table2 className="h-4 w-4" />
             Tables
           </TabsTrigger>
