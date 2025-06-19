@@ -9,5 +9,37 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    background-image: url('/attached_assets/newindianexpress_2025-01-17_7zra51ol_Vijayawada_1750328706751.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.5) 100%);
+    z-index: -1;
+  }
+  
+  /* Enhanced text readability for glassmorphic design */
+  h1, h2, h3, h4, h5, h6 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    font-weight: bold;
+  }
+  
+  p, span, label, button {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  }
+  
+  /* Enhanced table text readability */
+  table th, table td {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
   }
 }
