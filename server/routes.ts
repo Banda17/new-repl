@@ -3038,10 +3038,11 @@ export function registerRoutes(app: Express): Server {
       currentPeriodData.rows.forEach(row => {
         const daysInCurrentPeriod = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
+        const avgPerDay = daysInCurrentPeriod > 0 ? (Number(row.rks) || 0) / daysInCurrentPeriod : 0;
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInCurrentPeriod > 0 ? (Number(row.rks) || 0) / daysInCurrentPeriod : 0,
+          avgPerDay: Number(avgPerDay.toFixed(2)),
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
@@ -3051,10 +3052,11 @@ export function registerRoutes(app: Express): Server {
       const previousMap = new Map();
       previousPeriodData.rows.forEach(row => {
         const daysInPreviousPeriod = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        const avgPerDay = daysInPreviousPeriod > 0 ? (Number(row.rks) || 0) / daysInPreviousPeriod : 0;
         previousMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
-          avgPerDay: daysInPreviousPeriod > 0 ? (Number(row.rks) || 0) / daysInPreviousPeriod : 0,
+          avgPerDay: Number(avgPerDay.toFixed(2)),
           wagons: Number(row.total_wagons) || 0,
           tonnage: Number(row.total_tonnage) || 0,
           freight: Number(row.total_freight) || 0
