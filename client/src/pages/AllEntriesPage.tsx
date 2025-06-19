@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CalendarIcon, SearchIcon, DownloadIcon, EditIcon, SaveIcon, XIcon } from "lucide-react";
+import { CalendarIcon, SearchIcon, DownloadIcon, EditIcon, SaveIcon, XIcon, FileTextIcon } from "lucide-react";
 import { format } from "date-fns";
 import { useToast } from "@/hooks/use-toast";
 
@@ -155,6 +155,36 @@ export default function AllEntriesPage() {
 
   const handleFieldChange = (field: keyof RailwayLoadingOperation, value: string | number) => {
     setEditValues(prev => ({ ...prev, [field]: value }));
+  };
+
+  // PDF Export Function for All Entries
+  const exportAllEntriesPDF = async () => {
+    try {
+      const response = await fetch(`/api/exports/all-entries-pdf?page=${page}&limit=${pageSize}`);
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `railway-entries-page-${page}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
+      toast({
+        title: "PDF Export Successful",
+        description: `Exported page ${page} railway entries to PDF.`,
+      });
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      toast({
+        title: "Export Failed",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const entries = entriesData?.data || [];

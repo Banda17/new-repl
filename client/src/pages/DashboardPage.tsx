@@ -91,6 +91,45 @@ export default function DashboardPage() {
     return "text-gray-600";
   };
 
+  // PDF Export Functions
+  const exportComparativeLoadingPDF = async () => {
+    try {
+      const response = await fetch('/api/exports/comparative-loading-pdf');
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'comparative-loading-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+    }
+  };
+
+  const exportYearlyComparisonPDF = async () => {
+    try {
+      const response = await fetch('/api/exports/yearly-comparison-pdf');
+      if (!response.ok) throw new Error('Failed to generate PDF');
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'yearly-comparison-report.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+    }
+  };
+
   // Get top commodities by total tonnage across all years
   const getTopCommodities = () => {
     if (!commodityData) return [];
@@ -251,24 +290,36 @@ export default function DashboardPage() {
                   <BarChart3 className="h-5 w-5" />
                   Yearly Commodity Loading Comparison (MT)
                 </div>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowAllCommodities(!showAllCommodities)}
-                  className="flex items-center gap-2"
-                >
-                  {showAllCommodities ? (
-                    <>
-                      <ChevronUp className="h-4 w-4" />
-                      Show Top 5
-                    </>
-                  ) : (
-                    <>
-                      <ChevronDown className="h-4 w-4" />
-                      Show All ({commodityData ? Array.from(new Set(commodityData.map(item => item.commodity))).length : 0})
-                    </>
-                  )}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={exportYearlyComparisonPDF}
+                    disabled={!commodityData || !stationData}
+                    className="flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Export PDF
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowAllCommodities(!showAllCommodities)}
+                    className="flex items-center gap-2"
+                  >
+                    {showAllCommodities ? (
+                      <>
+                        <ChevronUp className="h-4 w-4" />
+                        Show Top 5
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4" />
+                        Show All ({commodityData ? Array.from(new Set(commodityData.map(item => item.commodity))).length : 0})
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardTitle>
               <p className="text-sm text-muted-foreground">
                 {showAllCommodities 
@@ -411,19 +462,33 @@ export default function DashboardPage() {
         <TabsContent value="tables" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Commodity-wise Comparative Loading Particulars</CardTitle>
-              {comparativeData && (
-                <div className="text-sm text-muted-foreground">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="font-medium">Current Period:</span> {comparativeData.periods.current}
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>Commodity-wise Comparative Loading Particulars</CardTitle>
+                  {comparativeData && (
+                    <div className="text-sm text-muted-foreground mt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="font-medium">Current Period:</span> {comparativeData.periods.current}
+                        </div>
+                        <div>
+                          <span className="font-medium">Previous Period:</span> {comparativeData.periods.previous}
+                        </div>
+                      </div>
                     </div>
-                    <div>
-                      <span className="font-medium">Previous Period:</span> {comparativeData.periods.previous}
-                    </div>
-                  </div>
+                  )}
                 </div>
-              )}
+                <Button 
+                  onClick={exportComparativeLoadingPDF}
+                  variant="outline" 
+                  size="sm"
+                  disabled={!comparativeData}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
               {isLoadingComparative ? (

@@ -4,7 +4,7 @@ import { db } from "@db";
 import { detentions, interchangeData } from "@db/schema";
 import PDFDocument from "pdfkit";
 import { format as formatDate, parse } from "date-fns"; //Import parse function
-import { eq, and, gte, lte } from "drizzle-orm";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
 import { setupAuth } from "./auth";
 import { createSheetDataTransformer } from "./services/sheets";
 import bodyParser from "body-parser";
