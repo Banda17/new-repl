@@ -2286,6 +2286,7 @@ export function registerRoutes(app: Express): Server {
       const currentMap = new Map();
       currentPeriodData.rows.forEach(row => {
         const daysInCurrentPeriod = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+        console.log(`Current period - ${row.commodity}: rks=${row.rks}, wagons=${row.total_wagons}, tonnage=${row.total_tonnage}`);
         currentMap.set(row.commodity, {
           commodity: row.commodity,
           rks: Number(row.rks) || 0,
