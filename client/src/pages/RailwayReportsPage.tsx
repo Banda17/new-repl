@@ -251,14 +251,14 @@ export default function RailwayReportsPage() {
     <div className="container mx-auto py-10 space-y-8">
       <div className="space-y-4">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold">Railway Loading Operations Report</h1>
+          <h1 className="text-2xl font-bold text-white">Railway Loading Operations Report</h1>
         </div>
 
         <div className="flex gap-4 items-end">
           <div className="space-y-4">
             <div className="flex gap-4">
               <div className="w-[200px]">
-                <label className="block text-sm font-medium mb-1">Commodity</label>
+                <label className="block text-sm font-medium mb-1 text-white">Commodity</label>
                 <Select
                   value={selectedCommodity}
                   onValueChange={setSelectedCommodity}
@@ -278,7 +278,7 @@ export default function RailwayReportsPage() {
               </div>
 
               <div className="w-[200px]">
-                <label className="block text-sm font-medium mb-1">Station</label>
+                <label className="block text-sm font-medium mb-1 text-white">Station</label>
                 <Select
                   value={selectedStation}
                   onValueChange={setSelectedStation}
@@ -300,11 +300,11 @@ export default function RailwayReportsPage() {
 
             <div className="flex gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Start Date</label>
+                <label className="block text-sm font-medium mb-1 text-white">Start Date</label>
                 <DatePicker date={startDate} setDate={setStartDate} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">End Date</label>
+                <label className="block text-sm font-medium mb-1 text-white">End Date</label>
                 <DatePicker date={endDate} setDate={setEndDate} />
               </div>
               <Button

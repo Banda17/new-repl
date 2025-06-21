@@ -107,6 +107,8 @@ The system follows a modern full-stack architecture with clear separation of con
   - Implemented clean white table backgrounds with dark text for optimal readability
   - Maintained glassmorphic card containers while ensuring data tables remain highly readable
   - Balanced aesthetic appeal with practical usability for data analysis
+  - Fixed all tab navigation text to white with proper active/hover states
+  - Updated Railway Reports page with white text for all headings and form labels
 
 ## User Preferences
 
