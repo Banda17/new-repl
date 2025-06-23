@@ -26,6 +26,7 @@ import DailyReportsPage from "./pages/DailyReportsPage";
 import AllEntriesPage from "./pages/AllEntriesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
 import StationComparativePage from "./pages/StationComparativePage";
+import UsersPage from "./pages/UsersPage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
@@ -143,7 +144,7 @@ function Navigation() {
           {user?.isAdmin && (
             <Button 
               variant="ghost"
-              onClick={() => navigate("/auth")}
+              onClick={() => navigate("/users")}
               className="text-white/90 hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4"
             >
               Users
@@ -243,6 +244,9 @@ function App() {
           </Route>
           <Route path="/upload">
             {() => <DataUploadPage />}
+          </Route>
+          <Route path="/users">
+            {() => user?.isAdmin ? <UsersPage /> : <NotFound />}
           </Route>
           <Route path="/auth">
             {() => user?.isAdmin ? <AuthPage /> : <NotFound />}

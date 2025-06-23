@@ -12,7 +12,7 @@ import multer from "multer";
 import { read, utils } from "xlsx";
 import { initializeAccessSync, syncAccessData } from './services/accessSync';
 import { sql } from 'drizzle-orm';
-import { railwayLoadingOperations } from '@db/schema'; // Import the new schema
+import { railwayLoadingOperations, users } from '@db/schema'; // Import the new schema
 
 const upload = multer({
   storage: multer.memoryStorage(),
