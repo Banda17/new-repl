@@ -3278,9 +3278,14 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "User already exists" });
       }
 
-      const bcrypt = await import("bcryptjs");
-      const saltRounds = 10;
-      const hashedPassword = await bcrypt.hash(password, saltRounds);
+      // Use the same crypto system as auth.ts
+      const { scrypt, randomBytes } = await import("crypto");
+      const { promisify } = await import("util");
+      const scryptAsync = promisify(scrypt);
+      
+      const salt = randomBytes(16).toString("hex");
+      const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+      const hashedPassword = `${buf.toString("hex")}.${salt}`;
 
       const [newUser] = await db
         .insert(users)
