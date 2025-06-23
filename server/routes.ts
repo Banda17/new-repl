@@ -3222,6 +3222,70 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Users management endpoints
+  app.get("/api/users", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    const user = req.user as any;
+    if (!user?.isAdmin) {
+      return res.status(403).send("Access denied. Admin privileges required.");
+    }
+
+    try {
+      const allUsers = await db
+        .select({
+          id: users.id,
+          username: users.username,
+          isAdmin: users.isAdmin,
+          createdAt: users.createdAt,
+        })
+        .from(users)
+        .orderBy(desc(users.createdAt));
+
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.delete("/api/users/:id", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    const user = req.user as any;
+    if (!user?.isAdmin) {
+      return res.status(403).send("Access denied. Admin privileges required.");
+    }
+
+    try {
+      const { id } = req.params;
+      const userId = parseInt(id);
+
+      // Prevent deleting self
+      if (userId === user.id) {
+        return res.status(400).json({ error: "Cannot delete your own account" });
+      }
+
+      const [deletedUser] = await db
+        .delete(users)
+        .where(eq(users.id, userId))
+        .returning();
+
+      if (!deletedUser) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      res.json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
