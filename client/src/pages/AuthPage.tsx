@@ -12,11 +12,19 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { useLocation } from "wouter";
-// Railway station background image will be loaded via URL
+
+// Type for user with admin properties
+interface UserWithAdmin {
+  id: number;
+  username: string;
+  isAdmin: boolean;
+  createdAt?: Date;
+}
 
 export default function AuthPage() {
   const { toast } = useToast();
   const { login, register, user, isLoading: authLoading } = useUser();
+  const typedUser = user as UserWithAdmin;
   const [location, setLocation] = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -29,9 +37,9 @@ export default function AuthPage() {
   useEffect(() => {
     // If user is already logged in and not an admin, redirect to dashboard
     // Admin users can stay to manage users
-    if (user && !user.isAdmin) {
+    if (typedUser && !typedUser.isAdmin) {
       setLocation("/dashboard");
-    } else if (user && user.isAdmin) {
+    } else if (typedUser && typedUser.isAdmin) {
       // Set registration mode for admin users
       setIsRegistering(true);
     }
@@ -52,7 +60,7 @@ export default function AuthPage() {
     setIsLoading(true);
 
     try {
-      if (isRegistering && !user?.isAdmin) {
+      if (isRegistering && !typedUser?.isAdmin) {
         throw new Error("Only administrators can register new users");
       }
 
@@ -84,7 +92,7 @@ export default function AuthPage() {
   };
 
   // If user is logged in and not an admin, they shouldn't be here
-  if (user && !user.isAdmin) {
+  if (typedUser && !typedUser.isAdmin) {
     return null;
   }
 
@@ -105,7 +113,7 @@ export default function AuthPage() {
         <CardHeader className="space-y-2">
           <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl text-white font-bold">
             {isRegistering ? "Register New User" : "Railway Operations Login"}
-            {user?.isAdmin && (
+            {typedUser?.isAdmin && (
               <span className="text-xs sm:text-sm bg-white/20 text-white px-2 py-1 rounded-full backdrop-blur-sm">
                 Admin
               </span>
@@ -114,7 +122,7 @@ export default function AuthPage() {
           <CardDescription className="text-sm sm:text-base text-white/90">
             {isRegistering
               ? "As an admin, you can create new user accounts here"
-              : user?.isAdmin
+              : typedUser?.isAdmin
                 ? "Login or use the button below to register new users"
                 : "South Central Railway Operations Management System"}
           </CardDescription>
@@ -179,7 +187,7 @@ export default function AuthPage() {
             >
               {isLoading ? "Processing..." : isRegistering ? "Register User" : "Login"}
             </Button>
-            {user?.isAdmin && (
+            {typedUser?.isAdmin && (
               <Button
                 type="button"
                 variant="outline"
