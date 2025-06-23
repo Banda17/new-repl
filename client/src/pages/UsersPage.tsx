@@ -55,7 +55,7 @@ export default function UsersPage() {
   // Create user mutation
   const createUserMutation = useMutation({
     mutationFn: async (userData: typeof formData) => {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function UsersPage() {
       
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Failed to create user');
+        throw new Error(error.error || 'Failed to create user');
       }
       
       return response.json();

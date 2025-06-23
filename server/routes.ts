@@ -3251,6 +3251,58 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.post("/api/users", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+
+    const user = req.user as any;
+    if (!user?.isAdmin) {
+      return res.status(403).send("Access denied. Admin privileges required.");
+    }
+
+    try {
+      const { username, password, isAdmin } = req.body;
+
+      if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+      }
+
+      if (password.length < 6) {
+        return res.status(400).json({ error: "Password must be at least 6 characters" });
+      }
+
+      // Check if user already exists
+      const existingUser = await db.select().from(users).where(eq(users.username, username)).limit(1);
+      if (existingUser.length > 0) {
+        return res.status(400).json({ error: "User already exists" });
+      }
+
+      const bcrypt = await import("bcryptjs");
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          username,
+          password: hashedPassword,
+          isAdmin: Boolean(isAdmin),
+        })
+        .returning({
+          id: users.id,
+          username: users.username,
+          isAdmin: users.isAdmin,
+          createdAt: users.createdAt,
+        });
+
+      res.json(newUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
   app.delete("/api/users/:id", async (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).send("Not authenticated");
