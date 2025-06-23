@@ -27,9 +27,13 @@ export default function AuthPage() {
   });
 
   useEffect(() => {
-    // If user is already logged in, redirect to dashboard
-    if (user) {
+    // If user is already logged in and not an admin, redirect to dashboard
+    // Admin users can stay to manage users
+    if (user && !user.isAdmin) {
       setLocation("/dashboard");
+    } else if (user && user.isAdmin) {
+      // Set registration mode for admin users
+      setIsRegistering(true);
     }
   }, [user, setLocation]);
 
@@ -79,8 +83,8 @@ export default function AuthPage() {
     }
   };
 
-  // If user is logged in and we're still on auth page, redirect
-  if (user) {
+  // If user is logged in and not an admin, they shouldn't be here
+  if (user && !user.isAdmin) {
     return null;
   }
 
