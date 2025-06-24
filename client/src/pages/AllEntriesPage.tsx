@@ -192,42 +192,50 @@ export default function AllEntriesPage() {
   const totalRecords = entriesData?.totalRecords || 0;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="container mx-auto p-2 sm:p-4 md:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">All Railway Loading Operations</h1>
-          <p className="text-white/80">
-            View and search through all railway loading operation entries
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold tracking-tight text-white">
+            <span className="hidden sm:inline">All Railway Loading Operations</span>
+            <span className="sm:hidden">All Operations</span>
+          </h1>
+          <p className="text-white/80 text-sm sm:text-base">
+            <span className="hidden sm:inline">View and search through all railway loading operation entries</span>
+            <span className="sm:hidden">View all operations</span>
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={exportAllEntriesPDF}>
-            <FileTextIcon className="w-4 h-4 mr-2" />
-            Export PDF
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={exportAllEntriesPDF} className="transition-all duration-300">
+            <FileTextIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Export PDF</span>
+            <span className="sm:hidden">PDF</span>
           </Button>
-          <Button variant="outline" onClick={() => handleExport('csv')}>
-            <DownloadIcon className="w-4 h-4 mr-2" />
-            Export CSV
+          <Button variant="outline" onClick={() => handleExport('csv')} className="transition-all duration-300">
+            <DownloadIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Export CSV</span>
+            <span className="sm:hidden">CSV</span>
           </Button>
-          <Button variant="outline" onClick={() => handleExport('excel')}>
-            <DownloadIcon className="w-4 h-4 mr-2" />
-            Export Excel
+          <Button variant="outline" onClick={() => handleExport('excel')} className="transition-all duration-300">
+            <DownloadIcon className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+            <span className="hidden sm:inline">Export Excel</span>
+            <span className="sm:hidden">Excel</span>
           </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl">
-        <CardHeader>
-          <CardTitle className="text-white">Filters & Search</CardTitle>
-          <CardDescription className="text-white/80">
-            Filter and search through {totalRecords.toLocaleString()} total records
+      <Card className="backdrop-blur-lg bg-blue-900/10 border border-white/20 shadow-2xl transition-all duration-300">
+        <CardHeader className="p-3 sm:p-6">
+          <CardTitle className="text-white text-sm sm:text-lg">Filters & Search</CardTitle>
+          <CardDescription className="text-white/80 text-xs sm:text-sm">
+            <span className="hidden sm:inline">Filter and search through {totalRecords.toLocaleString()} total records</span>
+            <span className="sm:hidden">{totalRecords.toLocaleString()} records</span>
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <CardContent className="p-3 sm:p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
+              <label className="text-xs sm:text-sm font-medium text-white">Search</label>
               <div className="relative">
                 <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input

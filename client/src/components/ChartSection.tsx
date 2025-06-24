@@ -198,12 +198,15 @@ export function ChartSection({ years, commodityData }: ChartSectionProps) {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Yearly Comparison Charts</h2>
-        <div className="space-x-4 flex items-center">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
+          <span className="hidden sm:inline">Yearly Comparison Charts</span>
+          <span className="sm:hidden">Charts</span>
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 lg:gap-4 w-full sm:w-auto">
           <Select value={selectedMetric} onValueChange={(value: MetricType) => setSelectedMetric(value)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[180px] bg-white text-black transition-all duration-300">
               <SelectValue placeholder="Select metric" />
             </SelectTrigger>
             <SelectContent>
@@ -214,7 +217,7 @@ export function ChartSection({ years, commodityData }: ChartSectionProps) {
             </SelectContent>
           </Select>
           <Select value={selectedView} onValueChange={(value: ViewType) => setSelectedView(value)}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full sm:w-[140px] lg:w-[180px] bg-white text-black transition-all duration-300">
               <SelectValue placeholder="Select view" />
             </SelectTrigger>
             <SelectContent>
@@ -227,10 +230,13 @@ export function ChartSection({ years, commodityData }: ChartSectionProps) {
       </div>
 
       <Tabs value={selectedView} onValueChange={(value: ViewType) => setSelectedView(value)}>
-        <TabsList className="mb-4">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="commodities">Commodities</TabsTrigger>
-          <TabsTrigger value="stations">Stations</TabsTrigger>
+        <TabsList className="mb-4 grid w-full grid-cols-3 max-w-full sm:max-w-md bg-blue-900/20 backdrop-blur-lg border border-white/20">
+          <TabsTrigger value="overview" className="text-xs sm:text-sm font-medium text-white transition-all duration-300 py-2">Overview</TabsTrigger>
+          <TabsTrigger value="commodities" className="text-xs sm:text-sm font-medium text-white transition-all duration-300 py-2">
+            <span className="hidden sm:inline">Commodities</span>
+            <span className="sm:hidden">Comm.</span>
+          </TabsTrigger>
+          <TabsTrigger value="stations" className="text-xs sm:text-sm font-medium text-white transition-all duration-300 py-2">Stations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
