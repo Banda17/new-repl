@@ -105,10 +105,6 @@ function Navigation() {
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-48">
-            <DropdownMenuItem onClick={() => navigate("/")}>
-              <Activity className="w-4 h-4 mr-2" />
-              Detention Form
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/upload")}>
               <Upload className="w-4 h-4 mr-2" />
               Upload Data
@@ -117,14 +113,6 @@ function Navigation() {
               <Search className="w-4 h-4 mr-2" />
               Historical
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/railway-reports")}>
-              <FileText className="w-4 h-4 mr-2" />
-              Railway Reports
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/daily-reports")}>
-              <FileText className="w-4 h-4 mr-2" />
-              Daily Reports
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/all-entries")}>
               <Search className="w-4 h-4 mr-2" />
               All Entries
@@ -132,10 +120,6 @@ function Navigation() {
             <DropdownMenuItem onClick={() => navigate("/excel-upload")}>
               <Upload className="w-4 h-4 mr-2" />
               Excel Upload
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/station-comparative")}>
-              <FileText className="w-4 h-4 mr-2" />
-              Station Comparative (May 26-31)
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
