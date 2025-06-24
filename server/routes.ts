@@ -1050,8 +1050,18 @@ export function registerRoutes(app: Express): Server {
         })
       };
 
-      // Generate PDF
-      const doc = new PDFDocument({ margin: 30, size: 'A4', layout: 'landscape' });
+      // Generate PDF with proper A4 landscape dimensions
+      const doc = new PDFDocument({ 
+        margin: 0, 
+        size: 'A4', 
+        layout: 'landscape',
+        info: {
+          Title: 'Comparative Loading Analysis Report',
+          Author: 'SCR Railway Operations',
+          Subject: 'Railway Loading Performance Analysis',
+          Keywords: 'railway, loading, comparative, analysis, SCR'
+        }
+      });
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="comparative-loading-report.pdf"');
       
