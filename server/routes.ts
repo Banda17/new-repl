@@ -143,64 +143,137 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
 
 function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
   try {
-    // Header with blue background
-    doc.rect(0, 0, 612, 85).fill('#1e40af');
-    doc.fillColor('white').fontSize(22).font('Helvetica-Bold')
-       .text("Comparative Loading Analysis Report", 50, 20, { align: "center" });
-    doc.fontSize(12).text(`Period: ${data.periods.current} vs ${data.periods.previous}`, 50, 45, { align: "center" });
-    doc.fontSize(10).text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 450, 65);
+    // Modern header design with gradient-like effect
+    doc.rect(0, 0, 842, 120).fill('#1e3a8a');
+    doc.rect(0, 100, 842, 20).fill('#3b82f6');
+    
+    // Company logo area (placeholder for SCR logo)
+    doc.rect(30, 15, 80, 70).stroke('#ffffff').lineWidth(2);
+    doc.fillColor('white').fontSize(10).text('SCR', 60, 45, { align: 'center' });
+    doc.fontSize(8).text('LOGO', 58, 58, { align: 'center' });
+    
+    // Main title with better typography
+    doc.fillColor('white').fontSize(26).font('Helvetica-Bold')
+       .text("COMPARATIVE LOADING ANALYSIS", 130, 25, { align: "center", width: 580 });
+    
+    doc.fontSize(16).font('Helvetica')
+       .text("OPERATIONAL PERFORMANCE REPORT", 130, 55, { align: "center", width: 580 });
+    
+    // Period information with better formatting
+    doc.fontSize(12).font('Helvetica-Bold')
+       .text(`Analysis Period: ${data.periods.current}`, 130, 80, { align: "center", width: 280 });
+    doc.text(`vs ${data.periods.previous}`, 430, 80, { align: "center", width: 280 });
+    
+    // Generation info
+    const now = new Date();
+    doc.fontSize(10).font('Helvetica')
+       .text(`Generated: ${now.toLocaleDateString('en-IN')} at ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`, 600, 105);
     
     doc.fillColor('black');
-    let yPosition = 105;
+    let yPosition = 150;
 
-    // Optimized headers and column widths
-    const headers = ['Commodity', 'Curr RKs', 'Curr Avg', 'Curr Wag', 'Curr MT', 'Curr Fr', 'Prev RKs', 'Prev Avg', 'Prev Wag', 'Prev MT', 'Prev Fr', 'Change %'];
-    const columnWidths = [90, 40, 40, 40, 45, 50, 40, 40, 40, 45, 50, 50];
-    let xPosition = 30;
+    // Enhanced table design
+    const headers = [
+      'Commodity', 
+      'Current Period', '', '', '', '',
+      'Previous Period', '', '', '', '',
+      'Performance'
+    ];
+    const subHeaders = [
+      '',
+      'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight',
+      'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight',
+      'Change %'
+    ];
+    const columnWidths = [85, 45, 45, 50, 50, 65, 45, 45, 50, 50, 65, 60];
     
-    // Header row with blue background
-    doc.rect(25, yPosition - 5, 560, 25).fill('#3b82f6');
+    // Main header row
+    let xPosition = 30;
+    doc.rect(25, yPosition - 5, 790, 25).fill('#1e40af');
+    doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
+    
+    // Merge headers for current and previous periods
+    doc.text('Commodity', 30, yPosition + 7, { width: 85, align: 'center' });
+    doc.text('CURRENT PERIOD', 120, yPosition + 7, { width: 255, align: 'center' });
+    doc.text('PREVIOUS PERIOD', 380, yPosition + 7, { width: 255, align: 'center' });
+    doc.text('Performance', 640, yPosition + 7, { width: 60, align: 'center' });
+    
+    // Dividing lines
+    doc.strokeColor('#ffffff').lineWidth(1);
+    doc.moveTo(115, yPosition - 5).lineTo(115, yPosition + 20).stroke();
+    doc.moveTo(375, yPosition - 5).lineTo(375, yPosition + 20).stroke();
+    doc.moveTo(635, yPosition - 5).lineTo(635, yPosition + 20).stroke();
+    
+    yPosition += 25;
+    
+    // Sub-header row
+    xPosition = 30;
+    doc.rect(25, yPosition - 5, 790, 22).fill('#3b82f6');
     doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
     
-    headers.forEach((header, index) => {
-      doc.text(header, xPosition + 2, yPosition + 5, { 
-        width: columnWidths[index] - 4, 
-        align: 'center' 
-      });
+    subHeaders.forEach((header, index) => {
+      if (header) {
+        doc.text(header, xPosition + 2, yPosition + 5, { 
+          width: columnWidths[index] - 4, 
+          align: 'center' 
+        });
+      }
       xPosition += columnWidths[index];
     });
     
-    yPosition += 25;
-    doc.fillColor('black').fontSize(8).font('Helvetica');
+    yPosition += 22;
+    doc.fillColor('black').fontSize(9).font('Helvetica');
 
     data.data.forEach((row: any, rowIndex: number) => {
       if (yPosition > 720) {
         doc.addPage();
-        yPosition = 50;
+        yPosition = 80;
         
-        // Redraw header on new page
-        doc.rect(25, yPosition - 5, 560, 25).fill('#3b82f6');
+        // Redraw header on new page with modern styling
+        doc.rect(25, yPosition - 5, 790, 25).fill('#1e40af');
+        doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
+        
+        doc.text('Commodity', 30, yPosition + 7, { width: 85, align: 'center' });
+        doc.text('CURRENT PERIOD', 120, yPosition + 7, { width: 255, align: 'center' });
+        doc.text('PREVIOUS PERIOD', 380, yPosition + 7, { width: 255, align: 'center' });
+        doc.text('Performance', 640, yPosition + 7, { width: 60, align: 'center' });
+        
+        yPosition += 25;
+        
+        // Sub-header row
+        doc.rect(25, yPosition - 5, 790, 22).fill('#3b82f6');
         doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
+        
         let headerX = 30;
-        headers.forEach((header, index) => {
-          doc.text(header, headerX + 2, yPosition + 5, { 
-            width: columnWidths[index] - 4, 
-            align: 'center' 
-          });
+        subHeaders.forEach((header, index) => {
+          if (header) {
+            doc.text(header, headerX + 2, yPosition + 5, { 
+              width: columnWidths[index] - 4, 
+              align: 'center' 
+            });
+          }
           headerX += columnWidths[index];
         });
-        yPosition += 25;
-        doc.fillColor('black').fontSize(8).font('Helvetica');
+        yPosition += 22;
+        doc.fillColor('black').fontSize(9).font('Helvetica');
       }
 
-      // Alternating row colors
-      const rowColor = rowIndex % 2 === 0 ? '#f1f5f9' : '#ffffff';
-      doc.rect(25, yPosition - 2, 560, 18).fill(rowColor);
+      // Enhanced alternating row colors with better contrast
+      const rowColor = rowIndex % 2 === 0 ? '#f8fafc' : '#ffffff';
+      doc.rect(25, yPosition - 3, 790, 22).fill(rowColor);
       
-      // Color code the change percentage
-      const changeColor = row.changeInPercentage > 0 ? '#16a34a' : 
-                         row.changeInPercentage < 0 ? '#dc2626' : '#6b7280';
+      // Add subtle borders
+      doc.strokeColor('#e2e8f0').lineWidth(0.5);
+      doc.rect(25, yPosition - 3, 790, 22).stroke();
+      
+      // Color code the change percentage with better colors
+      const changeValue = row.changeInPercentage || 0;
+      const changeColor = changeValue > 0 ? '#059669' : 
+                         changeValue < 0 ? '#dc2626' : '#64748b';
+      const changeBgColor = changeValue > 0 ? '#ecfdf5' : 
+                           changeValue < 0 ? '#fef2f2' : '#f1f5f9';
 
+      // Enhanced data formatting
       const values = [
         row.commodity || 'N/A',
         row.currentPeriod.rks?.toString() || '0',
@@ -213,53 +286,107 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
         row.previousPeriod.wagons?.toString() || '0',
         (row.previousPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
         `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1) || '0.0'}Cr`,
-        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1) || '0.0'}%`
+        `${changeValue > 0 ? '+' : ''}${changeValue?.toFixed(1) || '0.0'}%`
       ];
+
+      // Special background for change percentage
+      doc.rect(640, yPosition - 3, 60, 22).fill(changeBgColor);
+      doc.strokeColor('#e2e8f0').lineWidth(0.5);
+      doc.rect(640, yPosition - 3, 60, 22).stroke();
 
       xPosition = 30;
       values.forEach((value, index) => {
-        // Use special color for change percentage
-        if (index === 11) {
-          doc.fillColor(changeColor);
+        // Enhanced formatting for specific columns
+        if (index === 0) {
+          // Commodity name in bold
+          doc.fillColor('#1f2937').font('Helvetica-Bold');
+        } else if (index === 11) {
+          // Change percentage with special styling
+          doc.fillColor(changeColor).font('Helvetica-Bold');
         } else {
-          doc.fillColor('black');
+          // Regular data
+          doc.fillColor('#374151').font('Helvetica');
         }
         
-        doc.text(value, xPosition + 2, yPosition + 2, { 
-          width: columnWidths[index] - 4, 
+        doc.text(value, xPosition + 4, yPosition + 6, { 
+          width: columnWidths[index] - 8, 
           align: index === 0 ? 'left' : 'center'
         });
         xPosition += columnWidths[index];
       });
       
-      yPosition += 18;
+      yPosition += 22;
     });
 
-    // Summary section
-    yPosition += 15;
-    if (yPosition > 680) {
+    // Enhanced Summary section
+    yPosition += 25;
+    if (yPosition > 650) {
       doc.addPage();
-      yPosition = 50;
+      yPosition = 80;
     }
 
-    // Summary box with light blue background
-    doc.rect(25, yPosition, 560, 70).fill('#f0f9ff').stroke('#3b82f6');
-    doc.fillColor('#1e40af').fontSize(14).font('Helvetica-Bold')
-       .text("Summary", 35, yPosition + 10);
+    // Professional summary design
+    doc.rect(25, yPosition, 790, 100).fill('#f8fafc').stroke('#cbd5e1');
+    doc.rect(25, yPosition, 790, 35).fill('#1e40af');
     
-    doc.fillColor('black').fontSize(10).font('Helvetica');
+    // Summary header
+    doc.fillColor('white').fontSize(16).font('Helvetica-Bold')
+       .text("PERFORMANCE SUMMARY", 30, yPosition + 10, { align: 'center', width: 780 });
+    
+    yPosition += 40;
+    
     const totalCurrent = data.totals?.currentPeriod?.tonnage || 0;
     const totalPrevious = data.totals?.previousPeriod?.tonnage || 0;
     const totalChange = totalPrevious > 0 ? ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
     
-    doc.text(`Total Current Period: ${(totalCurrent / 1000000).toFixed(2)} Million MT`, 35, yPosition + 30);
-    doc.text(`Total Previous Period: ${(totalPrevious / 1000000).toFixed(2)} Million MT`, 35, yPosition + 45);
-    doc.fillColor(totalChange > 0 ? '#16a34a' : totalChange < 0 ? '#dc2626' : '#6b7280')
-       .text(`Overall Change: ${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)}%`, 350, yPosition + 37);
+    // Current period metrics
+    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
+       .text("Current Period Total:", 40, yPosition + 10);
+    doc.fillColor('#059669').fontSize(14).font('Helvetica-Bold')
+       .text(`${(totalCurrent / 1000000).toFixed(2)} Million MT`, 200, yPosition + 10);
+    
+    // Previous period metrics
+    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
+       .text("Previous Period Total:", 40, yPosition + 30);
+    doc.fillColor('#6b7280').fontSize(14).font('Helvetica')
+       .text(`${(totalPrevious / 1000000).toFixed(2)} Million MT`, 200, yPosition + 30);
+    
+    // Performance indicator
+    const changeColor = totalChange > 0 ? '#059669' : totalChange < 0 ? '#dc2626' : '#6b7280';
+    const changeText = totalChange > 0 ? 'IMPROVEMENT' : totalChange < 0 ? 'DECLINE' : 'NO CHANGE';
+    
+    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
+       .text("Overall Performance:", 420, yPosition + 10);
+    doc.fillColor(changeColor).fontSize(16).font('Helvetica-Bold')
+       .text(`${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)}%`, 580, yPosition + 10);
+    doc.fillColor(changeColor).fontSize(10).font('Helvetica-Bold')
+       .text(changeText, 580, yPosition + 30);
 
-    // Footer
-    doc.fillColor('#6b7280').fontSize(8)
-       .text(`Railway Operations Management System - SCR Division`, 30, doc.page.height - 30);
+    // Key insights box
+    yPosition += 70;
+    doc.rect(25, yPosition, 790, 60).fill('#eff6ff').stroke('#3b82f6');
+    doc.fillColor('#1e40af').fontSize(12).font('Helvetica-Bold')
+       .text("KEY INSIGHTS", 30, yPosition + 10);
+    
+    doc.fillColor('#374151').fontSize(10).font('Helvetica');
+    const insights = [
+      `• Total ${Math.abs(data.data.length)} commodities analyzed in this comparative study`,
+      `• Freight revenue comparison shows ${totalChange > 0 ? 'positive growth' : totalChange < 0 ? 'decline' : 'stable performance'}`,
+      `• Performance metrics calculated based on operational data from SCR Division`
+    ];
+    
+    insights.forEach((insight, index) => {
+      doc.text(insight, 40, yPosition + 30 + (index * 12));
+    });
+
+    // Enhanced footer with contact info
+    yPosition = doc.page.height - 60;
+    doc.rect(0, yPosition, 842, 60).fill('#1e3a8a');
+    doc.fillColor('white').fontSize(10).font('Helvetica-Bold')
+       .text('South Central Railway - Operations Management System', 30, yPosition + 15);
+    doc.fontSize(8).font('Helvetica')
+       .text('Confidential Report | For Internal Use Only', 30, yPosition + 30)
+       .text(`Report Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1`, 600, yPosition + 30);
 
     console.log("Comparative loading PDF generation completed");
   } catch (error) {
