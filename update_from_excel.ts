@@ -8,7 +8,7 @@ async function updateDatabaseFromExcel() {
     console.log("Starting database update from Excel file...");
 
     // Read the Excel file
-    const filePath = "./attached_assets/16-06-2025.xlsx";
+    const filePath = "./attached_assets/new.xlsx";
     const fileBuffer = readFileSync(filePath);
     const workbook = read(fileBuffer);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];

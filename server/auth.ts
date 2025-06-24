@@ -17,14 +17,36 @@ const crypto = {
     return `${buf.toString("hex")}.${salt}`;
   },
   compare: async (suppliedPassword: string, storedPassword: string) => {
-    const [hashedPassword, salt] = storedPassword.split(".");
-    const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
-    const suppliedPasswordBuf = (await scryptAsync(
-      suppliedPassword,
-      salt,
-      64
-    )) as Buffer;
-    return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
+    try {
+      // Handle bcrypt format (legacy users)
+      if (storedPassword.startsWith('$2b$') || storedPassword.startsWith('$2a$')) {
+        const bcrypt = await import("bcryptjs");
+        return await bcrypt.compare(suppliedPassword, storedPassword);
+      }
+      
+      // Handle scrypt format (new format)
+      if (!storedPassword || !storedPassword.includes('.')) {
+        console.error('Invalid stored password format:', storedPassword);
+        return false;
+      }
+      
+      const [hashedPassword, salt] = storedPassword.split(".");
+      if (!hashedPassword || !salt) {
+        console.error('Missing hash or salt components');
+        return false;
+      }
+      
+      const hashedPasswordBuf = Buffer.from(hashedPassword, "hex");
+      const suppliedPasswordBuf = (await scryptAsync(
+        suppliedPassword,
+        salt,
+        64
+      )) as Buffer;
+      return timingSafeEqual(hashedPasswordBuf, suppliedPasswordBuf);
+    } catch (error) {
+      console.error('Password comparison error:', error);
+      return false;
+    }
   },
 };
 
@@ -95,9 +117,14 @@ export function setupAuth(app: Express) {
           .limit(1);
 
         if (!user) {
+          console.log('Login attempt: User not found for username:', username);
           return done(null, false, { message: "Incorrect username." });
         }
+        
+        console.log('Login attempt for user:', username, 'stored password format:', user.password?.substring(0, 20) + '...');
         const isMatch = await crypto.compare(password, user.password);
+        console.log('Password match result:', isMatch);
+        
         if (!isMatch) {
           return done(null, false, { message: "Incorrect password." });
         }
