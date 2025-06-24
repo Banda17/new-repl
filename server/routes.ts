@@ -143,250 +143,241 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
 
 function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
   try {
-    // Modern header design with gradient-like effect
-    doc.rect(0, 0, 842, 120).fill('#1e3a8a');
-    doc.rect(0, 100, 842, 20).fill('#3b82f6');
+    // Clean header design
+    doc.rect(0, 0, 842, 100).fill('#1e3a8a');
     
-    // Company logo area (placeholder for SCR logo)
-    doc.rect(30, 15, 80, 70).stroke('#ffffff').lineWidth(2);
-    doc.fillColor('white').fontSize(10).text('SCR', 60, 45, { align: 'center' });
-    doc.fontSize(8).text('LOGO', 58, 58, { align: 'center' });
+    // SCR Logo area - positioned on the left
+    doc.rect(40, 20, 60, 60).fill('#ffffff').stroke('#1e3a8a').lineWidth(2);
+    doc.fillColor('#1e3a8a').fontSize(16).font('Helvetica-Bold').text('SCR', 55, 45, { align: 'center', width: 30 });
     
-    // Main title with better typography
-    doc.fillColor('white').fontSize(26).font('Helvetica-Bold')
-       .text("COMPARATIVE LOADING ANALYSIS", 130, 25, { align: "center", width: 580 });
+    // Main title - centered with proper spacing
+    doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
+       .text("COMPARATIVE LOADING ANALYSIS", 120, 20, { align: "center", width: 600 });
     
-    doc.fontSize(16).font('Helvetica')
-       .text("OPERATIONAL PERFORMANCE REPORT", 130, 55, { align: "center", width: 580 });
+    doc.fontSize(14).font('Helvetica')
+       .text("OPERATIONAL PERFORMANCE REPORT", 120, 45, { align: "center", width: 600 });
     
-    // Period information with better formatting
-    doc.fontSize(12).font('Helvetica-Bold')
-       .text(`Analysis Period: ${data.periods.current}`, 130, 80, { align: "center", width: 280 });
-    doc.text(`vs ${data.periods.previous}`, 430, 80, { align: "center", width: 280 });
-    
-    // Generation info
-    const now = new Date();
+    // Period information on separate lines for clarity
+    doc.fontSize(11).font('Helvetica-Bold')
+       .text(`Period: ${data.periods.current}`, 120, 70, { align: "center", width: 600 });
     doc.fontSize(10).font('Helvetica')
-       .text(`Generated: ${now.toLocaleDateString('en-IN')} at ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`, 600, 105);
+       .text(`vs ${data.periods.previous}`, 120, 85, { align: "center", width: 600 });
+    
+    // Generation info - top right
+    const now = new Date();
+    doc.fontSize(9).font('Helvetica')
+       .text(`Generated: ${now.toLocaleDateString('en-IN')} ${now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}`, 720, 15);
     
     doc.fillColor('black');
-    let yPosition = 150;
+    let yPosition = 130;
 
-    // Enhanced table design
-    const headers = [
-      'Commodity', 
-      'Current Period', '', '', '', '',
-      'Previous Period', '', '', '', '',
-      'Performance'
-    ];
-    const subHeaders = [
-      '',
-      'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight',
-      'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight',
-      'Change %'
-    ];
-    const columnWidths = [85, 45, 45, 50, 50, 65, 45, 45, 50, 50, 65, 60];
+    // Properly sized table with better proportions
+    const columnWidths = [95, 50, 55, 55, 55, 70, 50, 55, 55, 55, 70, 70];
+    const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
+    const startX = (842 - tableWidth) / 2; // Center the table
     
     // Main header row
-    let xPosition = 30;
-    doc.rect(25, yPosition - 5, 790, 25).fill('#1e40af');
-    doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
+    doc.rect(startX, yPosition, tableWidth, 25).fill('#1e40af');
+    doc.fillColor('white').fontSize(12).font('Helvetica-Bold');
     
-    // Merge headers for current and previous periods
-    doc.text('Commodity', 30, yPosition + 7, { width: 85, align: 'center' });
-    doc.text('CURRENT PERIOD', 120, yPosition + 7, { width: 255, align: 'center' });
-    doc.text('PREVIOUS PERIOD', 380, yPosition + 7, { width: 255, align: 'center' });
-    doc.text('Performance', 640, yPosition + 7, { width: 60, align: 'center' });
+    // Properly aligned merged headers
+    doc.text('Commodity', startX + 5, yPosition + 8, { width: 85, align: 'center' });
+    doc.text('CURRENT PERIOD', startX + 95, yPosition + 8, { width: 285, align: 'center' });
+    doc.text('PREVIOUS PERIOD', startX + 380, yPosition + 8, { width: 285, align: 'center' });
+    doc.text('Performance', startX + 665, yPosition + 8, { width: 70, align: 'center' });
     
-    // Dividing lines
-    doc.strokeColor('#ffffff').lineWidth(1);
-    doc.moveTo(115, yPosition - 5).lineTo(115, yPosition + 20).stroke();
-    doc.moveTo(375, yPosition - 5).lineTo(375, yPosition + 20).stroke();
-    doc.moveTo(635, yPosition - 5).lineTo(635, yPosition + 20).stroke();
+    // Clean dividing lines
+    doc.strokeColor('#ffffff').lineWidth(1.5);
+    doc.moveTo(startX + 95, yPosition).lineTo(startX + 95, yPosition + 25).stroke();
+    doc.moveTo(startX + 380, yPosition).lineTo(startX + 380, yPosition + 25).stroke();
+    doc.moveTo(startX + 665, yPosition).lineTo(startX + 665, yPosition + 25).stroke();
     
     yPosition += 25;
     
-    // Sub-header row
-    xPosition = 30;
-    doc.rect(25, yPosition - 5, 790, 22).fill('#3b82f6');
+    // Sub-header row with proper alignment
+    doc.rect(startX, yPosition, tableWidth, 20).fill('#3b82f6');
     doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
+    
+    const subHeaders = ['', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'Change %'];
+    let xPosition = startX;
     
     subHeaders.forEach((header, index) => {
       if (header) {
-        doc.text(header, xPosition + 2, yPosition + 5, { 
-          width: columnWidths[index] - 4, 
+        doc.text(header, xPosition + 5, yPosition + 6, { 
+          width: columnWidths[index] - 10, 
           align: 'center' 
         });
       }
       xPosition += columnWidths[index];
     });
     
-    yPosition += 22;
+    yPosition += 20;
     doc.fillColor('black').fontSize(9).font('Helvetica');
 
     data.data.forEach((row: any, rowIndex: number) => {
       if (yPosition > 720) {
         doc.addPage();
-        yPosition = 80;
+        yPosition = 50;
         
-        // Redraw header on new page with modern styling
-        doc.rect(25, yPosition - 5, 790, 25).fill('#1e40af');
-        doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
+        // Redraw header on new page
+        doc.rect(startX, yPosition, tableWidth, 25).fill('#1e40af');
+        doc.fillColor('white').fontSize(12).font('Helvetica-Bold');
         
-        doc.text('Commodity', 30, yPosition + 7, { width: 85, align: 'center' });
-        doc.text('CURRENT PERIOD', 120, yPosition + 7, { width: 255, align: 'center' });
-        doc.text('PREVIOUS PERIOD', 380, yPosition + 7, { width: 255, align: 'center' });
-        doc.text('Performance', 640, yPosition + 7, { width: 60, align: 'center' });
+        doc.text('Commodity', startX + 5, yPosition + 8, { width: 85, align: 'center' });
+        doc.text('CURRENT PERIOD', startX + 95, yPosition + 8, { width: 285, align: 'center' });
+        doc.text('PREVIOUS PERIOD', startX + 380, yPosition + 8, { width: 285, align: 'center' });
+        doc.text('Performance', startX + 665, yPosition + 8, { width: 70, align: 'center' });
         
         yPosition += 25;
         
         // Sub-header row
-        doc.rect(25, yPosition - 5, 790, 22).fill('#3b82f6');
+        doc.rect(startX, yPosition, tableWidth, 20).fill('#3b82f6');
         doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
         
-        let headerX = 30;
+        let headerX = startX;
         subHeaders.forEach((header, index) => {
           if (header) {
-            doc.text(header, headerX + 2, yPosition + 5, { 
-              width: columnWidths[index] - 4, 
+            doc.text(header, headerX + 5, yPosition + 6, { 
+              width: columnWidths[index] - 10, 
               align: 'center' 
             });
           }
           headerX += columnWidths[index];
         });
-        yPosition += 22;
+        yPosition += 20;
         doc.fillColor('black').fontSize(9).font('Helvetica');
       }
 
-      // Enhanced alternating row colors with better contrast
+      // Clean alternating row design
       const rowColor = rowIndex % 2 === 0 ? '#f8fafc' : '#ffffff';
-      doc.rect(25, yPosition - 3, 790, 22).fill(rowColor);
+      doc.rect(startX, yPosition, tableWidth, 20).fill(rowColor);
       
-      // Add subtle borders
-      doc.strokeColor('#e2e8f0').lineWidth(0.5);
-      doc.rect(25, yPosition - 3, 790, 22).stroke();
+      // Subtle row borders
+      doc.strokeColor('#e2e8f0').lineWidth(0.3);
+      doc.rect(startX, yPosition, tableWidth, 20).stroke();
       
-      // Color code the change percentage with better colors
-      const changeValue = row.changeInPercentage || 0;
-      const changeColor = changeValue > 0 ? '#059669' : 
-                         changeValue < 0 ? '#dc2626' : '#64748b';
-      const changeBgColor = changeValue > 0 ? '#ecfdf5' : 
-                           changeValue < 0 ? '#fef2f2' : '#f1f5f9';
-
-      // Enhanced data formatting
+      // Enhanced data formatting with proper alignment
       const values = [
         row.commodity || 'N/A',
         row.currentPeriod.rks?.toString() || '0',
         row.currentPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.currentPeriod.wagons?.toString() || '0',
         (row.currentPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
-        `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1) || '0.0'}Cr`,
+        `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1)}Cr`,
         row.previousPeriod.rks?.toString() || '0',
         row.previousPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.previousPeriod.wagons?.toString() || '0',
         (row.previousPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
-        `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1) || '0.0'}Cr`,
-        `${changeValue > 0 ? '+' : ''}${changeValue?.toFixed(1) || '0.0'}%`
+        `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1)}Cr`,
+        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1)}%`
       ];
 
-      // Special background for change percentage
-      doc.rect(640, yPosition - 3, 60, 22).fill(changeBgColor);
-      doc.strokeColor('#e2e8f0').lineWidth(0.5);
-      doc.rect(640, yPosition - 3, 60, 22).stroke();
-
-      xPosition = 30;
+      // Color coding for performance column
+      const changeValue = row.changeInPercentage || 0;
+      
+      xPosition = startX;
       values.forEach((value, index) => {
-        // Enhanced formatting for specific columns
         if (index === 0) {
-          // Commodity name in bold
-          doc.fillColor('#1f2937').font('Helvetica-Bold');
+          // Commodity name - left aligned and bold
+          doc.fillColor('#1f2937').font('Helvetica-Bold').fontSize(9);
+          doc.text(value, xPosition + 8, yPosition + 6, { 
+            width: columnWidths[index] - 16, 
+            align: 'left'
+          });
         } else if (index === 11) {
-          // Change percentage with special styling
-          doc.fillColor(changeColor).font('Helvetica-Bold');
+          // Change percentage with color coding
+          const changeColor = changeValue > 0 ? '#059669' : changeValue < 0 ? '#dc2626' : '#64748b';
+          doc.fillColor(changeColor).font('Helvetica-Bold').fontSize(9);
+          doc.text(value, xPosition + 5, yPosition + 6, { 
+            width: columnWidths[index] - 10, 
+            align: 'center'
+          });
         } else {
-          // Regular data
-          doc.fillColor('#374151').font('Helvetica');
+          // Regular data - center aligned
+          doc.fillColor('#374151').font('Helvetica').fontSize(9);
+          doc.text(value, xPosition + 5, yPosition + 6, { 
+            width: columnWidths[index] - 10, 
+            align: 'center'
+          });
         }
-        
-        doc.text(value, xPosition + 4, yPosition + 6, { 
-          width: columnWidths[index] - 8, 
-          align: index === 0 ? 'left' : 'center'
-        });
         xPosition += columnWidths[index];
       });
       
-      yPosition += 22;
+      yPosition += 20;
     });
 
-    // Enhanced Summary section
-    yPosition += 25;
-    if (yPosition > 650) {
+    // Clean Summary section
+    yPosition += 30;
+    if (yPosition > 580) {
       doc.addPage();
-      yPosition = 80;
+      yPosition = 50;
     }
 
-    // Professional summary design
-    doc.rect(25, yPosition, 790, 100).fill('#f8fafc').stroke('#cbd5e1');
-    doc.rect(25, yPosition, 790, 35).fill('#1e40af');
-    
+    const summaryWidth = 700;
+    const summaryX = (842 - summaryWidth) / 2;
+
     // Summary header
-    doc.fillColor('white').fontSize(16).font('Helvetica-Bold')
-       .text("PERFORMANCE SUMMARY", 30, yPosition + 10, { align: 'center', width: 780 });
+    doc.rect(summaryX, yPosition, summaryWidth, 30).fill('#1e40af');
+    doc.fillColor('white').fontSize(18).font('Helvetica-Bold')
+       .text("PERFORMANCE SUMMARY", summaryX, yPosition + 8, { align: 'center', width: summaryWidth });
     
-    yPosition += 40;
+    yPosition += 35;
     
     const totalCurrent = data.totals?.currentPeriod?.tonnage || 0;
     const totalPrevious = data.totals?.previousPeriod?.tonnage || 0;
     const totalChange = totalPrevious > 0 ? ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
     
-    // Current period metrics
-    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
-       .text("Current Period Total:", 40, yPosition + 10);
-    doc.fillColor('#059669').fontSize(14).font('Helvetica-Bold')
-       .text(`${(totalCurrent / 1000000).toFixed(2)} Million MT`, 200, yPosition + 10);
+    // Summary content with better layout
+    doc.rect(summaryX, yPosition, summaryWidth, 80).fill('#f8fafc').stroke('#cbd5e1');
     
-    // Previous period metrics
-    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
-       .text("Previous Period Total:", 40, yPosition + 30);
-    doc.fillColor('#6b7280').fontSize(14).font('Helvetica')
-       .text(`${(totalPrevious / 1000000).toFixed(2)} Million MT`, 200, yPosition + 30);
+    // Left side - Current period
+    doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
+       .text("Current Period Total:", summaryX + 30, yPosition + 20);
+    doc.fillColor('#059669').fontSize(16).font('Helvetica-Bold')
+       .text(`${(totalCurrent / 1000000).toFixed(2)} Million MT`, summaryX + 30, yPosition + 40);
     
-    // Performance indicator
+    // Middle - Previous period
+    doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
+       .text("Previous Period Total:", summaryX + 250, yPosition + 20);
+    doc.fillColor('#6b7280').fontSize(16).font('Helvetica')
+       .text(`${(totalPrevious / 1000000).toFixed(2)} Million MT`, summaryX + 250, yPosition + 40);
+    
+    // Right side - Performance change
     const changeColor = totalChange > 0 ? '#059669' : totalChange < 0 ? '#dc2626' : '#6b7280';
     const changeText = totalChange > 0 ? 'IMPROVEMENT' : totalChange < 0 ? 'DECLINE' : 'NO CHANGE';
     
-    doc.fillColor('#1f2937').fontSize(12).font('Helvetica-Bold')
-       .text("Overall Performance:", 420, yPosition + 10);
-    doc.fillColor(changeColor).fontSize(16).font('Helvetica-Bold')
-       .text(`${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)}%`, 580, yPosition + 10);
-    doc.fillColor(changeColor).fontSize(10).font('Helvetica-Bold')
-       .text(changeText, 580, yPosition + 30);
+    doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
+       .text("Overall Performance:", summaryX + 470, yPosition + 20);
+    doc.fillColor(changeColor).fontSize(18).font('Helvetica-Bold')
+       .text(`${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)}%`, summaryX + 470, yPosition + 40);
+    doc.fillColor(changeColor).fontSize(11).font('Helvetica-Bold')
+       .text(changeText, summaryX + 470, yPosition + 60);
 
-    // Key insights box
-    yPosition += 70;
-    doc.rect(25, yPosition, 790, 60).fill('#eff6ff').stroke('#3b82f6');
-    doc.fillColor('#1e40af').fontSize(12).font('Helvetica-Bold')
-       .text("KEY INSIGHTS", 30, yPosition + 10);
+    // Key insights section
+    yPosition += 100;
+    doc.rect(summaryX, yPosition, summaryWidth, 70).fill('#eff6ff').stroke('#3b82f6');
+    doc.fillColor('#1e40af').fontSize(14).font('Helvetica-Bold')
+       .text("KEY INSIGHTS", summaryX + 20, yPosition + 15);
     
-    doc.fillColor('#374151').fontSize(10).font('Helvetica');
+    doc.fillColor('#374151').fontSize(11).font('Helvetica');
     const insights = [
-      `• Total ${Math.abs(data.data.length)} commodities analyzed in this comparative study`,
+      `• Total ${data.data.length} commodities analyzed in this comparative study`,
       `• Freight revenue comparison shows ${totalChange > 0 ? 'positive growth' : totalChange < 0 ? 'decline' : 'stable performance'}`,
       `• Performance metrics calculated based on operational data from SCR Division`
     ];
     
     insights.forEach((insight, index) => {
-      doc.text(insight, 40, yPosition + 30 + (index * 12));
+      doc.text(insight, summaryX + 30, yPosition + 35 + (index * 15));
     });
 
-    // Enhanced footer with contact info
-    yPosition = doc.page.height - 60;
-    doc.rect(0, yPosition, 842, 60).fill('#1e3a8a');
-    doc.fillColor('white').fontSize(10).font('Helvetica-Bold')
-       .text('South Central Railway - Operations Management System', 30, yPosition + 15);
-    doc.fontSize(8).font('Helvetica')
-       .text('Confidential Report | For Internal Use Only', 30, yPosition + 30)
-       .text(`Report Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1`, 600, yPosition + 30);
+    // Professional footer
+    const footerY = doc.page.height - 40;
+    doc.rect(0, footerY, 842, 40).fill('#1e3a8a');
+    doc.fillColor('white').fontSize(11).font('Helvetica-Bold')
+       .text('South Central Railway - Operations Management System', 40, footerY + 10);
+    doc.fontSize(9).font('Helvetica')
+       .text('Confidential Report | For Internal Use Only', 40, footerY + 25)
+       .text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1 of 1`, 650, footerY + 25);
 
     console.log("Comparative loading PDF generation completed");
   } catch (error) {
