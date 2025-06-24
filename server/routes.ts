@@ -146,9 +146,14 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     // Clean header design
     doc.rect(0, 0, 842, 100).fill('#1e3a8a');
     
-    // SCR Logo area - positioned on the left
-    doc.rect(40, 20, 60, 60).fill('#ffffff').stroke('#1e3a8a').lineWidth(2);
-    doc.fillColor('#1e3a8a').fontSize(16).font('Helvetica-Bold').text('SCR', 55, 45, { align: 'center', width: 30 });
+    // Indian Railway Logo - positioned on the left
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 40, 20, { width: 60, height: 60 });
+    } catch (error) {
+      // Fallback if logo image is not available
+      doc.rect(40, 20, 60, 60).fill('#dc2626').stroke('#ffffff').lineWidth(2);
+      doc.fillColor('#ffffff').fontSize(12).font('Helvetica-Bold').text('IR', 60, 45, { align: 'center', width: 20 });
+    }
     
     // Main title - centered with proper spacing
     doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
@@ -373,8 +378,14 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     // Professional footer
     const footerY = doc.page.height - 40;
     doc.rect(0, footerY, 842, 40).fill('#1e3a8a');
+    // Add small logo in footer too
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 40, footerY + 5, { width: 30, height: 30 });
+    } catch (error) {
+      // Fallback for footer logo
+    }
     doc.fillColor('white').fontSize(11).font('Helvetica-Bold')
-       .text('South Central Railway - Operations Management System', 40, footerY + 10);
+       .text('South Central Railway - Operations Management System', 80, footerY + 10);
     doc.fontSize(9).font('Helvetica')
        .text('Confidential Report | For Internal Use Only', 40, footerY + 25)
        .text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1 of 1`, 650, footerY + 25);
@@ -388,11 +399,21 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
 
 function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any[], stationData: any[]) {
   try {
-    // Header with green gradient background
-    doc.rect(0, 0, 612, 80).fill('#059669');
-    doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
-       .text("Yearly Comparison Report", 50, 20, { align: "center" });
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 450, 55);
+    // Header with Indian Railway branding
+    doc.rect(0, 0, 612, 80).fill('#1e3a8a');
+    
+    // Add Indian Railway logo
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 30, 15, { width: 50, height: 50 });
+    } catch (error) {
+      // Fallback if logo not available
+      doc.rect(30, 15, 50, 50).fill('#dc2626').stroke('#ffffff').lineWidth(2);
+      doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('IR', 50, 35, { align: 'center', width: 10 });
+    }
+    
+    doc.fillColor('white').fontSize(22).font('Helvetica-Bold')
+       .text("YEARLY COMPARISON REPORT", 100, 20, { align: "center", width: 400 });
+    doc.fontSize(12).text(`Generated: ${new Date().toLocaleDateString('en-IN')}`, 420, 55);
     
     doc.fillColor('black');
     let yPosition = 100;
@@ -540,9 +561,16 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
     doc.text(`Total Tonnage: ${(totalTonnage / 1000000).toFixed(2)} Million MT`, 200, yPosition + 28);
     doc.text(`Total Freight: ₹${(totalFreight / 10000000).toFixed(1)} Cr`, 400, yPosition + 28);
 
-    // Footer
-    doc.fillColor('#6b7280').fontSize(8)
-       .text(`South Central Railway - Operations Analysis Report`, 30, doc.page.height - 30);
+    // Footer with logo
+    const footerY = doc.page.height - 40;
+    doc.rect(0, footerY, 612, 40).fill('#1e3a8a');
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 30, footerY + 5, { width: 30, height: 30 });
+    } catch (error) {
+      // Fallback for footer logo
+    }
+    doc.fillColor('white').fontSize(10).font('Helvetica-Bold')
+       .text('South Central Railway - Operations Analysis Report', 70, footerY + 15);
 
     console.log("Yearly comparison PDF generation completed");
   } catch (error) {
@@ -552,10 +580,26 @@ function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any
 }
 
 function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
-  // Header
-  doc.fontSize(16).text("Station wise Comparative Loading Particulars", 50, 50, { align: 'center' });
+  // Header with Indian Railway branding
+  doc.rect(0, 0, 842, 80).fill('#1e3a8a');
   
-  let yPosition = 90;
+  // Add Indian Railway logo
+  try {
+    doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 30, 15, { width: 50, height: 50 });
+  } catch (error) {
+    // Fallback if logo not available
+    doc.rect(30, 15, 50, 50).fill('#dc2626').stroke('#ffffff').lineWidth(2);
+    doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('IR', 50, 35, { align: 'center', width: 10 });
+  }
+  
+  doc.fillColor('white').fontSize(20).font('Helvetica-Bold')
+     .text("STATION WISE COMPARATIVE LOADING", 100, 25, { align: "center", width: 640 });
+  doc.fontSize(12).font('Helvetica')
+     .text(`Period: ${data.periods.current} vs ${data.periods.previous}`, 100, 50, { align: "center", width: 640 });
+  
+  doc.fillColor('black');
+  
+  let yPosition = 100;
   
   // Period headers
   doc.fontSize(12);
@@ -674,12 +718,24 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
 
 function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
   try {
-    // Header with background color
+    // Header with Indian Railway branding
     doc.rect(0, 0, 612, 80).fill('#1e3a8a');
-    doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
-       .text("Railway Loading Operations - All Entries", 50, 25, { align: "center" });
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, 420, 50);
-    doc.fontSize(10).text(`Total Records: ${entries.length}`, 420, 65);
+    
+    // Add Indian Railway logo
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 30, 15, { width: 50, height: 50 });
+    } catch (error) {
+      // Fallback if logo not available
+      doc.rect(30, 15, 50, 50).fill('#dc2626').stroke('#ffffff').lineWidth(2);
+      doc.fillColor('#ffffff').fontSize(10).font('Helvetica-Bold').text('IR', 50, 35, { align: 'center', width: 10 });
+    }
+    
+    doc.fillColor('white').fontSize(20).font('Helvetica-Bold')
+       .text("RAILWAY LOADING OPERATIONS", 100, 20, { align: "center", width: 400 });
+    doc.fontSize(14).font('Helvetica')
+       .text("All Entries Report", 100, 40, { align: "center", width: 400 });
+    doc.fontSize(10).text(`Generated: ${new Date().toLocaleDateString()}`, 420, 55);
+    doc.fontSize(9).text(`Total Records: ${entries.length}`, 420, 68);
     
     doc.fillColor('black');
     let yPosition = 100;
@@ -750,9 +806,16 @@ function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
       yPosition += 18;
     });
 
-    // Footer
-    doc.fontSize(8).fillColor('#666666')
-       .text(`Report generated by Railway Operations Management System`, 50, doc.page.height - 30);
+    // Footer with logo
+    const footerY = doc.page.height - 40;
+    doc.rect(0, footerY, 612, 40).fill('#1e3a8a');
+    try {
+      doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 30, footerY + 5, { width: 30, height: 30 });
+    } catch (error) {
+      // Fallback for footer logo
+    }
+    doc.fillColor('white').fontSize(10).font('Helvetica-Bold')
+       .text('Railway Operations Management System', 70, footerY + 15);
 
     console.log("All entries PDF generation completed");
   } catch (error) {
