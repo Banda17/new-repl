@@ -113,10 +113,6 @@ function Navigation() {
               <Search className="w-4 h-4 mr-2" />
               Historical
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/all-entries")}>
-              <Search className="w-4 h-4 mr-2" />
-              All Entries
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => navigate("/excel-upload")}>
               <Upload className="w-4 h-4 mr-2" />
               Excel Upload
