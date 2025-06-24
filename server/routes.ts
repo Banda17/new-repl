@@ -143,57 +143,123 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
 
 function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
   try {
-    doc.fontSize(20).text("Comparative Loading Analysis Report", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
-    doc.fontSize(10).text(`Period: ${data.periods.current} vs ${data.periods.previous}`, { align: "right" });
-    doc.moveDown(2);
+    // Header with blue background
+    doc.rect(0, 0, 612, 85).fill('#1e40af');
+    doc.fillColor('white').fontSize(22).font('Helvetica-Bold')
+       .text("Comparative Loading Analysis Report", 50, 20, { align: "center" });
+    doc.fontSize(12).text(`Period: ${data.periods.current} vs ${data.periods.previous}`, 50, 45, { align: "center" });
+    doc.fontSize(10).text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 450, 65);
+    
+    doc.fillColor('black');
+    let yPosition = 105;
 
-    // Table headers
-    const headers = ['Commodity', 'Current RKS', 'Current Avg/Day', 'Current Wagons', 'Current MT', 'Current Freight (₹)', 
-                    'Previous RKS', 'Previous Avg/Day', 'Previous Wagons', 'Previous MT', 'Previous Freight (₹)', 'Change %'];
+    // Optimized headers and column widths
+    const headers = ['Commodity', 'Curr RKs', 'Curr Avg', 'Curr Wag', 'Curr MT', 'Curr Fr', 'Prev RKs', 'Prev Avg', 'Prev Wag', 'Prev MT', 'Prev Fr', 'Change %'];
+    const columnWidths = [90, 40, 40, 40, 45, 50, 40, 40, 40, 45, 50, 50];
+    let xPosition = 30;
     
-    doc.fontSize(8);
-    let yPosition = doc.y;
-    const columnWidth = 45;
+    // Header row with blue background
+    doc.rect(25, yPosition - 5, 560, 25).fill('#3b82f6');
+    doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
     
-    // Draw headers
     headers.forEach((header, index) => {
-      doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+      doc.text(header, xPosition + 2, yPosition + 5, { 
+        width: columnWidths[index] - 4, 
+        align: 'center' 
+      });
+      xPosition += columnWidths[index];
     });
     
-    yPosition += 20;
-    doc.moveTo(50, yPosition).lineTo(550, yPosition).stroke();
-    yPosition += 5;
+    yPosition += 25;
+    doc.fillColor('black').fontSize(8).font('Helvetica');
 
-    // Draw data rows
     data.data.forEach((row: any, rowIndex: number) => {
-      if (yPosition > 700) {
+      if (yPosition > 720) {
         doc.addPage();
         yPosition = 50;
+        
+        // Redraw header on new page
+        doc.rect(25, yPosition - 5, 560, 25).fill('#3b82f6');
+        doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
+        let headerX = 30;
+        headers.forEach((header, index) => {
+          doc.text(header, headerX + 2, yPosition + 5, { 
+            width: columnWidths[index] - 4, 
+            align: 'center' 
+          });
+          headerX += columnWidths[index];
+        });
+        yPosition += 25;
+        doc.fillColor('black').fontSize(8).font('Helvetica');
       }
 
+      // Alternating row colors
+      const rowColor = rowIndex % 2 === 0 ? '#f1f5f9' : '#ffffff';
+      doc.rect(25, yPosition - 2, 560, 18).fill(rowColor);
+      
+      // Color code the change percentage
+      const changeColor = row.changeInPercentage > 0 ? '#16a34a' : 
+                         row.changeInPercentage < 0 ? '#dc2626' : '#6b7280';
+
       const values = [
-        row.commodity,
-        row.currentPeriod.rks.toString(),
-        row.currentPeriod.avgPerDay.toFixed(2),
-        row.currentPeriod.wagons.toString(),
-        (row.currentPeriod.tonnage / 1000000).toFixed(2),
-        `₹${(row.currentPeriod.freight / 10000000).toFixed(1)}Cr`,
-        row.previousPeriod.rks.toString(),
-        row.previousPeriod.avgPerDay.toFixed(2),
-        row.previousPeriod.wagons.toString(),
-        (row.previousPeriod.tonnage / 1000000).toFixed(2),
-        `₹${(row.previousPeriod.freight / 10000000).toFixed(1)}Cr`,
-        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage.toFixed(1)}%`
+        row.commodity || 'N/A',
+        row.currentPeriod.rks?.toString() || '0',
+        row.currentPeriod.avgPerDay?.toFixed(1) || '0.0',
+        row.currentPeriod.wagons?.toString() || '0',
+        (row.currentPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
+        `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1) || '0.0'}Cr`,
+        row.previousPeriod.rks?.toString() || '0',
+        row.previousPeriod.avgPerDay?.toFixed(1) || '0.0',
+        row.previousPeriod.wagons?.toString() || '0',
+        (row.previousPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
+        `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1) || '0.0'}Cr`,
+        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1) || '0.0'}%`
       ];
 
+      xPosition = 30;
       values.forEach((value, index) => {
-        doc.text(value, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+        // Use special color for change percentage
+        if (index === 11) {
+          doc.fillColor(changeColor);
+        } else {
+          doc.fillColor('black');
+        }
+        
+        doc.text(value, xPosition + 2, yPosition + 2, { 
+          width: columnWidths[index] - 4, 
+          align: index === 0 ? 'left' : 'center'
+        });
+        xPosition += columnWidths[index];
       });
       
-      yPosition += 15;
+      yPosition += 18;
     });
+
+    // Summary section
+    yPosition += 15;
+    if (yPosition > 680) {
+      doc.addPage();
+      yPosition = 50;
+    }
+
+    // Summary box with light blue background
+    doc.rect(25, yPosition, 560, 70).fill('#f0f9ff').stroke('#3b82f6');
+    doc.fillColor('#1e40af').fontSize(14).font('Helvetica-Bold')
+       .text("Summary", 35, yPosition + 10);
+    
+    doc.fillColor('black').fontSize(10).font('Helvetica');
+    const totalCurrent = data.totals?.currentPeriod?.tonnage || 0;
+    const totalPrevious = data.totals?.previousPeriod?.tonnage || 0;
+    const totalChange = totalPrevious > 0 ? ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
+    
+    doc.text(`Total Current Period: ${(totalCurrent / 1000000).toFixed(2)} Million MT`, 35, yPosition + 30);
+    doc.text(`Total Previous Period: ${(totalPrevious / 1000000).toFixed(2)} Million MT`, 35, yPosition + 45);
+    doc.fillColor(totalChange > 0 ? '#16a34a' : totalChange < 0 ? '#dc2626' : '#6b7280')
+       .text(`Overall Change: ${totalChange > 0 ? '+' : ''}${totalChange.toFixed(1)}%`, 350, yPosition + 37);
+
+    // Footer
+    doc.fillColor('#6b7280').fontSize(8)
+       .text(`Railway Operations Management System - SCR Division`, 30, doc.page.height - 30);
 
     console.log("Comparative loading PDF generation completed");
   } catch (error) {
@@ -204,99 +270,161 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
 
 function generateYearlyComparisonPDF(doc: typeof PDFDocument, commodityData: any[], stationData: any[]) {
   try {
-    doc.fontSize(20).text("Yearly Comparison Report", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
-    doc.moveDown(2);
+    // Header with green gradient background
+    doc.rect(0, 0, 612, 80).fill('#059669');
+    doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
+       .text("Yearly Comparison Report", 50, 20, { align: "center" });
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString('en-IN')}`, 450, 55);
+    
+    doc.fillColor('black');
+    let yPosition = 100;
 
-    // Commodity Summary
-    doc.fontSize(16).text("Commodity-wise Loading Summary", { underline: true });
-    doc.moveDown();
+    // Commodity Summary Section
+    doc.rect(30, yPosition, 550, 30).fill('#10b981');
+    doc.fillColor('white').fontSize(16).font('Helvetica-Bold')
+       .text("Commodity-wise Loading Summary", 40, yPosition + 8);
+    
+    yPosition += 40;
     
     const commodityHeaders = ['Commodity', 'Total Wagons', 'Total Tonnage (MT)', 'Total Freight (₹ Cr)'];
-    doc.fontSize(10);
-    let yPosition = doc.y;
-    const colWidth = 120;
+    const colWidths = [140, 120, 140, 140];
+    let xPosition = 30;
+    
+    // Commodity table header
+    doc.rect(25, yPosition - 5, 565, 22).fill('#34d399');
+    doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
     
     commodityHeaders.forEach((header, index) => {
-      doc.text(header, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+      doc.text(header, xPosition + 5, yPosition + 3, { 
+        width: colWidths[index] - 10, 
+        align: 'center' 
+      });
+      xPosition += colWidths[index];
     });
     
-    yPosition += 20;
-    doc.moveTo(50, yPosition).lineTo(530, yPosition).stroke();
-    yPosition += 5;
+    yPosition += 22;
+    doc.fillColor('black').fontSize(10).font('Helvetica');
 
-    commodityData.forEach((item: any) => {
+    commodityData.forEach((item: any, itemIndex: number) => {
       if (yPosition > 700) {
         doc.addPage();
         yPosition = 50;
       }
 
-      // Safely handle potentially undefined/null values
+      // Alternating row colors for commodities
+      const rowColor = itemIndex % 2 === 0 ? '#ecfdf5' : '#ffffff';
+      doc.rect(25, yPosition - 2, 565, 18).fill(rowColor);
+
       const safeWagons = Number(item.totalWagons) || 0;
       const safeTonnage = Number(item.totalTonnage) || 0;
       const safeFreight = Number(item.totalFreight) || 0;
 
       const values = [
         String(item.commodity || 'N/A'),
-        safeWagons.toLocaleString(),
+        safeWagons.toLocaleString('en-IN'),
         (safeTonnage / 1000000).toFixed(2),
         `₹${(safeFreight / 10000000).toFixed(1)}`
       ];
 
+      xPosition = 30;
       values.forEach((value, index) => {
-        doc.text(String(value), 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+        doc.fillColor('black').text(String(value), xPosition + 5, yPosition + 2, { 
+          width: colWidths[index] - 10, 
+          align: index === 0 ? 'left' : 'center' 
+        });
+        xPosition += colWidths[index];
       });
       
-      yPosition += 15;
+      yPosition += 18;
     });
 
-    // Station Summary
-    if (yPosition > 600) {
+    // Station Summary Section
+    yPosition += 30;
+    if (yPosition > 650) {
       doc.addPage();
       yPosition = 50;
-    } else {
-      yPosition += 30;
     }
 
-    doc.fontSize(16).text("Station-wise Loading Summary", 50, yPosition);
-    doc.moveTo(50, yPosition + 18).lineTo(250, yPosition + 18).stroke();
-    yPosition += 30;
+    doc.rect(30, yPosition, 550, 30).fill('#1e40af');
+    doc.fillColor('white').fontSize(16).font('Helvetica-Bold')
+       .text("Station-wise Loading Summary", 40, yPosition + 8);
+    
+    yPosition += 40;
     
     const stationHeaders = ['Station', 'Total Wagons', 'Total Tonnage (MT)', 'Total Freight (₹ Cr)'];
+    xPosition = 30;
+    
+    // Station table header
+    doc.rect(25, yPosition - 5, 565, 22).fill('#3b82f6');
+    doc.fillColor('white').fontSize(11).font('Helvetica-Bold');
     
     stationHeaders.forEach((header, index) => {
-      doc.text(header, 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+      doc.text(header, xPosition + 5, yPosition + 3, { 
+        width: colWidths[index] - 10, 
+        align: 'center' 
+      });
+      xPosition += colWidths[index];
     });
     
-    yPosition += 20;
-    doc.moveTo(50, yPosition).lineTo(530, yPosition).stroke();
-    yPosition += 5;
+    yPosition += 22;
+    doc.fillColor('black').fontSize(10).font('Helvetica');
 
-    stationData.forEach((item: any) => {
-      if (yPosition > 700) {
+    stationData.forEach((item: any, itemIndex: number) => {
+      if (yPosition > 720) {
         doc.addPage();
         yPosition = 50;
       }
 
-      // Safely handle potentially undefined/null values
+      // Alternating row colors for stations
+      const rowColor = itemIndex % 2 === 0 ? '#eff6ff' : '#ffffff';
+      doc.rect(25, yPosition - 2, 565, 18).fill(rowColor);
+
       const safeWagons = Number(item.totalWagons) || 0;
       const safeTonnage = Number(item.totalTonnage) || 0;
       const safeFreight = Number(item.totalFreight) || 0;
 
       const values = [
         String(item.station || 'N/A'),
-        safeWagons.toLocaleString(),
+        safeWagons.toLocaleString('en-IN'),
         (safeTonnage / 1000000).toFixed(2),
         `₹${(safeFreight / 10000000).toFixed(1)}`
       ];
 
+      xPosition = 30;
       values.forEach((value, index) => {
-        doc.text(String(value), 50 + (index * colWidth), yPosition, { width: colWidth - 5, align: 'center' });
+        doc.fillColor('black').text(String(value), xPosition + 5, yPosition + 2, { 
+          width: colWidths[index] - 10, 
+          align: index === 0 ? 'left' : 'center' 
+        });
+        xPosition += colWidths[index];
       });
       
-      yPosition += 15;
+      yPosition += 18;
     });
+
+    // Summary totals section
+    yPosition += 20;
+    if (yPosition > 680) {
+      doc.addPage();
+      yPosition = 50;
+    }
+
+    const totalWagons = commodityData.reduce((sum, item) => sum + (Number(item.totalWagons) || 0), 0);
+    const totalTonnage = commodityData.reduce((sum, item) => sum + (Number(item.totalTonnage) || 0), 0);
+    const totalFreight = commodityData.reduce((sum, item) => sum + (Number(item.totalFreight) || 0), 0);
+
+    doc.rect(25, yPosition, 565, 50).fill('#f8fafc').stroke('#e2e8f0');
+    doc.fillColor('#1e40af').fontSize(14).font('Helvetica-Bold')
+       .text("Overall Summary", 35, yPosition + 10);
+    
+    doc.fillColor('black').fontSize(11).font('Helvetica');
+    doc.text(`Total Wagons: ${totalWagons.toLocaleString('en-IN')}`, 35, yPosition + 28);
+    doc.text(`Total Tonnage: ${(totalTonnage / 1000000).toFixed(2)} Million MT`, 200, yPosition + 28);
+    doc.text(`Total Freight: ₹${(totalFreight / 10000000).toFixed(1)} Cr`, 400, yPosition + 28);
+
+    // Footer
+    doc.fillColor('#6b7280').fontSize(8)
+       .text(`South Central Railway - Operations Analysis Report`, 30, doc.page.height - 30);
 
     console.log("Yearly comparison PDF generation completed");
   } catch (error) {
@@ -428,56 +556,85 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
 
 function generateAllEntriesPDF(doc: typeof PDFDocument, entries: any[]) {
   try {
-    doc.fontSize(20).text("Railway Loading Operations - All Entries", { align: "center" });
-    doc.moveDown();
-    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, { align: "right" });
-    doc.fontSize(10).text(`Total Records: ${entries.length}`, { align: "right" });
-    doc.moveDown(2);
-
-    const headers = ['Date', 'Station', 'Commodity', 'Wagons', 'Tonnage', 'Freight (₹)', 'RR No.'];
-    doc.fontSize(8);
-    let yPosition = doc.y;
-    const columnWidth = 75;
+    // Header with background color
+    doc.rect(0, 0, 612, 80).fill('#1e3a8a');
+    doc.fillColor('white').fontSize(24).font('Helvetica-Bold')
+       .text("Railway Loading Operations - All Entries", 50, 25, { align: "center" });
+    doc.fontSize(12).text(`Generated on: ${new Date().toLocaleDateString()}`, 420, 50);
+    doc.fontSize(10).text(`Total Records: ${entries.length}`, 420, 65);
     
-    // Draw headers
+    doc.fillColor('black');
+    let yPosition = 100;
+
+    const headers = ['Date', 'Station', 'Commodity', 'Wagons', 'Tonnage (MT)', 'Freight (₹)', 'RR No.'];
+    const columnWidths = [70, 80, 100, 60, 80, 80, 70];
+    let xPosition = 50;
+    
+    // Header row with background
+    doc.rect(45, yPosition - 5, 520, 25).fill('#3b82f6');
+    doc.fillColor('white').fontSize(10).font('Helvetica-Bold');
+    
     headers.forEach((header, index) => {
-      doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+      doc.text(header, xPosition + 2, yPosition + 5, { 
+        width: columnWidths[index] - 4, 
+        align: 'center' 
+      });
+      xPosition += columnWidths[index];
     });
     
-    yPosition += 20;
-    doc.moveTo(50, yPosition).lineTo(575, yPosition).stroke();
-    yPosition += 5;
+    yPosition += 25;
+    doc.fillColor('black').fontSize(9).font('Helvetica');
 
-    entries.forEach((entry: any) => {
-      if (yPosition > 700) {
+    entries.forEach((entry: any, entryIndex) => {
+      if (yPosition > 720) {
         doc.addPage();
         yPosition = 50;
         
-        // Redraw headers on new page
+        // Redraw header on new page
+        doc.rect(45, yPosition - 5, 520, 25).fill('#3b82f6');
+        doc.fillColor('white').fontSize(10).font('Helvetica-Bold');
+        let headerX = 50;
         headers.forEach((header, index) => {
-          doc.text(header, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+          doc.text(header, headerX + 2, yPosition + 5, { 
+            width: columnWidths[index] - 4, 
+            align: 'center' 
+          });
+          headerX += columnWidths[index];
         });
-        yPosition += 20;
-        doc.moveTo(50, yPosition).lineTo(575, yPosition).stroke();
-        yPosition += 5;
+        yPosition += 25;
+        doc.fillColor('black').fontSize(9).font('Helvetica');
       }
 
+      // Alternating row colors
+      const rowColor = entryIndex % 2 === 0 ? '#f8fafc' : '#ffffff';
+      doc.rect(45, yPosition - 2, 520, 18).fill(rowColor);
+      doc.fillColor('black');
+
       const values = [
-        new Date(entry.pDate).toLocaleDateString(),
-        entry.station,
-        entry.commodity,
-        entry.wagons.toString(),
-        entry.tonnage.toLocaleString(),
+        new Date(entry.pDate).toLocaleDateString('en-IN'),
+        entry.station || 'N/A',
+        entry.commodity || 'N/A',
+        entry.wagons?.toString() || '0',
+        (entry.tonnage / 1000).toFixed(2),
         `₹${(entry.freight / 100000).toFixed(1)}L`,
-        `${entry.rrNoFrom}-${entry.rrNoTo}`
+        `${entry.rrNoFrom || 0}-${entry.rrNoTo || 0}`
       ];
 
+      xPosition = 50;
       values.forEach((value, index) => {
-        doc.text(value, 50 + (index * columnWidth), yPosition, { width: columnWidth - 2, align: 'center' });
+        doc.text(value, xPosition + 2, yPosition + 2, { 
+          width: columnWidths[index] - 4, 
+          align: index === 2 ? 'left' : 'center' 
+        });
+        xPosition += columnWidths[index];
       });
       
-      yPosition += 12;
+      yPosition += 18;
     });
+
+    // Footer
+    doc.fontSize(8).fillColor('#666666')
+       .text(`Report generated by Railway Operations Management System`, 50, doc.page.height - 30);
 
     console.log("All entries PDF generation completed");
   } catch (error) {
