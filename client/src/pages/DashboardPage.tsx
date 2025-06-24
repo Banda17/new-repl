@@ -325,32 +325,36 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-6 space-y-6">
-      <div className="flex items-center gap-2 mb-4">
-        <Activity className="h-6 w-6 text-white" />
-        <h1 className="text-2xl font-bold text-white">Operating Dashboard</h1>
+    <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+          <span className="hidden sm:inline">Operating Dashboard</span>
+          <span className="sm:hidden">Dashboard</span>
+        </h1>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30">
-          <TabsTrigger value="charts" className="flex items-center gap-2 text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white">
-            <BarChart3 className="h-4 w-4" />
+        <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30 transition-all duration-300">
+          <TabsTrigger value="charts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
             Charts
           </TabsTrigger>
-          <TabsTrigger value="tables" className="flex items-center gap-2 text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white">
-            <Table2 className="h-4 w-4" />
+          <TabsTrigger value="tables" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
+            <Table2 className="h-3 w-3 sm:h-4 sm:w-4" />
             Tables
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="charts" className="space-y-6">
+        <TabsContent value="charts" className="space-y-4 sm:space-y-6">
           {/* Commodity Loading Chart */}
-          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between text-white text-lg font-bold">
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
+            <CardHeader className="p-3 sm:p-6">
+              <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white text-sm sm:text-lg font-bold gap-3 sm:gap-2">
                 <div className="flex items-center gap-2">
-                  <BarChart3 className="h-5 w-5" />
-                  Yearly Commodity Loading Comparison (MT)
+                  <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <span className="hidden sm:inline">Yearly Commodity Loading Comparison (MT)</span>
+                  <span className="sm:hidden">Commodity Loading (MT)</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Button
