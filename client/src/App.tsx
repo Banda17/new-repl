@@ -50,25 +50,26 @@ function Navigation() {
   };
 
   return (
-    <nav className="backdrop-blur-lg bg-blue-900/30 border-b border-white/30 text-white px-4 py-3 sm:p-4 overflow-x-auto shadow-xl sticky top-0 z-50">
-      <div className="container mx-auto flex flex-nowrap gap-3 sm:gap-4 items-center min-w-max">
+    <nav className="backdrop-blur-lg bg-blue-900/30 border-b border-white/30 text-white px-2 py-2 sm:px-4 sm:py-3 overflow-x-auto shadow-xl sticky top-0 z-50 transition-all duration-300">
+      <div className="container mx-auto flex flex-nowrap gap-1 sm:gap-3 md:gap-4 items-center min-w-max lg:min-w-0 lg:justify-start">
         {/* Main Dashboard */}
         <Button 
           variant="ghost" 
           onClick={() => navigate("/dashboard")}
-          className={`text-white hover:bg-blue-500/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 backdrop-blur-sm ${location === "/dashboard" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
+          className={`text-white hover:bg-blue-500/20 transition-all duration-300 rounded-md text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 md:px-4 backdrop-blur-sm ${location === "/dashboard" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
         >
-          <Activity className="w-4 h-4 mr-2" />
-          Operating Dashboard
+          <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+          <span className="hidden sm:inline">Operating Dashboard</span>
+          <span className="sm:hidden">Dashboard</span>
         </Button>
 
         {/* Goods Tab */}
         <Button 
           variant="ghost" 
           onClick={() => navigate("/goods")}
-          className={`text-white hover:bg-blue-500/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4 backdrop-blur-sm ${location === "/goods" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
+          className={`text-white hover:bg-blue-500/20 transition-all duration-300 rounded-md text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 md:px-4 backdrop-blur-sm ${location === "/goods" ? "bg-blue-500/25 font-bold shadow-lg border border-white/20" : ""}`}
         >
-          <Package2 className="w-4 h-4 mr-2" />
+          <Package2 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
           Goods
         </Button>
 
@@ -99,43 +100,46 @@ function Navigation() {
         {/* Operations Dropdown - moved to secondary position */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="text-white hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4">
-              Operations
-              <ChevronDown className="w-4 h-4 ml-2" />
+            <Button variant="ghost" className="text-white hover:bg-white/20 transition-all duration-300 rounded-md text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 md:px-4">
+              <span className="hidden sm:inline">Operations</span>
+              <span className="sm:hidden">Ops</span>
+              <ChevronDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1 sm:ml-2" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-48">
-            <DropdownMenuItem onClick={() => navigate("/upload")}>
-              <Upload className="w-4 h-4 mr-2" />
-              Upload Data
+          <DropdownMenuContent className="w-40 sm:w-48 backdrop-blur-lg bg-white/95 border border-white/20 shadow-xl">
+            <DropdownMenuItem onClick={() => navigate("/upload")} className="transition-colors duration-200">
+              <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Upload Data</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/historical")}>
-              <Search className="w-4 h-4 mr-2" />
-              Historical
+            <DropdownMenuItem onClick={() => navigate("/historical")} className="transition-colors duration-200">
+              <Search className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Historical</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate("/excel-upload")}>
-              <Upload className="w-4 h-4 mr-2" />
-              Excel Upload
+            <DropdownMenuItem onClick={() => navigate("/excel-upload")} className="transition-colors duration-200">
+              <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Excel Upload</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <div className="ml-auto flex items-center gap-2 sm:gap-4">
+        <div className="ml-auto flex items-center gap-1 sm:gap-2 md:gap-4">
           {user?.isAdmin && (
             <Button 
               variant="ghost"
               onClick={() => navigate("/users")}
-              className="text-white/90 hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4"
+              className="text-white/90 hover:bg-white/20 transition-all duration-300 rounded-md text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 md:px-4"
             >
-              Users
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+              <span className="hidden sm:inline">Users</span>
             </Button>
           )}
           <Button 
             variant="ghost"
             onClick={handleLogout}
-            className="text-white/90 hover:bg-white/20 transition-all rounded-md text-xs sm:text-sm h-9 px-3 sm:px-4"
+            className="text-white/90 hover:bg-red-500/30 transition-all duration-300 rounded-md text-xs sm:text-sm h-8 sm:h-9 px-2 sm:px-3 md:px-4"
           >
-            Logout
+            <span className="hidden sm:inline">Logout</span>
+            <span className="sm:hidden">Exit</span>
           </Button>
         </div>
       </div>
