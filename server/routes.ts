@@ -142,7 +142,6 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
 }
 
 function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
-  console.log("PDF Generation Function - Received periods:", data.periods);
   try {
     // Clean header design
     doc.rect(0, 0, 842, 100).fill('#1e3a8a');
@@ -1020,22 +1019,49 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).send("Not authenticated");
       }
 
-      // Generate comparative loading data directly from database
-      const currentDate = new Date();
-      const currentYear = currentDate.getFullYear();
-      const previousYear = currentYear - 1;
+      // Use the exact same date calculation logic as the main comparative loading API
+      const today = new Date();
+      const currentYear = today.getFullYear(); // 2025
+      const previousYear = currentYear - 1; // 2024
+      const currentDay = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
       
-      const currentPeriodStart = new Date(currentYear, 5, 16); // June 16 current year
-      const currentPeriodEnd = new Date(currentYear, 5, 18);   // June 18 current year
-      const previousPeriodStart = new Date(previousYear, 5, 16); // June 16 previous year
-      const previousPeriodEnd = new Date(previousYear, 5, 18);   // June 18 previous year
+      let currentPeriodStart: Date;
+      let currentPeriodEnd: Date;
+      
+      // Implement the specific weekly pattern:
+      // - On Monday: show previous week (Monday to Sunday)
+      // - On Tuesday-Sunday: show current week Monday to previous day
+      if (currentDay === 1) { // Monday
+        // Show previous week (Monday to Sunday)
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() - 7); // Previous Monday
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous Sunday
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      } else {
+        // Show current week Monday to previous day
+        const mondayOffset = currentDay === 0 ? -6 : 1 - currentDay;
+        currentPeriodStart = new Date(today);
+        currentPeriodStart.setDate(today.getDate() + mondayOffset);
+        currentPeriodStart.setHours(0, 0, 0, 0);
+        
+        currentPeriodEnd = new Date(today);
+        currentPeriodEnd.setDate(today.getDate() - 1); // Previous day
+        currentPeriodEnd.setHours(23, 59, 59, 999);
+      }
+      
+      // Calculate the same period in previous year
+      const previousPeriodStart = new Date(previousYear, currentPeriodStart.getMonth(), currentPeriodStart.getDate());
+      const previousPeriodEnd = new Date(previousYear, currentPeriodEnd.getMonth(), currentPeriodEnd.getDate());
 
       const formatDate = (date: Date) => {
-        return date.toLocaleDateString('en-GB', { 
-          day: '2-digit', 
+        return date.toLocaleDateString('en-GB', {
+          day: '2-digit',
           month: '2-digit', 
-          year: 'numeric' 
-        });
+          year: 'numeric'
+        }).replace(/\//g, '-');
       };
 
       // Fetch current period data
@@ -1120,8 +1146,7 @@ export function registerRoutes(app: Express): Server {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="comparative-loading-report.pdf"');
       
-      console.log("PDF Generation - Current Date:", new Date().toISOString());
-      console.log("PDF Generation - Calculated Periods:", data.periods);
+
       doc.pipe(res);
       generateComparativeLoadingPDF(doc, data);
       doc.end();
