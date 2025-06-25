@@ -267,12 +267,12 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
         row.currentPeriod.rks?.toString() || '0',
         row.currentPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.currentPeriod.wagons?.toString() || '0',
-        (row.currentPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
+        row.currentPeriod.tonnage?.toFixed(3) || '0.000',
         `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1)}Cr`,
         row.previousPeriod.rks?.toString() || '0',
         row.previousPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.previousPeriod.wagons?.toString() || '0',
-        (row.previousPeriod.tonnage / 1000000)?.toFixed(2) || '0.00',
+        row.previousPeriod.tonnage?.toFixed(3) || '0.000',
         `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1)}Cr`,
         `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1)}%`
       ];
@@ -345,7 +345,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Previous Period Total:", summaryX + 250, yPosition + 20);
     doc.fillColor('#6b7280').fontSize(16).font('Helvetica')
-       .text(`${(totalPrevious / 1000000).toFixed(2)} Million MT`, summaryX + 250, yPosition + 40);
+       .text(`${totalPrevious.toFixed(3)} MT`, summaryX + 250, yPosition + 40);
     
     // Right side - Performance change
     const changeColor = totalChange > 0 ? '#059669' : totalChange < 0 ? '#dc2626' : '#6b7280';

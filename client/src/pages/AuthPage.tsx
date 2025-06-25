@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useUser } from "@/hooks/use-user";
 import { useLocation } from "wouter";
+// Use direct path to attached assets
 
 // Type for user with admin properties
 interface UserWithAdmin {
@@ -111,7 +112,14 @@ export default function AuthPage() {
       
       <Card className="w-full max-w-md relative z-10 backdrop-blur-lg bg-blue-500/5 border-white/15 shadow-2xl">
         <CardHeader className="space-y-2">
-          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl text-white font-bold">
+          <div className="flex items-center justify-center mb-4">
+            <img 
+              src="/attached_assets/Indian_Railway_Logo_2_1750768462355.png" 
+              alt="Indian Railway Logo" 
+              className="w-16 h-16 sm:w-20 sm:h-20"
+            />
+          </div>
+          <CardTitle className="flex items-center gap-2 text-xl sm:text-2xl text-white font-bold text-center">
             {isRegistering ? "Register New User" : "Railway Operations Login"}
             {typedUser?.isAdmin && (
               <span className="text-xs sm:text-sm bg-white/20 text-white px-2 py-1 rounded-full backdrop-blur-sm">
@@ -119,7 +127,7 @@ export default function AuthPage() {
               </span>
             )}
           </CardTitle>
-          <CardDescription className="text-sm sm:text-base text-white/90">
+          <CardDescription className="text-sm sm:text-base text-white/90 text-center">
             {isRegistering
               ? "As an admin, you can create new user accounts here"
               : typedUser?.isAdmin
