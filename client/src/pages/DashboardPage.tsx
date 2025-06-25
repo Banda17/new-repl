@@ -583,14 +583,14 @@ export default function DashboardPage() {
                         <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">MT</TableHead>
                         <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Freight (₹)</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Wagons</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">MT</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Freight (₹)</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in MT</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -764,9 +764,9 @@ export default function DashboardPage() {
                         <TableHead className="border text-center text-xs bg-yellow-50">Rks</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Avg/Day</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Wagon</TableHead>
-                        <TableHead className="border text-center text-xs bg-yellow-50">Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50">MT</TableHead>
                         <TableHead className="border text-center text-xs bg-yellow-50">Freight (₹)</TableHead>
-                        <TableHead className="border text-center text-xs bg-red-50">in Million MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50">in MT</TableHead>
                         <TableHead className="border text-center text-xs bg-red-50">in %age</TableHead>
                       </TableRow>
                     </TableHeader>
