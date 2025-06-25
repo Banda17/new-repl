@@ -203,7 +203,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.rect(startX, yPosition, tableWidth, 20).fill('#3b82f6');
     doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
     
-    const subHeaders = ['', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'Change %'];
+    const subHeaders = ['', 'RKs', 'Avg/Day', 'Wagons', 'Million MT', 'Freight', 'RKs', 'Avg/Day', 'Wagons', 'Million MT', 'Freight', 'Change %'];
     let xPosition = startX;
     
     subHeaders.forEach((header, index) => {
@@ -267,12 +267,12 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
         row.currentPeriod.rks?.toString() || '0',
         row.currentPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.currentPeriod.wagons?.toString() || '0',
-        row.currentPeriod.tonnage?.toFixed(3) || '0.000',
+        (row.currentPeriod.tonnage / 1000000)?.toFixed(3) || '0.000',
         `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1)}Cr`,
         row.previousPeriod.rks?.toString() || '0',
         row.previousPeriod.avgPerDay?.toFixed(1) || '0.0',
         row.previousPeriod.wagons?.toString() || '0',
-        row.previousPeriod.tonnage?.toFixed(3) || '0.000',
+        (row.previousPeriod.tonnage / 1000000)?.toFixed(3) || '0.000',
         `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1)}Cr`,
         `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1)}%`
       ];
@@ -339,13 +339,13 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Current Period Total:", summaryX + 30, yPosition + 20);
     doc.fillColor('#059669').fontSize(16).font('Helvetica-Bold')
-       .text(`${totalCurrent.toFixed(3)} MT`, summaryX + 30, yPosition + 40);
+       .text(`${(totalCurrent / 1000000).toFixed(3)} Million MT`, summaryX + 30, yPosition + 40);
     
     // Middle - Previous period
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Previous Period Total:", summaryX + 250, yPosition + 20);
     doc.fillColor('#6b7280').fontSize(16).font('Helvetica')
-       .text(`${totalPrevious.toFixed(3)} MT`, summaryX + 250, yPosition + 40);
+       .text(`${(totalPrevious / 1000000).toFixed(3)} Million MT`, summaryX + 250, yPosition + 40);
     
     // Right side - Performance change
     const changeColor = totalChange > 0 ? '#059669' : totalChange < 0 ? '#dc2626' : '#6b7280';
