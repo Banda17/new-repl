@@ -112,12 +112,12 @@ export default function DashboardPage() {
   // Fetch current period trend data
   const { data: dailyTrendData, isLoading: isLoadingDaily } = useQuery({
     queryKey: ["/api/daily-trend-data"],
-    enabled: activeTab === "trends" && periodView === "daily",
+    enabled: activeTab === "charts" && periodView === "daily",
   });
 
   const { data: monthlyTrendData, isLoading: isLoadingMonthly } = useQuery({
     queryKey: ["/api/monthly-trend-data"],
-    enabled: activeTab === "trends" && periodView === "monthly",
+    enabled: activeTab === "charts" && periodView === "monthly",
   });
 
   // Fetch yearly commodity data for Charts tab
