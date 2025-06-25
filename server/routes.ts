@@ -1460,27 +1460,27 @@ export function registerRoutes(app: Express): Server {
       res.json({
         tonnage: dailyTonnageData.map(item => ({
           date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
-          tonnage: item.tonnage
+          tonnage: Number(item.tonnage)
         })),
         operations: dailyOperationsData.map(item => ({
           date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
-          count: item.count
+          count: Number(item.count)
         })),
         commodities: Object.values(commodityChartData).map((item: any) => ({
           date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
-          COAL: item.COAL || 0,
-          "FERT.": item["FERT."] || 0,
-          LIMESTONE: item.LIMESTONE || 0,
-          LATERITE: item.LATERITE || 0,
-          OTHER: item.OTHER || 0
+          COAL: Number(item.COAL) || 0,
+          "FERT.": Number(item["FERT."]) || 0,
+          LIMESTONE: Number(item.LIMESTONE) || 0,
+          LATERITE: Number(item.LATERITE) || 0,
+          OTHER: Number(item.OTHER) || 0
         })),
         stations: Object.values(stationChartData).map((item: any) => ({
           date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
-          PKPK: item.PKPK || 0,
-          "COA/KSLK": item["COA/KSLK"] || 0,
-          "COA/CFL": item["COA/CFL"] || 0,
-          RVD: item.RVD || 0,
-          OTHER: item.OTHER || 0
+          PKPK: Number(item.PKPK) || 0,
+          "COA/KSLK": Number(item["COA/KSLK"]) || 0,
+          "COA/CFL": Number(item["COA/CFL"]) || 0,
+          RVD: Number(item.RVD) || 0,
+          OTHER: Number(item.OTHER) || 0
         }))
       });
     } catch (error) {
