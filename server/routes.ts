@@ -358,22 +358,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor(changeColor).fontSize(11).font('Helvetica-Bold')
        .text(changeText, summaryX + 470, yPosition + 60);
 
-    // Key insights section
-    yPosition += 100;
-    doc.rect(summaryX, yPosition, summaryWidth, 70).fill('#eff6ff').stroke('#3b82f6');
-    doc.fillColor('#1e40af').fontSize(14).font('Helvetica-Bold')
-       .text("KEY INSIGHTS", summaryX + 20, yPosition + 15);
-    
-    doc.fillColor('#374151').fontSize(11).font('Helvetica');
-    const insights = [
-      `• Total ${data.data.length} commodities analyzed in this comparative study`,
-      `• Freight revenue comparison shows ${totalChange > 0 ? 'positive growth' : totalChange < 0 ? 'decline' : 'stable performance'}`,
-      `• Performance metrics calculated based on operational data from SCR Division`
-    ];
-    
-    insights.forEach((insight, index) => {
-      doc.text(insight, summaryX + 30, yPosition + 35 + (index * 15));
-    });
+
 
     // Professional footer
     const footerY = doc.page.height - 40;
