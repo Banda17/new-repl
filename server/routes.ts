@@ -339,7 +339,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Current Period Total:", summaryX + 30, yPosition + 20);
     doc.fillColor('#059669').fontSize(16).font('Helvetica-Bold')
-       .text(`${(totalCurrent / 1000000).toFixed(2)} Million MT`, summaryX + 30, yPosition + 40);
+       .text(`${totalCurrent.toFixed(3)} MT`, summaryX + 30, yPosition + 40);
     
     // Middle - Previous period
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
