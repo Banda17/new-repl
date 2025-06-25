@@ -360,6 +360,182 @@ export default function DashboardPage() {
         </TabsList>
 
         <TabsContent value="charts" className="space-y-4 sm:space-y-6">
+          {/* Trend Analysis Section */}
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-white text-xl font-bold flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Current Period Trends
+                  </CardTitle>
+                  <p className="text-white/80 text-sm mt-1">
+                    Loading operations trend analysis with clear date visualization
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Select value={periodView} onValueChange={(value: "daily" | "monthly") => setPeriodView(value)}>
+                    <SelectTrigger className="w-32 bg-white/90 text-gray-800 border-white/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Daily
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="monthly">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Monthly
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {(periodView === "daily" && isLoadingDaily) || (periodView === "monthly" && isLoadingMonthly) ? (
+                <div className="flex items-center justify-center h-96">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  <p className="ml-3 text-white/80">Loading trend data...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Tonnage Trend */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Tonnage Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={periodView === "daily" ? dailyTrendData?.tonnage || [] : monthlyTrendData?.tonnage || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                          />
+                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <Tooltip 
+                            formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, 'Tonnage']}
+                            labelStyle={{ color: '#374151' }}
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="tonnage" 
+                            stroke="#2563eb" 
+                            strokeWidth={2}
+                            dot={{ fill: '#2563eb', r: 4 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Operations Count */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Operations Count ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={periodView === "daily" ? dailyTrendData?.operations || [] : monthlyTrendData?.operations || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                          />
+                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <Tooltip 
+                            formatter={(value: number) => [value, 'Operations']}
+                            labelStyle={{ color: '#374151' }}
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="count" 
+                            stroke="#dc2626" 
+                            strokeWidth={2}
+                            dot={{ fill: '#dc2626', r: 4 }}
+                          />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Top Commodities Trend */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Commodities Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={periodView === "daily" ? dailyTrendData?.commodities || [] : monthlyTrendData?.commodities || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                          />
+                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <Tooltip 
+                            formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, '']}
+                            labelStyle={{ color: '#374151' }}
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                          />
+                          <Line type="monotone" dataKey="COAL" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="IRON ORE" stroke="#ea580c" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="FERT." stroke="#7c2d12" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="LIMESTONE" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Top Stations Trend */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Stations Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <LineChart data={periodView === "daily" ? dailyTrendData?.stations || [] : monthlyTrendData?.stations || []}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                          />
+                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <Tooltip 
+                            formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, '']}
+                            labelStyle={{ color: '#374151' }}
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                          />
+                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Commodity Loading Chart */}
           <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
             <CardHeader className="p-3 sm:p-6">
