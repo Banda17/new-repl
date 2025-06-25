@@ -103,10 +103,21 @@ export default function DashboardPage() {
     enabled: activeTab === "tables", // Only fetch when Tables tab is active
   });
 
-  // Fetch station comparative loading data for Tables tab (May 26-31)
+  // Fetch station comparative loading data for Tables tab
   const { data: stationComparativeData, isLoading: isLoadingStationComparative } = useQuery<StationComparativeData>({
     queryKey: ["/api/station-comparative-loading"],
     enabled: activeTab === "tables", // Only fetch when Tables tab is active
+  });
+
+  // Fetch current period trend data
+  const { data: dailyTrendData, isLoading: isLoadingDaily } = useQuery({
+    queryKey: ["/api/daily-trend-data"],
+    enabled: activeTab === "trends" && periodView === "daily",
+  });
+
+  const { data: monthlyTrendData, isLoading: isLoadingMonthly } = useQuery({
+    queryKey: ["/api/monthly-trend-data"],
+    enabled: activeTab === "trends" && periodView === "monthly",
   });
 
   // Fetch yearly commodity data for Charts tab
