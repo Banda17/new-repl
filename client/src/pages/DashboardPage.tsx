@@ -569,10 +569,10 @@ export default function DashboardPage() {
                         <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50 text-gray-800">
                           Commodity
                         </TableHead>
-                        <TableHead colSpan={5} className="border text-center font-bold bg-green-50 text-gray-800">
+                        <TableHead colSpan={4} className="border text-center font-bold bg-green-50 text-gray-800">
                           {comparativeData.periods.current}
                         </TableHead>
-                        <TableHead colSpan={5} className="border text-center font-bold bg-yellow-50 text-gray-800">
+                        <TableHead colSpan={4} className="border text-center font-bold bg-yellow-50 text-gray-800">
                           {comparativeData.periods.previous}
                         </TableHead>
                         <TableHead colSpan={2} className="border text-center font-bold bg-red-50 text-gray-800">

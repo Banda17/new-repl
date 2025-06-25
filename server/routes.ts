@@ -613,12 +613,12 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
     
     // Column headers with precise spacing to match reference
     const headers = [
-      'Station', 'Rks', 'Avg/Day', 'Wagon', 'MT', 'Freight', 
-      'Rks', 'Avg/Day', 'Wagon', 'MT', 'Freight', 
+      'Station', 'Rks', 'Avg/Day', 'Wagon', 'MT', 
+      'Rks', 'Avg/Day', 'Wagon', 'MT', 
       'in Units', 'in %age'
     ];
     
-    const colWidths = [70, 35, 50, 50, 60, 70, 35, 50, 50, 60, 70, 65, 55];
+    const colWidths = [80, 40, 60, 60, 70, 40, 60, 60, 70, 75, 65];
     let xPosition = tableStartX + 5;
     
     doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
@@ -665,12 +665,10 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
         currentAvgPerDay.toFixed(2),
         currentWagon.toString(),
         (currentMT / 1000).toFixed(0), // Tonnage in thousands as shown in reference
-        currentFreight.toFixed(0),
         compareRks.toString(),
         compareAvgPerDay.toFixed(2),
         compareWagon.toString(),
         (compareMT / 1000).toFixed(0), // Tonnage in thousands as shown in reference
-        compareFreight.toFixed(0),
         (changeInMT / 1000).toFixed(3), // Change in thousands with 3 decimals
         changeInPercentage.toFixed(2)
       ];
@@ -703,12 +701,10 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
       Number(totals.currentPeriod.avgPerDay).toFixed(2),
       Number(totals.currentPeriod.wagons).toString(),
       (Number(totals.currentPeriod.tonnage) / 1000).toFixed(0), // Tonnage in thousands
-      Number(totals.currentPeriod.freight).toFixed(0),
       Number(totals.previousPeriod.rks).toString(),
       Number(totals.previousPeriod.avgPerDay).toFixed(2),
       Number(totals.previousPeriod.wagons).toString(),
       (Number(totals.previousPeriod.tonnage) / 1000).toFixed(0), // Tonnage in thousands
-      Number(totals.previousPeriod.freight).toFixed(0),
       (totalChangeInMT / 1000).toFixed(3), // Change in thousands with 3 decimals
       totalChangeInPercentage.toFixed(2)
     ];
