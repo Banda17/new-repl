@@ -348,14 +348,10 @@ export default function DashboardPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 bg-blue-900/40 backdrop-blur-lg border border-white/30 transition-all duration-300">
+        <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30 transition-all duration-300">
           <TabsTrigger value="charts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
             <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
-            Charts
-          </TabsTrigger>
-          <TabsTrigger value="trends" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
-            <TrendingUp className="h-3 w-3 sm:h-4 sm:w-4" />
-            Trends
+            Charts & Trends
           </TabsTrigger>
           <TabsTrigger value="tables" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
             <Table2 className="h-3 w-3 sm:h-4 sm:w-4" />
