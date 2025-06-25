@@ -407,9 +407,12 @@ export default function DashboardPage() {
                   {/* Tonnage Trend */}
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Tonnage Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
-                    <div className="h-64">
+                    <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? dailyTrendData?.tonnage || [] : monthlyTrendData?.tonnage || []}>
+                        <LineChart 
+                          data={periodView === "daily" ? dailyTrendData?.tonnage || [] : monthlyTrendData?.tonnage || []}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey={periodView === "daily" ? "date" : "month"} 
@@ -418,8 +421,14 @@ export default function DashboardPage() {
                             angle={-45}
                             textAnchor="end"
                             height={80}
+                            interval={0}
                           />
-                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <YAxis 
+                            fontSize={10} 
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value/1000).toFixed(0)}K`}
+                            domain={['dataMin', 'dataMax']}
+                          />
                           <Tooltip 
                             formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, 'Tonnage']}
                             labelStyle={{ color: '#374151' }}
@@ -431,6 +440,7 @@ export default function DashboardPage() {
                             stroke="#2563eb" 
                             strokeWidth={2}
                             dot={{ fill: '#2563eb', r: 4 }}
+                            connectNulls={false}
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -440,9 +450,12 @@ export default function DashboardPage() {
                   {/* Operations Count */}
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Operations Count ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
-                    <div className="h-64">
+                    <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? dailyTrendData?.operations || [] : monthlyTrendData?.operations || []}>
+                        <LineChart 
+                          data={periodView === "daily" ? dailyTrendData?.operations || [] : monthlyTrendData?.operations || []}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey={periodView === "daily" ? "date" : "month"} 
@@ -451,8 +464,13 @@ export default function DashboardPage() {
                             angle={-45}
                             textAnchor="end"
                             height={80}
+                            interval={0}
                           />
-                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <YAxis 
+                            fontSize={10} 
+                            tick={{ fill: '#374151' }}
+                            domain={['dataMin', 'dataMax']}
+                          />
                           <Tooltip 
                             formatter={(value: number) => [value, 'Operations']}
                             labelStyle={{ color: '#374151' }}
@@ -464,6 +482,7 @@ export default function DashboardPage() {
                             stroke="#dc2626" 
                             strokeWidth={2}
                             dot={{ fill: '#dc2626', r: 4 }}
+                            connectNulls={false}
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -473,9 +492,12 @@ export default function DashboardPage() {
                   {/* Top Commodities Trend */}
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Commodities Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
-                    <div className="h-64">
+                    <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? dailyTrendData?.commodities || [] : monthlyTrendData?.commodities || []}>
+                        <LineChart 
+                          data={periodView === "daily" ? dailyTrendData?.commodities || [] : monthlyTrendData?.commodities || []}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey={periodView === "daily" ? "date" : "month"} 
@@ -484,18 +506,24 @@ export default function DashboardPage() {
                             angle={-45}
                             textAnchor="end"
                             height={80}
+                            interval={0}
                           />
-                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <YAxis 
+                            fontSize={10} 
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value/1000).toFixed(0)}K`}
+                            domain={['dataMin', 'dataMax']}
+                          />
                           <Tooltip 
                             formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, '']}
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
-                          <Line type="monotone" dataKey="COAL" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="IRON ORE" stroke="#ea580c" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="FERT." stroke="#7c2d12" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="LIMESTONE" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="COAL" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="IRON ORE" stroke="#ea580c" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="FERT." stroke="#7c2d12" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="LIMESTONE" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -504,9 +532,12 @@ export default function DashboardPage() {
                   {/* Top Stations Trend */}
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Stations Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
-                    <div className="h-64">
+                    <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? dailyTrendData?.stations || [] : monthlyTrendData?.stations || []}>
+                        <LineChart 
+                          data={periodView === "daily" ? dailyTrendData?.stations || [] : monthlyTrendData?.stations || []}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey={periodView === "daily" ? "date" : "month"} 
@@ -515,18 +546,24 @@ export default function DashboardPage() {
                             angle={-45}
                             textAnchor="end"
                             height={80}
+                            interval={0}
                           />
-                          <YAxis fontSize={10} tick={{ fill: '#374151' }} />
+                          <YAxis 
+                            fontSize={10} 
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value/1000).toFixed(0)}K`}
+                            domain={['dataMin', 'dataMax']}
+                          />
                           <Tooltip 
                             formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, '']}
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
-                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} />
+                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>

@@ -1261,8 +1261,9 @@ export function registerRoutes(app: Express): Server {
           lte(railwayLoadingOperations.pDate, previousPeriodEnd)
         ));
 
-      const currentDays = 6;
-      const previousDays = 6;
+      // Calculate actual number of days in each period
+      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const stationComparison = generateStationComparison(currentData, previousData, currentDays, previousDays);
 
       const formatDate = (date: Date) => {
