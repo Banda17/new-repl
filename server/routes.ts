@@ -646,14 +646,14 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
       currentRks.toString(),
       currentAvgPerDay.toFixed(2),
       currentWagon.toString(),
-      currentMT.toFixed(3),
+      (currentMT / 1000000).toFixed(3),
       currentFreight.toFixed(2),
       compareRks.toString(),
       compareAvgPerDay.toFixed(2),
       compareWagon.toString(),
-      compareMT.toFixed(3),
+      (compareMT / 1000000).toFixed(3),
       compareFreight.toFixed(2),
-      changeInMT.toFixed(3),
+      (changeInMT / 1000000).toFixed(3),
       changeInPercentage.toFixed(2)
     ];
     
@@ -683,14 +683,14 @@ function generateStationComparativeLoadingPDF(doc: typeof PDFDocument, data: any
     Number(totals.currentPeriod.rks).toString(),
     Number(totals.currentPeriod.avgPerDay).toFixed(2),
     Number(totals.currentPeriod.wagons).toString(),
-    Number(totals.currentPeriod.tonnage).toFixed(3),
+    (Number(totals.currentPeriod.tonnage) / 1000000).toFixed(3),
     Number(totals.currentPeriod.freight).toFixed(2),
     Number(totals.previousPeriod.rks).toString(),
     Number(totals.previousPeriod.avgPerDay).toFixed(2),
     Number(totals.previousPeriod.wagons).toString(),
-    Number(totals.previousPeriod.tonnage).toFixed(3),
+    (Number(totals.previousPeriod.tonnage) / 1000000).toFixed(3),
     Number(totals.previousPeriod.freight).toFixed(2),
-    totalChangeInMT.toFixed(3),
+    (totalChangeInMT / 1000000).toFixed(3),
     totalChangeInPercentage.toFixed(2)
   ];
   
