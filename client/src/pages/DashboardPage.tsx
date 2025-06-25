@@ -662,7 +662,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.currentPeriod.wagons)}
                         </TableCell>
                         <TableCell className="border text-center font-bold text-lg">
-                          {(comparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(2)}
+                          {comparativeData.totals.currentPeriod.tonnage.toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           ₹{formatNumber(comparativeData.totals.currentPeriod.freight)}
@@ -679,7 +679,7 @@ export default function DashboardPage() {
                           {formatNumber(comparativeData.totals.previousPeriod.wagons)}
                         </TableCell>
                         <TableCell className="border text-center font-bold text-lg">
-                          {(comparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(2)}
+                          {comparativeData.totals.previousPeriod.tonnage.toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           ₹{formatNumber(comparativeData.totals.previousPeriod.freight)}
@@ -687,7 +687,7 @@ export default function DashboardPage() {
                         
                         {/* Total Change */}
                         <TableCell className={`border text-center font-bold text-lg ${getChangeColor(comparativeData.totals.changeInMT)}`}>
-                          {comparativeData.totals.changeInMT > 0 ? '+' : ''}{(comparativeData.totals.changeInMT / 1000000).toFixed(2)}
+                          {comparativeData.totals.changeInMT > 0 ? '+' : ''}{comparativeData.totals.changeInMT.toFixed(3)}
                         </TableCell>
                         <TableCell className={`border text-center font-bold text-lg ${getChangeColor(comparativeData.totals.changeInPercentage)}`}>
                           {comparativeData.totals.changeInPercentage > 0 ? '+' : ''}{comparativeData.totals.changeInPercentage}%
@@ -792,7 +792,7 @@ export default function DashboardPage() {
                               {row.currentWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {((row.currentMT || 0) / 1000000).toFixed(3)}
+                              {(row.currentMT || 0).toFixed(3)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
                               ₹{formatNumber(row.currentFreight || 0)}
@@ -809,7 +809,7 @@ export default function DashboardPage() {
                               {row.compareWagon || 0}
                             </TableCell>
                             <TableCell className="border text-center text-sm font-medium">
-                              {((row.compareMT || 0) / 1000000).toFixed(3)}
+                              {(row.compareMT || 0).toFixed(3)}
                             </TableCell>
                             <TableCell className="border text-center text-sm">
                               ₹{formatNumber(row.compareFreight || 0)}
@@ -817,7 +817,7 @@ export default function DashboardPage() {
                             
                             {/* Variation Data */}
                             <TableCell className={`border text-center text-sm font-medium ${variationUnits >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {(variationUnits / 1000000).toFixed(3)}
+                              {variationUnits.toFixed(3)}
                             </TableCell>
                             <TableCell className={`border text-center text-sm font-bold ${variationPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {variationPercentage.toFixed(2)}
@@ -843,7 +843,7 @@ export default function DashboardPage() {
                           {stationComparativeData.totals.currentPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {((stationComparativeData.totals.currentPeriod.tonnage || 0) / 1000000).toFixed(3)}
+                          {(stationComparativeData.totals.currentPeriod.tonnage || 0).toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           ₹{formatNumber(stationComparativeData.totals.currentPeriod.freight || 0)}
@@ -860,7 +860,7 @@ export default function DashboardPage() {
                           {stationComparativeData.totals.previousPeriod.wagons || 0}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
-                          {((stationComparativeData.totals.previousPeriod.tonnage || 0) / 1000000).toFixed(3)}
+                          {(stationComparativeData.totals.previousPeriod.tonnage || 0).toFixed(3)}
                         </TableCell>
                         <TableCell className="border text-center font-bold">
                           ₹{formatNumber(stationComparativeData.totals.previousPeriod.freight || 0)}
@@ -870,7 +870,7 @@ export default function DashboardPage() {
                         <TableCell className={`border text-center font-bold text-lg ${
                           ((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {(((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / 1000000).toFixed(3)}
+                          {((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)).toFixed(3)}
                         </TableCell>
                         <TableCell className={`border text-center font-bold text-lg ${
                           (((stationComparativeData.totals.currentPeriod.tonnage || 0) - (stationComparativeData.totals.previousPeriod.tonnage || 0)) / (stationComparativeData.totals.previousPeriod.tonnage || 1) * 100) >= 0 ? 'text-green-600' : 'text-red-600'
