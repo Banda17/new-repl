@@ -3295,9 +3295,10 @@ export function registerRoutes(app: Express): Server {
           lte(railwayLoadingOperations.pDate, previousPeriodEnd)
         ));
 
-      // Calculate days in period
-      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1; // May 26-31 = 6 days
+      // Calculate actual days in period correctly  
+      // For 23-06-2025 to 24-06-2025, this should be 2 days
+      const currentDays = Math.floor((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const previousDays = Math.floor((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
 
       const stationComparison = generateStationComparison(currentData, previousData, currentDays, previousDays);
 
