@@ -142,6 +142,7 @@ function generateWagonReport(doc: typeof PDFDocument, data: any[]) {
 }
 
 function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
+  console.log("PDF Generation Function - Received periods:", data.periods);
   try {
     // Clean header design
     doc.rect(0, 0, 842, 100).fill('#1e3a8a');
@@ -1119,6 +1120,8 @@ export function registerRoutes(app: Express): Server {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', 'attachment; filename="comparative-loading-report.pdf"');
       
+      console.log("PDF Generation - Current Date:", new Date().toISOString());
+      console.log("PDF Generation - Calculated Periods:", data.periods);
       doc.pipe(res);
       generateComparativeLoadingPDF(doc, data);
       doc.end();
