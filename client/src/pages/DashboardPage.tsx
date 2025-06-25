@@ -672,6 +672,7 @@ export default function DashboardPage() {
                           <Line type="monotone" dataKey="FERT." stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="LIMESTONE" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="LATERITE" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
                           <Legend />
                         </LineChart>
                       </ResponsiveContainer>
@@ -706,6 +707,7 @@ export default function DashboardPage() {
                           <Line type="monotone" dataKey="COA/KSLK" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="COA/CFL" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="RVD" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
                           <Legend />
                         </LineChart>
                       </ResponsiveContainer>

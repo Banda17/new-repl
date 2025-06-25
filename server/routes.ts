@@ -1394,34 +1394,48 @@ export function registerRoutes(app: Express): Server {
       .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`)
       .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
 
-      // Get daily commodity data for top 4 commodities
+      // Get daily commodity data for top commodities and others
       const dailyCommodityData = await db.select({
         date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
-        commodity: railwayLoadingOperations.commodity,
+        commodity: sql<string>`CASE 
+          WHEN ${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE') 
+          THEN ${railwayLoadingOperations.commodity}
+          ELSE 'OTHER'
+        END`,
         tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
       })
       .from(railwayLoadingOperations)
       .where(and(
         gte(railwayLoadingOperations.pDate, startDate),
-        lte(railwayLoadingOperations.pDate, endDate),
-        sql`${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE')`
+        lte(railwayLoadingOperations.pDate, endDate)
       ))
-      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, railwayLoadingOperations.commodity)
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, sql`CASE 
+        WHEN ${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE') 
+        THEN ${railwayLoadingOperations.commodity}
+        ELSE 'OTHER'
+      END`)
       .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
 
-      // Get daily station data for top 4 stations  
+      // Get daily station data for top stations and others
       const dailyStationData = await db.select({
         date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
-        station: railwayLoadingOperations.station,
+        station: sql<string>`CASE 
+          WHEN ${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD') 
+          THEN ${railwayLoadingOperations.station}
+          ELSE 'OTHER'
+        END`,
         tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
       })
       .from(railwayLoadingOperations)
       .where(and(
         gte(railwayLoadingOperations.pDate, startDate),
-        lte(railwayLoadingOperations.pDate, endDate),
-        sql`${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD')`
+        lte(railwayLoadingOperations.pDate, endDate)
       ))
-      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, railwayLoadingOperations.station)
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, sql`CASE 
+        WHEN ${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD') 
+        THEN ${railwayLoadingOperations.station}
+        ELSE 'OTHER'
+      END`)
       .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
 
       // Transform commodity data into chart format
@@ -1456,14 +1470,16 @@ export function registerRoutes(app: Express): Server {
           COAL: item.COAL || 0,
           "FERT.": item["FERT."] || 0,
           LIMESTONE: item.LIMESTONE || 0,
-          LATERITE: item.LATERITE || 0
+          LATERITE: item.LATERITE || 0,
+          OTHER: item.OTHER || 0
         })),
         stations: Object.values(stationChartData).map((item: any) => ({
           date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
           PKPK: item.PKPK || 0,
           "COA/KSLK": item["COA/KSLK"] || 0,
           "COA/CFL": item["COA/CFL"] || 0,
-          RVD: item.RVD || 0
+          RVD: item.RVD || 0,
+          OTHER: item.OTHER || 0
         }))
       });
     } catch (error) {
@@ -1512,34 +1528,48 @@ export function registerRoutes(app: Express): Server {
       .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`)
       .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
 
-      // Get monthly commodity data for top 4 commodities
+      // Get monthly commodity data for top commodities and others
       const monthlyCommodityData = await db.select({
         month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
-        commodity: railwayLoadingOperations.commodity,
+        commodity: sql<string>`CASE 
+          WHEN ${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE') 
+          THEN ${railwayLoadingOperations.commodity}
+          ELSE 'OTHER'
+        END`,
         tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
       })
       .from(railwayLoadingOperations)
       .where(and(
         gte(railwayLoadingOperations.pDate, startDate),
-        lte(railwayLoadingOperations.pDate, endDate),
-        sql`${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE')`
+        lte(railwayLoadingOperations.pDate, endDate)
       ))
-      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, railwayLoadingOperations.commodity)
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, sql`CASE 
+        WHEN ${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE') 
+        THEN ${railwayLoadingOperations.commodity}
+        ELSE 'OTHER'
+      END`)
       .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
 
-      // Get monthly station data for top 4 stations  
+      // Get monthly station data for top stations and others
       const monthlyStationData = await db.select({
         month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
-        station: railwayLoadingOperations.station,
+        station: sql<string>`CASE 
+          WHEN ${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD') 
+          THEN ${railwayLoadingOperations.station}
+          ELSE 'OTHER'
+        END`,
         tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
       })
       .from(railwayLoadingOperations)
       .where(and(
         gte(railwayLoadingOperations.pDate, startDate),
-        lte(railwayLoadingOperations.pDate, endDate),
-        sql`${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD')`
+        lte(railwayLoadingOperations.pDate, endDate)
       ))
-      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, railwayLoadingOperations.station)
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, sql`CASE 
+        WHEN ${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD') 
+        THEN ${railwayLoadingOperations.station}
+        ELSE 'OTHER'
+      END`)
       .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
 
       // Transform commodity data into chart format
@@ -1574,14 +1604,16 @@ export function registerRoutes(app: Express): Server {
           COAL: item.COAL || 0,
           "FERT.": item["FERT."] || 0,
           LIMESTONE: item.LIMESTONE || 0,
-          LATERITE: item.LATERITE || 0
+          LATERITE: item.LATERITE || 0,
+          OTHER: item.OTHER || 0
         })),
         stations: Object.values(stationChartData).map((item: any) => ({
           month: item.month,
           PKPK: item.PKPK || 0,
           "COA/KSLK": item["COA/KSLK"] || 0,
           "COA/CFL": item["COA/CFL"] || 0,
-          RVD: item.RVD || 0
+          RVD: item.RVD || 0,
+          OTHER: item.OTHER || 0
         }))
       });
     } catch (error) {
