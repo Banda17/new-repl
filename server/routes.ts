@@ -1357,6 +1357,242 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Daily trend data endpoint - last 30 days
+  app.get("/api/daily-trend-data", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - 30);
+      
+      // Get daily tonnage data
+      const dailyTonnageData = await db.select({
+        date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate)
+      ))
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`)
+      .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
+
+      // Get daily operations count
+      const dailyOperationsData = await db.select({
+        date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
+        count: sql<number>`COUNT(*)`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate)
+      ))
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`)
+      .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
+
+      // Get daily commodity data for top 4 commodities
+      const dailyCommodityData = await db.select({
+        date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
+        commodity: railwayLoadingOperations.commodity,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate),
+        sql`${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE')`
+      ))
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, railwayLoadingOperations.commodity)
+      .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
+
+      // Get daily station data for top 4 stations  
+      const dailyStationData = await db.select({
+        date: sql<string>`DATE(${railwayLoadingOperations.pDate})`,
+        station: railwayLoadingOperations.station,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate),
+        sql`${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD')`
+      ))
+      .groupBy(sql`DATE(${railwayLoadingOperations.pDate})`, railwayLoadingOperations.station)
+      .orderBy(sql`DATE(${railwayLoadingOperations.pDate})`);
+
+      // Transform commodity data into chart format
+      const commodityChartData: { [key: string]: any } = {};
+      dailyCommodityData.forEach(item => {
+        if (!commodityChartData[item.date]) {
+          commodityChartData[item.date] = { date: item.date };
+        }
+        commodityChartData[item.date][item.commodity] = item.tonnage;
+      });
+
+      // Transform station data into chart format
+      const stationChartData: { [key: string]: any } = {};
+      dailyStationData.forEach(item => {
+        if (!stationChartData[item.date]) {
+          stationChartData[item.date] = { date: item.date };
+        }
+        stationChartData[item.date][item.station] = item.tonnage;
+      });
+
+      res.json({
+        tonnage: dailyTonnageData.map(item => ({
+          date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
+          tonnage: item.tonnage
+        })),
+        operations: dailyOperationsData.map(item => ({
+          date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
+          count: item.count
+        })),
+        commodities: Object.values(commodityChartData).map((item: any) => ({
+          date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
+          COAL: item.COAL || 0,
+          "FERT.": item["FERT."] || 0,
+          LIMESTONE: item.LIMESTONE || 0,
+          LATERITE: item.LATERITE || 0
+        })),
+        stations: Object.values(stationChartData).map((item: any) => ({
+          date: new Date(item.date).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' }),
+          PKPK: item.PKPK || 0,
+          "COA/KSLK": item["COA/KSLK"] || 0,
+          "COA/CFL": item["COA/CFL"] || 0,
+          RVD: item.RVD || 0
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching daily trend data:", error);
+      res.status(500).json({
+        error: "Failed to fetch daily trend data",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Monthly trend data endpoint - last 12 months
+  app.get("/api/monthly-trend-data", async (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).send("Not authenticated");
+    }
+    
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setMonth(endDate.getMonth() - 12);
+      
+      // Get monthly tonnage data
+      const monthlyTonnageData = await db.select({
+        month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate)
+      ))
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`)
+      .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
+
+      // Get monthly operations count
+      const monthlyOperationsData = await db.select({
+        month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
+        count: sql<number>`COUNT(*)`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate)
+      ))
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`)
+      .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
+
+      // Get monthly commodity data for top 4 commodities
+      const monthlyCommodityData = await db.select({
+        month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
+        commodity: railwayLoadingOperations.commodity,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate),
+        sql`${railwayLoadingOperations.commodity} IN ('COAL', 'FERT.', 'LIMESTONE', 'LATERITE')`
+      ))
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, railwayLoadingOperations.commodity)
+      .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
+
+      // Get monthly station data for top 4 stations  
+      const monthlyStationData = await db.select({
+        month: sql<string>`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`,
+        station: railwayLoadingOperations.station,
+        tonnage: sql<number>`SUM(${railwayLoadingOperations.tonnage})`
+      })
+      .from(railwayLoadingOperations)
+      .where(and(
+        gte(railwayLoadingOperations.pDate, startDate),
+        lte(railwayLoadingOperations.pDate, endDate),
+        sql`${railwayLoadingOperations.station} IN ('PKPK', 'COA/KSLK', 'COA/CFL', 'RVD')`
+      ))
+      .groupBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`, railwayLoadingOperations.station)
+      .orderBy(sql`TO_CHAR(${railwayLoadingOperations.pDate}, 'YYYY-MM')`);
+
+      // Transform commodity data into chart format
+      const commodityChartData: { [key: string]: any } = {};
+      monthlyCommodityData.forEach(item => {
+        if (!commodityChartData[item.month]) {
+          commodityChartData[item.month] = { month: item.month };
+        }
+        commodityChartData[item.month][item.commodity] = item.tonnage;
+      });
+
+      // Transform station data into chart format
+      const stationChartData: { [key: string]: any } = {};
+      monthlyStationData.forEach(item => {
+        if (!stationChartData[item.month]) {
+          stationChartData[item.month] = { month: item.month };
+        }
+        stationChartData[item.month][item.station] = item.tonnage;
+      });
+
+      res.json({
+        tonnage: monthlyTonnageData.map(item => ({
+          month: item.month,
+          tonnage: item.tonnage
+        })),
+        operations: monthlyOperationsData.map(item => ({
+          month: item.month,
+          count: item.count
+        })),
+        commodities: Object.values(commodityChartData).map((item: any) => ({
+          month: item.month,
+          COAL: item.COAL || 0,
+          "FERT.": item["FERT."] || 0,
+          LIMESTONE: item.LIMESTONE || 0,
+          LATERITE: item.LATERITE || 0
+        })),
+        stations: Object.values(stationChartData).map((item: any) => ({
+          month: item.month,
+          PKPK: item.PKPK || 0,
+          "COA/KSLK": item["COA/KSLK"] || 0,
+          "COA/CFL": item["COA/CFL"] || 0,
+          RVD: item.RVD || 0
+        }))
+      });
+    } catch (error) {
+      console.error("Error fetching monthly trend data:", error);
+      res.status(500).json({
+        error: "Failed to fetch monthly trend data",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   app.get("/api/railway-loading-operations", async (req, res) => {
     try {
       if (!req.isAuthenticated()) {

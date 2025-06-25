@@ -116,6 +116,14 @@ The system follows a modern full-stack architecture with clear separation of con
   - Updated all PDF generation functions (comparative, yearly, station, all entries) with consistent branding
   - Improved typography, color schemes, and visual hierarchy across all reports
   - Added fallback handling for logo display and enhanced professional appearance
+- June 25, 2025. Added current period trend analysis with switchable time views:
+  - Created new "Trends" tab in dashboard with daily/monthly toggle
+  - Added four line charts: Tonnage trend, Operations count, Top commodities trend, Top stations trend
+  - Implemented backend APIs for daily (last 30 days) and monthly (last 12 months) trend data
+  - Charts feature clear date visualization with proper formatting and interactive tooltips
+  - Fixed average per day calculation issue (was dividing by 3 instead of 2 days)
+  - Removed freight column from both comparative loading tables and PDF reports
+  - Enhanced user experience with responsive design and glassmorphic styling
 
 ## User Preferences
 
