@@ -1359,6 +1359,100 @@ export default function DashboardPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* Duration Summary Table */}
+          <Card className="bg-gradient-to-br from-purple-600 via-blue-600 to-indigo-700 backdrop-blur-sm border-white/20 shadow-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-white text-xl">
+                <Activity className="h-6 w-6" />
+                Duration & Performance Summary
+              </CardTitle>
+              <p className="text-sm text-white/80">
+                {comparativeData && stationComparativeData
+                  ? `Analysis period: ${comparativeData.periods.current} vs ${comparativeData.periods.previous}`
+                  : "Comprehensive duration analysis combining commodity and station performance metrics."
+                }
+              </p>
+            </CardHeader>
+            <CardContent>
+              {isLoadingComparative || isLoadingStationComparative ? (
+                <div className="h-64 flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  <p className="ml-3 text-white/80">Loading duration data...</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg overflow-hidden shadow-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gradient-to-r from-purple-50 to-blue-50">
+                        <TableHead className="border text-center font-bold">Category</TableHead>
+                        <TableHead className="border text-center font-bold">Item</TableHead>
+                        <TableHead className="border text-center font-bold">Period Duration</TableHead>
+                        <TableHead className="border text-center font-bold">Current Avg/Day</TableHead>
+                        <TableHead className="border text-center font-bold">Previous Avg/Day</TableHead>
+                        <TableHead className="border text-center font-bold">Current Total (MT)</TableHead>
+                        <TableHead className="border text-center font-bold">Previous Total (MT)</TableHead>
+                        <TableHead className="border text-center font-bold">Change (%)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {/* Commodity Duration Data */}
+                      {comparativeData?.data.slice(0, 5).map((row, index) => (
+                        <TableRow key={`commodity-${row.commodity}`} className={index % 2 === 0 ? "bg-purple-50/30" : "bg-white"}>
+                          <TableCell className="border font-medium text-purple-800">Commodity</TableCell>
+                          <TableCell className="border font-medium">{row.commodity}</TableCell>
+                          <TableCell className="border text-center text-sm">
+                            {comparativeData.periods.current}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.currentPeriod.avgPerDay || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.previousPeriod.avgPerDay || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.currentPeriod.tonnage / 1000).toFixed(1)}K
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.previousPeriod.tonnage / 1000).toFixed(1)}K
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-medium ${getChangeColor(row.changeInPercentage)}`}>
+                            {row.changeInPercentage > 0 ? '+' : ''}{row.changeInPercentage.toFixed(1)}%
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      
+                      {/* Station Duration Data */}
+                      {stationComparativeData?.data.slice(0, 5).map((row, index) => (
+                        <TableRow key={`station-${row.station}`} className={index % 2 === 0 ? "bg-blue-50/30" : "bg-white"}>
+                          <TableCell className="border font-medium text-blue-800">Station</TableCell>
+                          <TableCell className="border font-medium">{row.station}</TableCell>
+                          <TableCell className="border text-center text-sm">
+                            {stationComparativeData.periods.current}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.currentAvgPerDay || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.compareAvgPerDay || 0).toFixed(2)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.currentMT / 1000).toFixed(1)}K
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-medium">
+                            {(row.compareMT / 1000).toFixed(1)}K
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-medium ${getChangeColor(row.variationPercent || 0)}`}>
+                            {(row.variationPercent || 0) > 0 ? '+' : ''}{(row.variationPercent || 0).toFixed(1)}%
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>

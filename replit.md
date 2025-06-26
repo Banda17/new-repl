@@ -131,6 +131,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Updated yearly charts to show current year context
   - Enhanced Tables tab to display actual comparison periods from API data
   - Improved chart readability with descriptive legend names and proper formatting
+  - Added Duration & Performance Summary table consolidating commodity and station data with period analysis
+  - Created unified view showing category type, period duration, average per day metrics, and percentage changes
+  - Enhanced data visualization with color-coded categories (purple for commodities, blue for stations)
 
 ## User Preferences
 
