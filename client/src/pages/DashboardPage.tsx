@@ -449,7 +449,13 @@ export default function DashboardPage() {
 
                   {/* Operations Count */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Operations Count ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Operations Count</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {periodView === "daily" 
+                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      }
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
@@ -491,7 +497,13 @@ export default function DashboardPage() {
 
                   {/* Top Commodities Trend */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Commodities Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities Trend</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {periodView === "daily" 
+                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      }
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
@@ -519,11 +531,17 @@ export default function DashboardPage() {
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
-                          <Line type="monotone" dataKey="COAL" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="IRON ORE" stroke="#ea580c" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="FERT." stroke="#7c2d12" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="LIMESTONE" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Legend 
+                            verticalAlign="bottom" 
+                            height={36}
+                            iconType="line"
+                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
+                          />
+                          <Line type="monotone" dataKey="COAL" stroke="#16a34a" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Coal" />
+                          <Line type="monotone" dataKey="IRON ORE" stroke="#ea580c" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Iron Ore" />
+                          <Line type="monotone" dataKey="FERT." stroke="#7c2d12" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Fertilizer" />
+                          <Line type="monotone" dataKey="LIMESTONE" stroke="#1d4ed8" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Limestone" />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Others" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
@@ -531,7 +549,13 @@ export default function DashboardPage() {
 
                   {/* Top Stations Trend */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Stations Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations Trend</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {periodView === "daily" 
+                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      }
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
@@ -559,11 +583,17 @@ export default function DashboardPage() {
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
-                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} />
+                          <Legend 
+                            verticalAlign="bottom" 
+                            height={36}
+                            iconType="line"
+                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
+                          />
+                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="PKPK Station" />
+                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="COA/KSLK Station" />
+                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="COA/CFL Station" />
+                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="RVD Station" />
+                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Other Stations" />
                         </LineChart>
                       </ResponsiveContainer>
                     </div>
