@@ -124,6 +124,13 @@ The system follows a modern full-stack architecture with clear separation of con
   - Fixed average per day calculation issue (was dividing by 3 instead of 2 days)
   - Removed freight column from both comparative loading tables and PDF reports
   - Enhanced user experience with responsive design and glassmorphic styling
+- June 26, 2025. Enhanced chart displays with comprehensive date ranges and legends:
+  - Added specific date range displays for all trend charts showing exact periods
+  - Implemented legends for all charts including single-line charts (tonnage trend, operations count)
+  - Fixed tonnage data conversion from strings to numbers for proper chart scaling
+  - Updated yearly charts to show current year context
+  - Enhanced Tables tab to display actual comparison periods from API data
+  - Improved chart readability with descriptive legend names and proper formatting
 
 ## User Preferences
 

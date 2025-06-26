@@ -440,6 +440,12 @@ export default function DashboardPage() {
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
+                          <Legend 
+                            verticalAlign="bottom" 
+                            height={36}
+                            iconType="line"
+                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
+                          />
                           <Line 
                             type="monotone" 
                             dataKey="tonnage" 
@@ -447,6 +453,7 @@ export default function DashboardPage() {
                             strokeWidth={2}
                             dot={{ fill: '#2563eb', r: 4 }}
                             connectNulls={false}
+                            name="Total Tonnage (MT)"
                           />
                         </LineChart>
                       </ResponsiveContainer>
@@ -488,6 +495,12 @@ export default function DashboardPage() {
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
+                          <Legend 
+                            verticalAlign="bottom" 
+                            height={36}
+                            iconType="line"
+                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
+                          />
                           <Line 
                             type="monotone" 
                             dataKey="count" 
@@ -495,6 +508,7 @@ export default function DashboardPage() {
                             strokeWidth={2}
                             dot={{ fill: '#dc2626', r: 4 }}
                             connectNulls={false}
+                            name="Operations Count"
                           />
                         </LineChart>
                       </ResponsiveContainer>
