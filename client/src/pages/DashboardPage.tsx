@@ -647,9 +647,9 @@ export default function DashboardPage() {
                   </Card>
 
                   {/* Commodity Loading Chart */}
-          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
-            <CardHeader className="p-3 sm:p-6">
-              <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white text-sm sm:text-lg font-bold gap-3 sm:gap-2">
+                  <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
+                    <CardHeader className="p-3 sm:p-6">
+                      <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white text-sm sm:text-lg font-bold gap-3 sm:gap-2">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
                   <span className="hidden sm:inline">Yearly Commodity Loading Comparison (MT)</span>
