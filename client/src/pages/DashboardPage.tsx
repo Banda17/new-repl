@@ -550,87 +550,103 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Comparative Performance Chart */}
-                  <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Comparative Performance Overview</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {comparativeData && stationComparativeData
-                        ? `Performance comparison (3-day duration each period): ${comparativeData.periods.current} vs ${comparativeData.periods.previous} - Top 5 commodities and stations with others grouping`
-                        : "Current vs previous period performance comparison for top 5 commodities and stations with others grouping - 3-day duration analysis"
-                      }
-                    </p>
-                    <div className="h-80">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart 
-                          data={[
-                            // Top 5 commodities + others
-                            ...(comparativeData?.data.slice(0, 5).map(item => ({
-                              name: item.commodity,
-                              current: item.currentPeriod.tonnage / 1000,
-                              previous: item.previousPeriod.tonnage / 1000,
-                              type: 'Commodity'
-                            })) || []),
-                            // Others commodity group
-                            ...(comparativeData?.data.length > 5 ? [{
-                              name: 'Others (Commodities)',
-                              current: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentPeriod.tonnage, 0) || 0) / 1000,
-                              previous: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.previousPeriod.tonnage, 0) || 0) / 1000,
-                              type: 'Commodity'
-                            }] : []),
-                            // Top 5 stations + others
-                            ...(stationComparativeData?.data.slice(0, 5).map(item => ({
-                              name: item.station,
-                              current: item.currentMT / 1000,
-                              previous: item.compareMT / 1000,
-                              type: 'Station'
-                            })) || []),
-                            // Others station group
-                            ...(stationComparativeData?.data.length > 5 ? [{
-                              name: 'Others (Stations)',
-                              current: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentMT, 0) || 0) / 1000,
-                              previous: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.compareMT, 0) || 0) / 1000,
-                              type: 'Station'
-                            }] : [])
-                          ]}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis 
-                            dataKey="name" 
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={80}
-                            interval={0}
-                          />
-                          <YAxis 
-                            fontSize={10} 
-                            tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${value.toFixed(0)}K`}
-                            domain={['dataMin', 'dataMax']}
-                          />
-                          <Tooltip 
-                            formatter={(value: number) => [`${value.toFixed(1)}K MT`, '']}
-                            labelStyle={{ color: '#374151' }}
-                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
-                          />
-                          <Legend 
-                            verticalAlign="bottom" 
-                            height={36}
-                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
-                          />
-                          <Bar dataKey="current" fill="#3b82f6" name="Current Period" />
-                          <Bar dataKey="previous" fill="#ef4444" name="Previous Period" />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+                  <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-white text-lg font-bold">
+                        <BarChart3 className="h-5 w-5" />
+                        Comparative Performance Overview
+                      </CardTitle>
+                      <p className="text-sm text-white/80">
+                        {comparativeData && stationComparativeData
+                          ? `Performance comparison (3-day duration each period): ${comparativeData.periods.current} vs ${comparativeData.periods.previous} - Top 5 commodities and stations with others grouping`
+                          : "Current vs previous period performance comparison for top 5 commodities and stations with others grouping - 3-day duration analysis"
+                        }
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingComparative || isLoadingStationComparative ? (
+                        <div className="h-96 flex items-center justify-center">
+                          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                          <p className="ml-3 text-white/80">Loading performance data...</p>
+                        </div>
+                      ) : (
+                        <div className="h-96">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart 
+                              data={[
+                                // Top 5 commodities + others
+                                ...(comparativeData?.data.slice(0, 5).map(item => ({
+                                  name: item.commodity,
+                                  current: item.currentPeriod.tonnage / 1000,
+                                  previous: item.previousPeriod.tonnage / 1000,
+                                  type: 'Commodity'
+                                })) || []),
+                                // Others commodity group
+                                ...((comparativeData?.data?.length || 0) > 5 ? [{
+                                  name: 'Others (Commodities)',
+                                  current: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentPeriod.tonnage, 0) || 0) / 1000,
+                                  previous: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.previousPeriod.tonnage, 0) || 0) / 1000,
+                                  type: 'Commodity'
+                                }] : []),
+                                // Top 5 stations + others
+                                ...(stationComparativeData?.data.slice(0, 5).map(item => ({
+                                  name: item.station,
+                                  current: item.currentMT / 1000,
+                                  previous: item.compareMT / 1000,
+                                  type: 'Station'
+                                })) || []),
+                                // Others station group
+                                ...((stationComparativeData?.data?.length || 0) > 5 ? [{
+                                  name: 'Others (Stations)',
+                                  current: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentMT, 0) || 0) / 1000,
+                                  previous: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.compareMT, 0) || 0) / 1000,
+                                  type: 'Station'
+                                }] : [])
+                              ]}
+                              margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+                              <XAxis 
+                                dataKey="name" 
+                                fontSize={10}
+                                tick={{ fill: '#ffffff' }}
+                                angle={-45}
+                                textAnchor="end"
+                                height={80}
+                                interval={0}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <YAxis 
+                                fontSize={12}
+                                tick={{ fill: '#ffffff' }}
+                                tickFormatter={(value) => `${value}K`}
+                                axisLine={false}
+                                tickLine={false}
+                              />
+                              <Tooltip 
+                                formatter={(value: any, name: string) => [`${value}K MT`, name === 'current' ? 'Current Period' : 'Previous Period']}
+                                labelFormatter={(label) => `${label}`}
+                                contentStyle={{
+                                  backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                                  borderRadius: '8px',
+                                  color: '#ffffff'
+                                }}
+                              />
+                              <Legend 
+                                wrapperStyle={{ fontSize: '12px', fontWeight: '500', color: '#ffffff' }}
+                              />
+                              <Bar dataKey="current" fill="#3b82f6" name="Current Period" radius={[2, 2, 0, 0]} />
+                              <Bar dataKey="previous" fill="#ef4444" name="Previous Period" radius={[2, 2, 0, 0]} />
+                            </BarChart>
+                          </ResponsiveContainer>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
 
-          {/* Commodity Loading Chart */}
+                  {/* Commodity Loading Chart */}
           <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
             <CardHeader className="p-3 sm:p-6">
               <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white text-sm sm:text-lg font-bold gap-3 sm:gap-2">
