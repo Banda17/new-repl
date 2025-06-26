@@ -442,10 +442,10 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000000).toFixed(2)} MT`, name]}
                             labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
                           />
-                          <Line type="monotone" dataKey="PKPK" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="COA/KSLK" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="COA/CFL" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="RVD" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="COAL" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="IRON ORE" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="FERT." stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="LIMESTONE" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
                           <Legend />
                         </LineChart>
@@ -483,10 +483,10 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000000).toFixed(2)} MT`, name]}
                             labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
                           />
-                          <Line type="monotone" dataKey="KI" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="REG/MMHR" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="AKVD" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="EE" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="PKPK" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="COA/KSLK" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="COA/CFL" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
+                          <Line type="monotone" dataKey="RVD" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
                           <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
                           <Legend />
                         </LineChart>
