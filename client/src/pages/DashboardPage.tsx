@@ -97,16 +97,16 @@ export default function DashboardPage() {
   const [showAllStations, setShowAllStations] = useState(false);
   const [periodView, setPeriodView] = useState<"daily" | "monthly">("daily");
 
-  // Fetch weekly comparative loading data for Tables tab
+  // Fetch weekly comparative loading data for Tables and Charts tabs
   const { data: comparativeData, isLoading: isLoadingComparative } = useQuery<ComparativeLoadingData>({
     queryKey: ["/api/comparative-loading"],
-    enabled: activeTab === "tables", // Only fetch when Tables tab is active
+    enabled: activeTab === "tables" || activeTab === "charts", // Fetch for both Tables and Charts tabs
   });
 
-  // Fetch station comparative loading data for Tables tab
+  // Fetch station comparative loading data for Tables and Charts tabs
   const { data: stationComparativeData, isLoading: isLoadingStationComparative } = useQuery<StationComparativeData>({
     queryKey: ["/api/station-comparative-loading"],
-    enabled: activeTab === "tables", // Only fetch when Tables tab is active
+    enabled: activeTab === "tables" || activeTab === "charts", // Fetch for both Tables and Charts tabs
   });
 
   // Fetch current period trend data

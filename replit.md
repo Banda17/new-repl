@@ -137,6 +137,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Replaced operations count chart with wagon distribution pie chart showing commodity-wise wagon breakdown
   - Added comparative performance chart displaying current vs previous period data for top commodities and stations
   - Enhanced trends section with more meaningful visualizations aligned with operational requirements
+  - Fixed comparative performance chart by enabling data queries for charts tab
+  - Added comprehensive duration information to all chart descriptions across dashboard
+  - Enhanced chart context with specific time periods and duration details for better operational understanding
 
 ## User Preferences
 
