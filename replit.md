@@ -149,8 +149,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Updated all trend chart duration information to display consistent date ranges (27/05/2025 to 26/06/2025) matching table data periods
   - Added comprehensive duration context to yearly comparison charts showing annual performance analysis for 2025
   - Restructured trend charts: removed generic daily data descriptions and created dedicated daily commodity and station comparison charts
-  - Added duration information directly in chart legends showing specific comparison periods (24-26 Jun vs 21-23 Jun)
+  - Added duration information directly in chart legends showing year-over-year comparison periods (2025 vs 2024)
   - Converted daily comparison charts to bar chart format for clearer period-to-period comparison visualization
+  - Corrected comparison periods to show proper year-over-year analysis: current period (24-26 Jun 2025) vs previous period (24-26 Jun 2024)
 
 ## User Preferences
 

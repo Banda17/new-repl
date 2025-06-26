@@ -416,13 +416,13 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Commodities Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 21/06/2025 to 23/06/2025
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={[
-                          { period: "Current (24-26 Jun)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
-                          { period: "Previous (21-23 Jun)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
+                          { period: "Current (24-26 Jun 2025)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
+                          { period: "Previous (24-26 Jun 2024)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
                         ]}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
@@ -440,11 +440,11 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Bar dataKey="COAL" fill="#dc2626" name="COAL (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="FERT." fill="#059669" name="FERT. (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="COAL" fill="#dc2626" name="COAL (2025 vs 2024)" />
+                          <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (2025 vs 2024)" />
+                          <Bar dataKey="FERT." fill="#059669" name="FERT. (2025 vs 2024)" />
+                          <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (2025 vs 2024)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
                           <Legend 
                             wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
                             formatter={(value) => value}
@@ -458,13 +458,13 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Stations Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 21/06/2025 to 23/06/2025
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={[
-                          { period: "Current (24-26 Jun)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
-                          { period: "Previous (21-23 Jun)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
+                          { period: "Current (24-26 Jun 2025)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
+                          { period: "Previous (24-26 Jun 2024)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
                         ]}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
@@ -482,11 +482,11 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="RVD" fill="#7c3aed" name="RVD (24-26 Jun vs 21-23 Jun)" />
-                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (2025 vs 2024)" />
+                          <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (2025 vs 2024)" />
+                          <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (2025 vs 2024)" />
+                          <Bar dataKey="RVD" fill="#7c3aed" name="RVD (2025 vs 2024)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
                           <Legend 
                             wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
                             formatter={(value) => value}
