@@ -144,6 +144,8 @@ The system follows a modern full-stack architecture with clear separation of con
   - Fixed critical JSX syntax errors in DashboardPage.tsx causing application crashes
   - Added station-wise comparative loading table alongside existing commodity table in Tables tab
   - Both comparative tables now show current vs previous period data with totals and PDF export functionality
+  - Enhanced number formatting: Avg/Day and MT columns now show 3 decimal places, wagon numbers display specific values with commas (not K format)
+  - Added variation columns to station table showing change in MT and percentage with color-coded indicators
 
 ## User Preferences
 

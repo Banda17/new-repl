@@ -149,6 +149,11 @@ export default function DashboardPage() {
     return num.toString();
   };
 
+  // Function to format wagon numbers (no K formatting)
+  const formatWagonNumber = (num: number) => {
+    return num.toLocaleString();
+  };
+
   // Chart colors
   const chartColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
 
@@ -669,13 +674,13 @@ export default function DashboardPage() {
                             {formatNumber(row.currentPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.currentPeriod.avgPerDay || 0).toFixed(2)}
+                            {(row.currentPeriod.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {formatNumber(row.currentPeriod.wagons)}
+                            {row.currentPeriod.wagons.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.currentPeriod.tonnage / 1000000).toFixed(2)}
+                            {(row.currentPeriod.tonnage / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Previous Period Data */}
@@ -683,18 +688,18 @@ export default function DashboardPage() {
                             {formatNumber(row.previousPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.previousPeriod.avgPerDay || 0).toFixed(2)}
+                            {(row.previousPeriod.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {formatNumber(row.previousPeriod.wagons)}
+                            {row.previousPeriod.wagons.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.previousPeriod.tonnage / 1000000).toFixed(2)}
+                            {(row.previousPeriod.tonnage / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Change Data */}
                           <TableCell className={`border text-center text-sm font-medium ${row.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {row.changeInMT >= 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(2)}
+                            {row.changeInMT >= 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(3)}
                           </TableCell>
                           <TableCell className={`border text-center text-sm font-medium ${row.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                             {row.changeInPercentage >= 0 ? '+' : ''}{row.changeInPercentage.toFixed(1)}%
@@ -714,13 +719,13 @@ export default function DashboardPage() {
                             {formatNumber(comparativeData.totals.currentPeriod?.rks || 0)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(comparativeData.totals.currentPeriod?.avgPerDay || 0).toFixed(2)}
+                            {(comparativeData.totals.currentPeriod?.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {formatNumber(comparativeData.totals.currentPeriod?.wagons || 0)}
+                            {(comparativeData.totals.currentPeriod?.wagons || 0).toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {((comparativeData.totals.currentPeriod?.tonnage || 0) / 1000000).toFixed(2)}
+                            {((comparativeData.totals.currentPeriod?.tonnage || 0) / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Previous Period Totals */}
@@ -728,13 +733,13 @@ export default function DashboardPage() {
                             {formatNumber(comparativeData.totals.previousPeriod?.rks || 0)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(comparativeData.totals.previousPeriod?.avgPerDay || 0).toFixed(2)}
+                            {(comparativeData.totals.previousPeriod?.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {formatNumber(comparativeData.totals.previousPeriod?.wagons || 0)}
+                            {(comparativeData.totals.previousPeriod?.wagons || 0).toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {((comparativeData.totals.previousPeriod?.tonnage || 0) / 1000000).toFixed(2)}
+                            {((comparativeData.totals.previousPeriod?.tonnage || 0) / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Total Change Data */}
@@ -742,7 +747,7 @@ export default function DashboardPage() {
                             ((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
                             {((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? '+' : ''}
-                            {(((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) / 1000000).toFixed(2)}
+                            {(((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) / 1000000).toFixed(3)}
                           </TableCell>
                           <TableCell className={`border text-center text-sm font-bold ${
                             ((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
@@ -869,13 +874,13 @@ export default function DashboardPage() {
                             {formatNumber(row.currentRks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.currentAvgPerDay || 0).toFixed(2)}
+                            {(row.currentAvgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {formatNumber(row.currentWagon)}
+                            {row.currentWagon.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.currentMT / 1000000).toFixed(2)}
+                            {(row.currentMT / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Previous Period Data */}
@@ -883,20 +888,20 @@ export default function DashboardPage() {
                             {formatNumber(row.compareRks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.compareAvgPerDay || 0).toFixed(2)}
+                            {(row.compareAvgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {formatNumber(row.compareWagon)}
+                            {row.compareWagon.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm text-gray-700">
-                            {(row.compareMT / 1000000).toFixed(2)}
+                            {(row.compareMT / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Variation Data */}
                           <TableCell className={`border text-center text-sm font-medium ${
                             (row.currentMT - row.compareMT) >= 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
-                            {(row.currentMT - row.compareMT) >= 0 ? '+' : ''}{((row.currentMT - row.compareMT) / 1000000).toFixed(2)}
+                            {(row.currentMT - row.compareMT) >= 0 ? '+' : ''}{((row.currentMT - row.compareMT) / 1000000).toFixed(3)}
                           </TableCell>
                           <TableCell className={`border text-center text-sm font-medium ${
                             (row.currentMT - row.compareMT) >= 0 ? 'text-green-600' : 'text-red-600'
@@ -919,13 +924,13 @@ export default function DashboardPage() {
                             {formatNumber(stationComparativeData.totals.currentPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(stationComparativeData.totals.currentPeriod.avgPerDay || 0).toFixed(2)}
+                            {(stationComparativeData.totals.currentPeriod.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {formatNumber(stationComparativeData.totals.currentPeriod.wagons)}
+                            {stationComparativeData.totals.currentPeriod.wagons.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(stationComparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(2)}
+                            {(stationComparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Previous Period Totals */}
@@ -933,13 +938,13 @@ export default function DashboardPage() {
                             {formatNumber(stationComparativeData.totals.previousPeriod.rks)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(stationComparativeData.totals.previousPeriod.avgPerDay || 0).toFixed(2)}
+                            {(stationComparativeData.totals.previousPeriod.avgPerDay || 0).toFixed(3)}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {formatNumber(stationComparativeData.totals.previousPeriod.wagons)}
+                            {stationComparativeData.totals.previousPeriod.wagons.toLocaleString()}
                           </TableCell>
                           <TableCell className="border text-center text-sm font-bold text-gray-800">
-                            {(stationComparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(2)}
+                            {(stationComparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(3)}
                           </TableCell>
                           
                           {/* Total Variation Data */}
@@ -947,7 +952,7 @@ export default function DashboardPage() {
                             (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
                           }`}>
                             {(stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? '+' : ''}
-                            {((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / 1000000).toFixed(2)}
+                            {((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / 1000000).toFixed(3)}
                           </TableCell>
                           <TableCell className={`border text-center text-sm font-bold ${
                             (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
