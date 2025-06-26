@@ -36,34 +36,6 @@ interface ComparativeLoadingData {
   totals: any;
 }
 
-// Interface for station comparative loading data
-interface StationComparativeData {
-  periods: {
-    current: string;
-    previous: string;
-  };
-  data: Array<{
-    station: string;
-    currentPeriod: {
-      rks: number;
-      avgPerDay: number;
-      wagons: number;
-      tonnage: number;
-      freight: number;
-    };
-    previousPeriod: {
-      rks: number;
-      avgPerDay: number;
-      wagons: number;
-      tonnage: number;
-      freight: number;
-    };
-    changeInMT: number;
-    changeInPercentage: number;
-  }>;
-  totals: any;
-}
-
 // Interface for yearly commodity data
 interface YearlyCommodityData {
   year: string;
@@ -82,32 +54,49 @@ interface YearlyStationData {
   totalFreight: number;
 }
 
+// Interface for station comparative data
+interface StationComparativeData {
+  periods: {
+    current: string;
+    previous: string;
+  };
+  data: Array<{
+    station: string;
+    currentRks: number;
+    currentAvgPerDay: number;
+    currentWagon: number;
+    currentMT: number;
+    currentFreight: number;
+    compareRks: number;
+    compareAvgPerDay: number;
+    compareWagon: number;
+    compareMT: number;
+    compareFreight: number;
+  }>;
+  totals: {
+    currentPeriod: {
+      rks: number;
+      wagons: number;
+      tonnage: number;
+      freight: number;
+      avgPerDay: number;
+    };
+    previousPeriod: {
+      rks: number;
+      wagons: number;
+      tonnage: number;
+      freight: number;
+      avgPerDay: number;
+    };
+  };
+}
+
 // Interface for trend data
 interface TrendData {
-  tonnage: Array<{
-    date: string;
-    tonnage: number;
-  }>;
-  operations: Array<{
-    date: string;
-    operations: number;
-  }>;
-  commodities: Array<{
-    date: string;
-    COAL: number;
-    "IRON ORE": number;
-    "FERT.": number;
-    LIMESTONE: number;
-    OTHER: number;
-  }>;
-  stations: Array<{
-    date: string;
-    PKPK: number;
-    "COA/KSLK": number;
-    "COA/CFL": number;
-    RVD: number;
-    OTHER: number;
-  }>;
+  tonnage: Array<{ date: string; tonnage: number; month?: string }>;
+  operations: Array<{ date: string; count: number; month?: string }>;
+  commodities: Array<{ date: string; [key: string]: any; month?: string }>;
+  stations: Array<{ date: string; [key: string]: any; month?: string }>;
 }
 
 export default function DashboardPage() {
@@ -160,30 +149,23 @@ export default function DashboardPage() {
     return num.toString();
   };
 
-  // Function to format numbers with commas and 3 decimal places for specific columns
-  const formatTableNumber = (num: number, type: 'wagons' | 'decimal' | 'percentage') => {
-    if (type === 'wagons') {
-      return num.toLocaleString('en-IN');
-    } else if (type === 'decimal') {
-      return num.toFixed(3);
-    } else if (type === 'percentage') {
-      return num.toFixed(2) + '%';
-    }
-    return num.toString();
+  // Function to format wagon numbers (no K formatting)
+  const formatWagonNumber = (num: number) => {
+    return num.toLocaleString();
   };
 
-  const currentTrendData = periodView === "daily" ? dailyTrendData : monthlyTrendData;
-  const isLoadingTrend = periodView === "daily" ? isLoadingDaily : isLoadingMonthly;
+  // Chart colors
+  const chartColors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#f97316', '#84cc16'];
 
-  // Export comparative loading PDF
-  const exportComparativePDF = async () => {
+  // Export functions
+  const exportComparativeLoadingPDF = async () => {
     try {
       const response = await fetch('/api/exports/comparative-loading-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify(comparativeData),
       });
 
       if (response.ok) {
@@ -202,15 +184,14 @@ export default function DashboardPage() {
     }
   };
 
-  // Export yearly comparison PDF
-  const exportYearlyPDF = async () => {
+  const exportYearlyComparisonPDF = async () => {
     try {
       const response = await fetch('/api/exports/yearly-comparison-pdf', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({}),
+        body: JSON.stringify({ commodityData, stationData }),
       });
 
       if (response.ok) {
@@ -233,7 +214,7 @@ export default function DashboardPage() {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white/95 backdrop-blur-sm p-3 border border-gray-300 rounded-lg shadow-xl">
+        <div className="bg-white p-3 border border-gray-300 rounded shadow-lg">
           <p className="font-semibold text-gray-800">{`${label}`}</p>
           {payload.map((entry: any, index: number) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
@@ -280,327 +261,290 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-800">
-      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-6">
-        <div className="flex items-center gap-2 mb-3 sm:mb-4">
-          <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white drop-shadow-lg" />
-          <h1 className="text-lg sm:text-xl md:text-3xl font-bold text-white drop-shadow-lg">
-            <span className="hidden sm:inline">Operating Dashboard</span>
-            <span className="sm:hidden">Dashboard</span>
-          </h1>
-        </div>
+    <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-6">
+      <div className="flex items-center gap-2 mb-3 sm:mb-4">
+        <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+          <span className="hidden sm:inline">Operating Dashboard</span>
+          <span className="sm:hidden">Dashboard</span>
+        </h1>
+      </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-xl border border-white/30 shadow-2xl rounded-xl transition-all duration-300">
-            <TabsTrigger value="charts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/30 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-white/20 hover:text-white transition-all duration-300 py-3 rounded-lg">
-              <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
-              Charts & Trends
-            </TabsTrigger>
-            <TabsTrigger value="tables" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/30 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-white/20 hover:text-white transition-all duration-300 py-3 rounded-lg">
-              <Table2 className="h-3 w-3 sm:h-4 sm:w-4" />
-              Tables
-            </TabsTrigger>
-          </TabsList>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30 transition-all duration-300">
+          <TabsTrigger value="charts" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
+            <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+            Charts & Trends
+          </TabsTrigger>
+          <TabsTrigger value="tables" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-white data-[state=active]:bg-white/20 data-[state=active]:text-white hover:text-white transition-all duration-300 py-2">
+            <Table2 className="h-3 w-3 sm:h-4 sm:w-4" />
+            Tables
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="charts" className="space-y-4 sm:space-y-6">
-            {/* Trend Analysis Section */}
-            <Card className="backdrop-blur-xl bg-white/10 border border-white/30 shadow-2xl rounded-2xl">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <div>
-                    <CardTitle className="text-white text-xl font-bold flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5" />
-                      Current Period Trends
-                    </CardTitle>
-                    <p className="text-white/80 text-sm mt-1">
-                      Loading operations trend analysis with clear date visualization
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Select value={periodView} onValueChange={(value: "daily" | "monthly") => setPeriodView(value)}>
-                      <SelectTrigger className="w-32 bg-white/90 text-gray-800 border-white/50">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="daily">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            Daily
-                          </div>
-                        </SelectItem>
-                        <SelectItem value="monthly">
-                          <div className="flex items-center gap-2">
-                            <Calendar className="h-4 w-4" />
-                            Monthly
-                          </div>
-                        </SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {isLoadingTrend ? (
-                  <div className="col-span-full text-center text-white/80 py-8">Loading trend data...</div>
-                ) : currentTrendData ? (
-                  <>
-                    {/* Tonnage Trend */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Tonnage Trend</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {periodView === "daily" 
-                          ? "Daily tonnage over last 30 days (27/05/2025 to 26/06/2025)"
-                          : "Monthly tonnage over last 12 months"
-                        }
-                      </p>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={currentTrendData.tonnage}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="date"
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                            />
-                            <YAxis 
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend />
-                            <Line 
-                              type="monotone" 
-                              dataKey="tonnage" 
-                              stroke="#dc2626" 
-                              strokeWidth={2}
-                              name="Tonnage (MT)"
-                            />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Wagon Distribution Pie Chart */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Wagon Distribution</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Commodity-wise wagon breakdown (Current period analysis)
-                      </p>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Pie
-                              data={[
-                                { name: 'COAL', value: 120356, fill: '#dc2626' },
-                                { name: 'IRON ORE', value: 40432, fill: '#2563eb' },
-                                { name: 'FERT.', value: 40524, fill: '#059669' },
-                                { name: 'LIMESTONE', value: 22459, fill: '#7c3aed' },
-                                { name: 'OTHER', value: 35000, fill: '#6b7280' }
-                              ]}
-                              cx="50%"
-                              cy="50%"
-                              labelLine={false}
-                              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                              outerRadius={80}
-                              fill="#8884d8"
-                              dataKey="value"
-                            />
-                            <Tooltip formatter={(value: any) => [`${formatNumber(value)} wagons`, 'Count']} />
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Top Commodities Trend */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities Trend</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {periodView === "daily" 
-                          ? "Daily commodity trends (27/05/2025 to 26/06/2025)"
-                          : "Monthly commodity trends over last 12 months"
-                        }
-                      </p>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={currentTrendData.commodities}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="date"
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                            />
-                            <YAxis 
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend />
-                            <Line type="monotone" dataKey="COAL" stroke="#dc2626" strokeWidth={2} name="COAL" />
-                            <Line type="monotone" dataKey="IRON ORE" stroke="#2563eb" strokeWidth={2} name="IRON ORE" />
-                            <Line type="monotone" dataKey="FERT." stroke="#059669" strokeWidth={2} name="FERT." />
-                            <Line type="monotone" dataKey="LIMESTONE" stroke="#7c3aed" strokeWidth={2} name="LIMESTONE" />
-                            <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} name="OTHER" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Top Stations Trend */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations Trend</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        {periodView === "daily" 
-                          ? "Daily station trends (27/05/2025 to 26/06/2025)"
-                          : "Monthly station trends over last 12 months"
-                        }
-                      </p>
-                      <div className="h-64">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={currentTrendData.stations}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="date"
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                            />
-                            <YAxis 
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                            />
-                            <Tooltip content={<CustomTooltip />} />
-                            <Legend />
-                            <Line type="monotone" dataKey="PKPK" stroke="#dc2626" strokeWidth={2} name="PKPK" />
-                            <Line type="monotone" dataKey="COA/KSLK" stroke="#2563eb" strokeWidth={2} name="COA/KSLK" />
-                            <Line type="monotone" dataKey="COA/CFL" stroke="#059669" strokeWidth={2} name="COA/CFL" />
-                            <Line type="monotone" dataKey="RVD" stroke="#7c3aed" strokeWidth={2} name="RVD" />
-                            <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} name="OTHER" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Daily Commodities Data */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Commodities Data</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
-                      </p>
-                      <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={[
-                            { period: "Current (24-26 Jun 2025)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
-                            { period: "Previous (24-26 Jun 2024)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
-                          ]}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="period"
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              textAnchor="middle"
-                            />
-                            <YAxis 
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                            />
-                            <Tooltip 
-                              formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
-                              labelFormatter={(label) => `Period: ${label}`}
-                            />
-                            <Legend />
-                            <Bar dataKey="COAL" fill="#dc2626" name="COAL (2025 vs 2024)" />
-                            <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (2025 vs 2024)" />
-                            <Bar dataKey="FERT." fill="#059669" name="FERT. (2025 vs 2024)" />
-                            <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (2025 vs 2024)" />
-                            <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Daily Stations Data */}
-                    <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Stations Data</h3>
-                      <p className="text-sm text-gray-600 mb-4">
-                        Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
-                      </p>
-                      <div className="h-80">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={[
-                            { period: "Current (24-26 Jun 2025)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
-                            { period: "Previous (24-26 Jun 2024)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
-                          ]}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                            <XAxis 
-                              dataKey="period"
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              textAnchor="middle"
-                            />
-                            <YAxis 
-                              fontSize={10}
-                              tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
-                            />
-                            <Tooltip 
-                              formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
-                              labelFormatter={(label) => `Period: ${label}`}
-                            />
-                            <Legend />
-                            <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (2025 vs 2024)" />
-                            <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (2025 vs 2024)" />
-                            <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (2025 vs 2024)" />
-                            <Bar dataKey="RVD" fill="#7c3aed" name="RVD (2025 vs 2024)" />
-                            <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
-                          </BarChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <div className="col-span-full text-center text-white/80 py-8">
-                    No trend data available
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Yearly Analysis Section */}
-            <Card className="backdrop-blur-xl bg-white/10 border border-white/30 shadow-2xl rounded-2xl">
-              <CardHeader>
-                <div className="flex justify-between items-center">
+        <TabsContent value="charts" className="space-y-4 sm:space-y-6">
+          {/* Trend Analysis Section */}
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
                   <CardTitle className="text-white text-xl font-bold flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Yearly Performance Analysis
+                    <TrendingUp className="h-5 w-5" />
+                    Current Period Trends
                   </CardTitle>
-                  <Button 
-                    onClick={exportYearlyPDF}
-                    className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </Button>
+                  <p className="text-white/80 text-sm mt-1">
+                    Loading operations trend analysis with clear date visualization
+                  </p>
                 </div>
-                <p className="text-white/80 text-sm">
-                  Full year duration analysis - Annual performance analysis for 2025
-                </p>
-              </CardHeader>
-              <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-                {/* Yearly Commodity Chart */}
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Commodities - 2025</h3>
-                  {isLoadingCommodity ? (
-                    <div className="text-center text-gray-600 py-8">Loading commodity data...</div>
-                  ) : commodityData ? (
+                <div className="flex items-center gap-3">
+                  <Select value={periodView} onValueChange={(value: "daily" | "monthly") => setPeriodView(value)}>
+                    <SelectTrigger className="w-32 bg-white/90 text-gray-800 border-white/50">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="daily">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Daily
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="monthly">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4" />
+                          Monthly
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {(periodView === "daily" && isLoadingDaily) || (periodView === "monthly" && isLoadingMonthly) ? (
+                <div className="flex items-center justify-center h-96">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  <p className="ml-3 text-white/80">Loading trend data...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Tonnage Trend */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Tonnage Trend</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {periodView === "monthly" 
+                        ? `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                        : "Operational tonnage trend analysis"
+                      }
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={commodityData.slice(0, 5)}>
+                        <LineChart 
+                          data={periodView === "daily" ? (dailyTrendData ? dailyTrendData.tonnage : []) : (monthlyTrendData ? monthlyTrendData.tonnage : [])}
+                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
+                        >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
-                            dataKey="commodity"
+                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={80}
+                            interval={0}
+                          />
+                          <YAxis 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                          />
+                          <Tooltip 
+                            formatter={(value: any) => [`${(value / 1000000).toFixed(2)} MT`, 'Tonnage']}
+                            labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
+                          />
+                          <Line 
+                            type="monotone" 
+                            dataKey="tonnage" 
+                            stroke="#2563eb" 
+                            strokeWidth={2}
+                            dot={{ fill: '#2563eb', r: 3 }}
+                            activeDot={{ r: 5, fill: '#1d4ed8' }}
+                          />
+                          <Legend />
+                        </LineChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Wagon Distribution Pie Chart */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Wagon Distribution by Type</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Current wagon type distribution across all operations for {new Date().getFullYear()} - Full year duration analysis showing wagon count breakdown by category
+                    </p>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={commodityData?.slice(0, 8).map((item, index) => ({
+                              name: item.commodity,
+                              value: item.totalWagons,
+                              fill: `hsl(${(index * 45) % 360}, 70%, 60%)`
+                            })) || []}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
+                          />
+                          <Tooltip 
+                            formatter={(value: number) => [`${value.toLocaleString()}`, 'Wagons']}
+                            contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
+                          />
+                          <Legend 
+                            verticalAlign="bottom" 
+                            height={36}
+                            wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Daily Commodities Data */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Commodities Data</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
+                    </p>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={[
+                          { period: "Current (24-26 Jun 2025)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
+                          { period: "Previous (24-26 Jun 2024)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
+                        ]}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey="period"
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            textAnchor="middle"
+                          />
+                          <YAxis 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                          />
+                          <Tooltip 
+                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            labelFormatter={(label) => `Period: ${label}`}
+                          />
+                          <Bar dataKey="COAL" fill="#dc2626" name="COAL (2025 vs 2024)" />
+                          <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (2025 vs 2024)" />
+                          <Bar dataKey="FERT." fill="#059669" name="FERT. (2025 vs 2024)" />
+                          <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (2025 vs 2024)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
+                          <Legend 
+                            wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                            formatter={(value) => value}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* Daily Stations Data */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Stations Data</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
+                    </p>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={[
+                          { period: "Current (24-26 Jun 2025)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
+                          { period: "Previous (24-26 Jun 2024)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
+                        ]}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey="period"
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            textAnchor="middle"
+                          />
+                          <YAxis 
+                            fontSize={10}
+                            tick={{ fill: '#374151' }}
+                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                          />
+                          <Tooltip 
+                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            labelFormatter={(label) => `Period: ${label}`}
+                          />
+                          <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (2025 vs 2024)" />
+                          <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (2025 vs 2024)" />
+                          <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (2025 vs 2024)" />
+                          <Bar dataKey="RVD" fill="#7c3aed" name="RVD (2025 vs 2024)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
+                          <Legend 
+                            wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                            formatter={(value) => value}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Yearly Comparison Charts */}
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle className="text-white text-xl font-bold">Yearly Comparison Charts</CardTitle>
+                  <p className="text-white/80 text-sm mt-1">
+                    Comprehensive yearly loading operations analysis showing commodity and station performance for {new Date().getFullYear()} - Full year duration analysis
+                  </p>
+                </div>
+                <Button 
+                  onClick={exportYearlyComparisonPDF}
+                  variant="outline" 
+                  size="sm"
+                  disabled={!commodityData || !stationData}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingCommodity || isLoadingStation ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+                  <p className="ml-3 text-white/80">Loading yearly comparison data...</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Commodity Chart */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities by Tonnage</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing commodity-wise loading operations and tonnage distribution
+                    </p>
+                    <div className="h-80">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={getTopCommodities().map(commodity => ({
+                          name: commodity,
+                          tonnage: commodityData?.filter(item => item.commodity === commodity).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
+                        }))}>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                          <XAxis 
+                            dataKey="name"
                             fontSize={10}
                             tick={{ fill: '#374151' }}
                             angle={-45}
@@ -612,229 +556,435 @@ export default function DashboardPage() {
                             tick={{ fill: '#374151' }}
                             tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
                           />
-                          <Tooltip 
-                            formatter={(value: any) => [`${(value / 1000000).toFixed(2)}M MT`, 'Tonnage']}
-                            labelFormatter={(label) => `Commodity: ${label}`}
-                          />
-                          <Bar dataKey="totalTonnage" fill="#3b82f6" />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Legend />
+                          <Bar dataKey="tonnage" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
-                  ) : (
-                    <div className="text-center text-gray-600 py-8">No commodity data available</div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Yearly Station Chart */}
-                <div className="bg-white/95 backdrop-blur-sm rounded-xl p-4 shadow-lg">
-                  <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Stations - 2025</h3>
-                  {isLoadingStation ? (
-                    <div className="text-center text-gray-600 py-8">Loading station data...</div>
-                  ) : stationData ? (
+                  {/* Station Chart */}
+                  <div className="bg-white rounded-lg p-4">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations by Tonnage</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing station-wise loading operations and tonnage distribution
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stationData.slice(0, 5)}>
+                        <BarChart data={getTopStations().map(station => ({
+                          name: station,
+                          tonnage: stationData?.filter(item => item.station === station).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
+                        }))}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
-                            dataKey="station"
+                            dataKey="name"
                             fontSize={10}
                             tick={{ fill: '#374151' }}
+                            angle={-45}
+                            textAnchor="end"
+                            height={60}
                           />
                           <YAxis 
                             fontSize={10}
                             tick={{ fill: '#374151' }}
                             tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
                           />
-                          <Tooltip 
-                            formatter={(value: any) => [`${(value / 1000000).toFixed(2)}M MT`, 'Tonnage']}
-                            labelFormatter={(label) => `Station: ${label}`}
-                          />
-                          <Bar dataKey="totalTonnage" fill="#10b981" />
+                          <Tooltip content={<CustomTooltip />} />
+                          <Legend />
+                          <Bar dataKey="tonnage" fill="#ef4444" radius={[4, 4, 0, 0]} />
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
-                  ) : (
-                    <div className="text-center text-gray-600 py-8">No station data available</div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="tables" className="space-y-6">
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-white text-xl font-bold">Commodity-wise Comparative Loading Particulars</CardTitle>
+                  {comparativeData && (
+                    <div className="text-sm text-white/90 mt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="font-medium text-white">Current Period:</span> <span className="text-white/90">{comparativeData.periods.current}</span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-white">Previous Period:</span> <span className="text-white/90">{comparativeData.periods.previous}</span>
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="tables" className="space-y-4 sm:space-y-6">
-            {/* Comparative Loading Data Table */}
-            <Card className="backdrop-blur-xl bg-white/10 border border-white/30 shadow-2xl rounded-2xl">
-              <CardHeader>
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-white text-xl font-bold">Comparative Loading Data</CardTitle>
-                  <Button 
-                    onClick={exportComparativePDF}
-                    className="bg-white/20 hover:bg-white/30 text-white border border-white/30 backdrop-blur-sm"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </Button>
+                <Button 
+                  onClick={exportComparativeLoadingPDF}
+                  variant="outline" 
+                  size="sm"
+                  disabled={!comparativeData}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingComparative ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                 </div>
-                {comparativeData && (
-                  <p className="text-white/80 text-sm">
-                    Comparing {comparativeData.periods.current} with {comparativeData.periods.previous}
-                  </p>
-                )}
-              </CardHeader>
-              <CardContent>
-                {isLoadingComparative ? (
-                  <div className="text-center text-white/80 py-8">Loading comparative data...</div>
-                ) : comparativeData ? (
-                  <div className="bg-white rounded-xl overflow-hidden shadow-lg">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="font-bold text-gray-800">Commodity</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Period RKs</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Avg/Day</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Wagons</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Period RKs</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Avg/Day</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Wagons</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Variation in MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Variation %</TableHead>
+              ) : comparativeData ? (
+                <div className="overflow-x-auto bg-white rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50 text-gray-800">
+                          Commodity
+                        </TableHead>
+                        <TableHead colSpan={4} className="border text-center font-bold bg-green-50 text-gray-800">
+                          {comparativeData.periods.current}
+                        </TableHead>
+                        <TableHead colSpan={4} className="border text-center font-bold bg-yellow-50 text-gray-800">
+                          {comparativeData.periods.previous}
+                        </TableHead>
+                        <TableHead colSpan={2} className="border text-center font-bold bg-red-50 text-gray-800">
+                          Change
+                        </TableHead>
+                      </TableRow>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in %age</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {comparativeData.data.map((row, index) => (
+                        <TableRow key={row.commodity} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <TableCell className="border font-medium text-left pl-3 text-gray-800">
+                            {row.commodity}
+                          </TableCell>
+                          
+                          {/* Current Period Data */}
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {formatNumber(row.currentPeriod.rks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.currentPeriod.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {row.currentPeriod.wagons.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.currentPeriod.tonnage / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Previous Period Data */}
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {formatNumber(row.previousPeriod.rks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.previousPeriod.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {row.previousPeriod.wagons.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.previousPeriod.tonnage / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Change Data */}
+                          <TableCell className={`border text-center text-sm font-medium ${row.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {row.changeInMT >= 0 ? '+' : ''}{(row.changeInMT / 1000000).toFixed(3)}
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-medium ${row.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {row.changeInPercentage >= 0 ? '+' : ''}{row.changeInPercentage.toFixed(1)}%
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {comparativeData.data.map((item, index) => (
-                          <TableRow key={index} className="hover:bg-gray-50">
-                            <TableCell className="font-medium text-gray-800">{item.commodity}</TableCell>
-                            <TableCell className="text-center text-gray-800">{item.currentPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{item.previousPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className={`text-center font-medium ${item.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.changeInMT >= 0 ? '+' : ''}{formatTableNumber(item.changeInMT, 'decimal')}
-                            </TableCell>
-                            <TableCell className={`text-center font-medium ${item.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.changeInPercentage >= 0 ? '+' : ''}{formatTableNumber(item.changeInPercentage, 'percentage')}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        {comparativeData.totals && (
-                          <TableRow className="bg-blue-50 font-bold">
-                            <TableCell className="font-bold text-gray-800">TOTAL</TableCell>
-                            <TableCell className="text-center text-gray-800">{comparativeData.totals.currentPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.currentPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.currentPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.currentPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{comparativeData.totals.previousPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.previousPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.previousPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(comparativeData.totals.previousPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className={`text-center font-bold ${comparativeData.totals.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {comparativeData.totals.changeInMT >= 0 ? '+' : ''}{formatTableNumber(comparativeData.totals.changeInMT, 'decimal')}
-                            </TableCell>
-                            <TableCell className={`text-center font-bold ${comparativeData.totals.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {comparativeData.totals.changeInPercentage >= 0 ? '+' : ''}{formatTableNumber(comparativeData.totals.changeInPercentage, 'percentage')}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center text-white/80 py-8">
-                    No comparative data available
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                      ))}
+                      
+                      {/* Totals Row */}
+                      {comparativeData.totals && (
+                        <TableRow className="bg-blue-50 font-bold">
+                          <TableCell className="border text-center font-bold text-gray-800">
+                            TOTAL
+                          </TableCell>
+                          
+                          {/* Current Period Totals */}
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {formatNumber(comparativeData.totals.currentPeriod?.rks || 0)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(comparativeData.totals.currentPeriod?.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(comparativeData.totals.currentPeriod?.wagons || 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {((comparativeData.totals.currentPeriod?.tonnage || 0) / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Previous Period Totals */}
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {formatNumber(comparativeData.totals.previousPeriod?.rks || 0)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(comparativeData.totals.previousPeriod?.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(comparativeData.totals.previousPeriod?.wagons || 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {((comparativeData.totals.previousPeriod?.tonnage || 0) / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Total Change Data */}
+                          <TableCell className={`border text-center text-sm font-bold ${
+                            ((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? '+' : ''}
+                            {(((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) / 1000000).toFixed(3)}
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-bold ${
+                            ((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) >= 0 ? '+' : ''}
+                            {(comparativeData.totals.previousPeriod?.tonnage ? 
+                              (((comparativeData.totals.currentPeriod?.tonnage || 0) - (comparativeData.totals.previousPeriod?.tonnage || 0)) / (comparativeData.totals.previousPeriod?.tonnage || 1) * 100).toFixed(1) 
+                              : '0.0'
+                            )}%
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center text-white/80 py-8">
+                  No comparative data available
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-            {/* Station Comparative Loading Data Table */}
-            <Card className="backdrop-blur-xl bg-white/10 border border-white/30 shadow-2xl rounded-2xl">
-              <CardHeader>
-                <CardTitle className="text-white text-xl font-bold">Station-wise Comparative Loading</CardTitle>
-                {stationComparativeData && (
-                  <p className="text-white/80 text-sm">
-                    Comparing {stationComparativeData.periods.current} with {stationComparativeData.periods.previous}
-                  </p>
-                )}
-              </CardHeader>
-              <CardContent>
-                {isLoadingStationComparative ? (
-                  <div className="text-center text-white/80 py-8">Loading station comparative data...</div>
-                ) : stationComparativeData ? (
-                  <div className="bg-white rounded-xl overflow-hidden shadow-lg">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="font-bold text-gray-800">Station</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Period RKs</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Avg/Day</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current Wagons</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Current MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Period RKs</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Avg/Day</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous Wagons</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Previous MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Variation in MT</TableHead>
-                          <TableHead className="font-bold text-gray-800 text-center">Variation %</TableHead>
+          {/* Station-wise Comparative Loading Table */}
+          <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle className="text-white text-xl font-bold">Station-wise Comparative Loading Particulars</CardTitle>
+                  {stationComparativeData && (
+                    <div className="text-sm text-white/90 mt-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="font-medium text-white">Current Period:</span> <span className="text-white/90">{stationComparativeData.periods.current}</span>
+                        </div>
+                        <div>
+                          <span className="font-medium text-white">Previous Period:</span> <span className="text-white/90">{stationComparativeData.periods.previous}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <Button 
+                  onClick={async () => {
+                    try {
+                      const response = await fetch('/api/exports/station-comparative-loading-pdf', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(stationComparativeData),
+                      });
+
+                      if (response.ok) {
+                        const blob = await response.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.style.display = 'none';
+                        a.href = url;
+                        a.download = 'station-comparative-loading-report.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                      }
+                    } catch (error) {
+                      console.error('Error exporting PDF:', error);
+                    }
+                  }}
+                  variant="outline" 
+                  size="sm"
+                  disabled={!stationComparativeData}
+                  className="flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export PDF
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoadingStationComparative ? (
+                <div className="flex items-center justify-center h-64">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                </div>
+              ) : stationComparativeData ? (
+                <div className="overflow-x-auto bg-white rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-gray-50">
+                        <TableHead rowSpan={2} className="border text-center font-bold bg-blue-50 text-gray-800">
+                          Station
+                        </TableHead>
+                        <TableHead colSpan={4} className="border text-center font-bold bg-green-50 text-gray-800">
+                          {stationComparativeData.periods.current}
+                        </TableHead>
+                        <TableHead colSpan={4} className="border text-center font-bold bg-yellow-50 text-gray-800">
+                          {stationComparativeData.periods.previous}
+                        </TableHead>
+                        <TableHead colSpan={2} className="border text-center font-bold bg-red-50 text-gray-800">
+                          Variation
+                        </TableHead>
+                      </TableRow>
+                      <TableRow className="bg-gray-50">
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-green-50 text-gray-700">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Rks</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Avg/Day</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">Wagons</TableHead>
+                        <TableHead className="border text-center text-xs bg-yellow-50 text-gray-700">MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in MT</TableHead>
+                        <TableHead className="border text-center text-xs bg-red-50 text-gray-700">in %age</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {stationComparativeData.data.map((row, index) => (
+                        <TableRow key={row.station} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
+                          <TableCell className="border font-medium text-left pl-3 text-gray-800">
+                            {row.station}
+                          </TableCell>
+                          
+                          {/* Current Period Data */}
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {formatNumber(row.currentRks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.currentAvgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {row.currentWagon.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.currentMT / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Previous Period Data */}
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {formatNumber(row.compareRks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.compareAvgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {row.compareWagon.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm text-gray-700">
+                            {(row.compareMT / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Variation Data */}
+                          <TableCell className={`border text-center text-sm font-medium ${
+                            (row.currentMT - row.compareMT) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {(row.currentMT - row.compareMT) >= 0 ? '+' : ''}{((row.currentMT - row.compareMT) / 1000000).toFixed(3)}
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-medium ${
+                            (row.currentMT - row.compareMT) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {(row.currentMT - row.compareMT) >= 0 ? '+' : ''}
+                            {row.compareMT ? ((row.currentMT - row.compareMT) / row.compareMT * 100).toFixed(1) : '0.0'}%
+                          </TableCell>
                         </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {stationComparativeData.data.map((item, index) => (
-                          <TableRow key={index} className="hover:bg-gray-50">
-                            <TableCell className="font-medium text-gray-800">{item.station}</TableCell>
-                            <TableCell className="text-center text-gray-800">{item.currentPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.currentPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{item.previousPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(item.previousPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className={`text-center font-medium ${item.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.changeInMT >= 0 ? '+' : ''}{formatTableNumber(item.changeInMT, 'decimal')}
-                            </TableCell>
-                            <TableCell className={`text-center font-medium ${item.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {item.changeInPercentage >= 0 ? '+' : ''}{formatTableNumber(item.changeInPercentage, 'percentage')}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                        {stationComparativeData.totals && (
-                          <TableRow className="bg-blue-50 font-bold">
-                            <TableCell className="font-bold text-gray-800">TOTAL</TableCell>
-                            <TableCell className="text-center text-gray-800">{stationComparativeData.totals.currentPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.currentPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.currentPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.currentPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{stationComparativeData.totals.previousPeriod.rks}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.previousPeriod.avgPerDay, 'decimal')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.previousPeriod.wagons, 'wagons')}</TableCell>
-                            <TableCell className="text-center text-gray-800">{formatTableNumber(stationComparativeData.totals.previousPeriod.tonnage, 'decimal')}</TableCell>
-                            <TableCell className={`text-center font-bold ${stationComparativeData.totals.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {stationComparativeData.totals.changeInMT >= 0 ? '+' : ''}{formatTableNumber(stationComparativeData.totals.changeInMT, 'decimal')}
-                            </TableCell>
-                            <TableCell className={`text-center font-bold ${stationComparativeData.totals.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {stationComparativeData.totals.changeInPercentage >= 0 ? '+' : ''}{formatTableNumber(stationComparativeData.totals.changeInPercentage, 'percentage')}
-                            </TableCell>
-                          </TableRow>
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
-                ) : (
-                  <div className="text-center text-white/80 py-8">
-                    No station comparative data available
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      </div>
+                      ))}
+                      
+                      {/* Totals Row */}
+                      {stationComparativeData.totals && (
+                        <TableRow className="bg-blue-50 font-bold">
+                          <TableCell className="border text-center font-bold text-gray-800">
+                            TOTAL
+                          </TableCell>
+                          
+                          {/* Current Period Totals */}
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {formatNumber(stationComparativeData.totals.currentPeriod.rks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(stationComparativeData.totals.currentPeriod.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {stationComparativeData.totals.currentPeriod.wagons.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(stationComparativeData.totals.currentPeriod.tonnage / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Previous Period Totals */}
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {formatNumber(stationComparativeData.totals.previousPeriod.rks)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(stationComparativeData.totals.previousPeriod.avgPerDay || 0).toFixed(3)}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {stationComparativeData.totals.previousPeriod.wagons.toLocaleString()}
+                          </TableCell>
+                          <TableCell className="border text-center text-sm font-bold text-gray-800">
+                            {(stationComparativeData.totals.previousPeriod.tonnage / 1000000).toFixed(3)}
+                          </TableCell>
+                          
+                          {/* Total Variation Data */}
+                          <TableCell className={`border text-center text-sm font-bold ${
+                            (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {(stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? '+' : ''}
+                            {((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / 1000000).toFixed(3)}
+                          </TableCell>
+                          <TableCell className={`border text-center text-sm font-bold ${
+                            (stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? 'text-green-600' : 'text-red-600'
+                          }`}>
+                            {(stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) >= 0 ? '+' : ''}
+                            {stationComparativeData.totals.previousPeriod.tonnage ? 
+                              (((stationComparativeData.totals.currentPeriod.tonnage - stationComparativeData.totals.previousPeriod.tonnage) / stationComparativeData.totals.previousPeriod.tonnage) * 100).toFixed(1) 
+                              : '0.0'
+                            }%
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </div>
+              ) : (
+                <div className="text-center text-white/80 py-8">
+                  No station comparative data available
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
