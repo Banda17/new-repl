@@ -406,7 +406,13 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Tonnage Trend */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Tonnage Trend ({periodView === "daily" ? "Last 30 Days" : "Last 12 Months"})</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Tonnage Trend</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      {periodView === "daily" 
+                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      }
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <LineChart 
@@ -645,8 +651,8 @@ export default function DashboardPage() {
               </CardTitle>
               <p className="text-sm text-white/80">
                 {showAllCommodities 
-                  ? "Displaying all commodities sorted by total tonnage" 
-                  : "Displaying top 5 commodities by total tonnage. Click 'Show All' to see more."
+                  ? `Displaying all commodities for ${new Date().getFullYear()} sorted by total tonnage` 
+                  : `Displaying top 5 commodities for ${new Date().getFullYear()} by total tonnage. Click 'Show All' to see more.`
                 }
               </p>
             </CardHeader>
