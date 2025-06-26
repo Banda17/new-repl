@@ -650,51 +650,51 @@ export default function DashboardPage() {
                   <Card className="backdrop-blur-lg bg-blue-900/25 border border-white/40 shadow-2xl transition-all duration-300">
                     <CardHeader className="p-3 sm:p-6">
                       <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-white text-sm sm:text-lg font-bold gap-3 sm:gap-2">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
-                  <span className="hidden sm:inline">Yearly Commodity Loading Comparison (MT)</span>
-                  <span className="sm:hidden">Commodity Loading (MT)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={exportYearlyComparisonPDF}
-                    disabled={!commodityData || !stationData}
-                    className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
-                  >
-                    <Download className="h-4 w-4" />
-                    Export PDF
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowAllCommodities(!showAllCommodities)}
-                    className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
-                  >
-                    {showAllCommodities ? (
-                      <>
-                        <ChevronUp className="h-4 w-4" />
-                        Show Top 5
-                      </>
-                    ) : (
-                      <>
-                        <ChevronDown className="h-4 w-4" />
-                        Show All ({commodityData ? Array.from(new Set(commodityData.map(item => item.commodity))).length : 0})
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardTitle>
-              <p className="text-sm text-white/80">
-                {showAllCommodities 
-                  ? `Displaying all commodities for ${new Date().getFullYear()} sorted by total tonnage - Full year duration (January to present)` 
-                  : `Displaying top 5 commodities for ${new Date().getFullYear()} by total tonnage - Full year duration (January to present). Click 'Show All' to see more.`
-                }
-              </p>
-            </CardHeader>
-            <CardContent>
-              {isLoadingCommodities ? (
+                        <div className="flex items-center gap-2">
+                          <BarChart3 className="h-4 w-4 sm:h-5 sm:w-5" />
+                          <span className="hidden sm:inline">Yearly Commodity Loading Comparison (MT)</span>
+                          <span className="sm:hidden">Commodity Loading (MT)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={exportYearlyComparisonPDF}
+                            disabled={!commodityData || !stationData}
+                            className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
+                          >
+                            <Download className="h-4 w-4" />
+                            Export PDF
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setShowAllCommodities(!showAllCommodities)}
+                            className="flex items-center gap-2 bg-white/90 text-gray-800 border-white/50 hover:bg-white hover:text-gray-900"
+                          >
+                            {showAllCommodities ? (
+                              <>
+                                <ChevronUp className="h-4 w-4" />
+                                Show Top 5
+                              </>
+                            ) : (
+                              <>
+                                <ChevronDown className="h-4 w-4" />
+                                Show All ({commodityData ? Array.from(new Set(commodityData.map(item => item.commodity))).length : 0})
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </CardTitle>
+                      <p className="text-sm text-white/80">
+                        {showAllCommodities 
+                          ? `Displaying all commodities for ${new Date().getFullYear()} sorted by total tonnage - Full year duration (January to present)` 
+                          : `Displaying top 5 commodities for ${new Date().getFullYear()} by total tonnage - Full year duration (January to present). Click 'Show All' to see more.`
+                        }
+                      </p>
+                    </CardHeader>
+                    <CardContent>
+                      {isLoadingCommodities ? (
                 <div className="h-96 flex items-center justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                   <p className="ml-3 text-white/80">Loading commodity data...</p>
