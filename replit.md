@@ -141,6 +141,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Added comprehensive duration information to all chart descriptions across dashboard
   - Enhanced chart context with specific time periods and duration details for better operational understanding
   - Modified comparative performance chart to show "top 5 & others" grouping for improved readability and data summarization
+  - Fixed critical JSX syntax errors in DashboardPage.tsx causing application crashes
+  - Added station-wise comparative loading table alongside existing commodity table in Tables tab
+  - Both comparative tables now show current vs previous period data with totals and PDF export functionality
 
 ## User Preferences
 
