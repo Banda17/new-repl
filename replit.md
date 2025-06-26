@@ -146,6 +146,8 @@ The system follows a modern full-stack architecture with clear separation of con
   - Both comparative tables now show current vs previous period data with totals and PDF export functionality
   - Enhanced number formatting: Avg/Day and MT columns now show 3 decimal places, wagon numbers display specific values with commas (not K format)
   - Added variation columns to station table showing change in MT and percentage with color-coded indicators
+  - Updated all trend chart duration information to display consistent date ranges (27/05/2025 to 26/06/2025) matching table data periods
+  - Added comprehensive duration context to yearly comparison charts showing annual performance analysis for 2025
 
 ## User Preferences
 

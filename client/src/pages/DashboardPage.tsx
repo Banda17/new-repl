@@ -332,7 +332,7 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Tonnage Trend</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       {periodView === "daily" 
-                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
                         : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
                       }
                     </p>
@@ -417,7 +417,7 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities Trend</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       {periodView === "daily" 
-                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
                         : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
                       }
                     </p>
@@ -458,7 +458,7 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations Trend</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       {periodView === "daily" 
-                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
+                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
                         : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
                       }
                     </p>
