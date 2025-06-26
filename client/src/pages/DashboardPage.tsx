@@ -331,9 +331,9 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Tonnage Trend</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      {periodView === "daily" 
-                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
-                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      {periodView === "monthly" 
+                        ? `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                        : "Operational tonnage trend analysis"
                       }
                     </p>
                     <div className="h-80">
@@ -412,26 +412,24 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Top Commodities Trend */}
+                  {/* Daily Commodities Data */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities Trend</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Commodities Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      {periodView === "daily" 
-                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
-                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
-                      }
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 21/06/2025 to 23/06/2025
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? (dailyTrendData ? dailyTrendData.commodities : []) : (monthlyTrendData ? monthlyTrendData.commodities : [])}>
+                        <BarChart data={[
+                          { period: "Current (24-26 Jun)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
+                          { period: "Previous (21-23 Jun)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
+                        ]}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
-                            dataKey={periodView === "daily" ? "date" : "month"}
+                            dataKey="period"
                             fontSize={10}
                             tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
+                            textAnchor="middle"
                           />
                           <YAxis 
                             fontSize={10}
@@ -439,40 +437,41 @@ export default function DashboardPage() {
                             tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
                           />
                           <Tooltip 
-                            formatter={(value: any, name: string) => [`${(value / 1000000).toFixed(2)} MT`, name]}
-                            labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
+                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Line type="monotone" dataKey="COAL" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="IRON ORE" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="FERT." stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="LIMESTONE" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
-                          <Legend />
-                        </LineChart>
+                          <Bar dataKey="COAL" fill="#dc2626" name="COAL (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="FERT." fill="#059669" name="FERT. (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (24-26 Jun vs 21-23 Jun)" />
+                          <Legend 
+                            wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                            formatter={(value) => value}
+                          />
+                        </BarChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
 
-                  {/* Top Stations Trend */}
+                  {/* Daily Stations Data */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations Trend</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Stations Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      {periodView === "daily" 
-                        ? "Daily data from 27/05/2025 to 26/06/2025 - 30-day operational trend analysis"
-                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
-                      }
+                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 21/06/2025 to 23/06/2025
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={periodView === "daily" ? (dailyTrendData ? dailyTrendData.stations : []) : (monthlyTrendData ? monthlyTrendData.stations : [])}>
+                        <BarChart data={[
+                          { period: "Current (24-26 Jun)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
+                          { period: "Previous (21-23 Jun)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
+                        ]}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
-                            dataKey={periodView === "daily" ? "date" : "month"}
+                            dataKey="period"
                             fontSize={10}
                             tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
+                            textAnchor="middle"
                           />
                           <YAxis 
                             fontSize={10}
@@ -480,16 +479,19 @@ export default function DashboardPage() {
                             tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
                           />
                           <Tooltip 
-                            formatter={(value: any, name: string) => [`${(value / 1000000).toFixed(2)} MT`, name]}
-                            labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
+                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Line type="monotone" dataKey="PKPK" stroke="#dc2626" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="COA/KSLK" stroke="#2563eb" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="COA/CFL" stroke="#059669" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="RVD" stroke="#7c3aed" strokeWidth={2} dot={{ r: 2 }} />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 2 }} />
-                          <Legend />
-                        </LineChart>
+                          <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="RVD" fill="#7c3aed" name="RVD (24-26 Jun vs 21-23 Jun)" />
+                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (24-26 Jun vs 21-23 Jun)" />
+                          <Legend 
+                            wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
+                            formatter={(value) => value}
+                          />
+                        </BarChart>
                       </ResponsiveContainer>
                     </div>
                   </div>

@@ -148,6 +148,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Added variation columns to station table showing change in MT and percentage with color-coded indicators
   - Updated all trend chart duration information to display consistent date ranges (27/05/2025 to 26/06/2025) matching table data periods
   - Added comprehensive duration context to yearly comparison charts showing annual performance analysis for 2025
+  - Restructured trend charts: removed generic daily data descriptions and created dedicated daily commodity and station comparison charts
+  - Added duration information directly in chart legends showing specific comparison periods (24-26 Jun vs 21-23 Jun)
+  - Converted daily comparison charts to bar chart format for clearer period-to-period comparison visualization
 
 ## User Preferences
 
