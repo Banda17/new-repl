@@ -464,7 +464,7 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Wagon Distribution by Type</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Current wagon type distribution across all operations - shows wagon count breakdown by category
+                      Current wagon type distribution across all operations for ${new Date().getFullYear()} - Full year duration analysis showing wagon count breakdown by category
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
@@ -554,8 +554,8 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Comparative Performance Overview</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       {comparativeData && stationComparativeData
-                        ? `Performance comparison: ${comparativeData.periods.current} vs ${comparativeData.periods.previous}`
-                        : "Current vs previous period performance comparison for top commodities and stations"
+                        ? `Performance comparison (3-day duration each period): ${comparativeData.periods.current} vs ${comparativeData.periods.previous} - Top 3 commodities and stations analysis`
+                        : "Current vs previous period performance comparison for top commodities and stations - 3-day duration analysis"
                       }
                     </p>
                     <div className="h-80">
@@ -656,8 +656,8 @@ export default function DashboardPage() {
               </CardTitle>
               <p className="text-sm text-white/80">
                 {showAllCommodities 
-                  ? `Displaying all commodities for ${new Date().getFullYear()} sorted by total tonnage - Full year duration analysis` 
-                  : `Displaying top 5 commodities for ${new Date().getFullYear()} by total tonnage - Full year duration analysis. Click 'Show All' to see more.`
+                  ? `Displaying all commodities for ${new Date().getFullYear()} sorted by total tonnage - Full year duration (January to present)` 
+                  : `Displaying top 5 commodities for ${new Date().getFullYear()} by total tonnage - Full year duration (January to present). Click 'Show All' to see more.`
                 }
               </p>
             </CardHeader>
@@ -738,8 +738,8 @@ export default function DashboardPage() {
               </CardTitle>
               <p className="text-sm text-white/80">
                 {showAllStations 
-                  ? `Displaying all stations for ${new Date().getFullYear()} sorted by total tonnage - Full year duration analysis` 
-                  : `Displaying top 5 stations for ${new Date().getFullYear()} by total tonnage - Full year duration analysis. Click 'Show All' to see more.`
+                  ? `Displaying all stations for ${new Date().getFullYear()} sorted by total tonnage - Full year duration (January to present)` 
+                  : `Displaying top 5 stations for ${new Date().getFullYear()} by total tonnage - Full year duration (January to present). Click 'Show All' to see more.`
                 }
               </p>
             </CardHeader>
