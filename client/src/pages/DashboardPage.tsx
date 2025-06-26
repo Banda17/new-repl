@@ -554,26 +554,42 @@ export default function DashboardPage() {
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Comparative Performance Overview</h3>
                     <p className="text-sm text-gray-600 mb-4">
                       {comparativeData && stationComparativeData
-                        ? `Performance comparison (3-day duration each period): ${comparativeData.periods.current} vs ${comparativeData.periods.previous} - Top 3 commodities and stations analysis`
-                        : "Current vs previous period performance comparison for top commodities and stations - 3-day duration analysis"
+                        ? `Performance comparison (3-day duration each period): ${comparativeData.periods.current} vs ${comparativeData.periods.previous} - Top 5 commodities and stations with others grouping`
+                        : "Current vs previous period performance comparison for top 5 commodities and stations with others grouping - 3-day duration analysis"
                       }
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart 
                           data={[
-                            ...(comparativeData?.data.slice(0, 3).map(item => ({
+                            // Top 5 commodities + others
+                            ...(comparativeData?.data.slice(0, 5).map(item => ({
                               name: item.commodity,
                               current: item.currentPeriod.tonnage / 1000,
                               previous: item.previousPeriod.tonnage / 1000,
                               type: 'Commodity'
                             })) || []),
-                            ...(stationComparativeData?.data.slice(0, 3).map(item => ({
+                            // Others commodity group
+                            ...(comparativeData?.data.length > 5 ? [{
+                              name: 'Others (Commodities)',
+                              current: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentPeriod.tonnage, 0) || 0) / 1000,
+                              previous: (comparativeData?.data.slice(5).reduce((sum, item) => sum + item.previousPeriod.tonnage, 0) || 0) / 1000,
+                              type: 'Commodity'
+                            }] : []),
+                            // Top 5 stations + others
+                            ...(stationComparativeData?.data.slice(0, 5).map(item => ({
                               name: item.station,
                               current: item.currentMT / 1000,
                               previous: item.compareMT / 1000,
                               type: 'Station'
-                            })) || [])
+                            })) || []),
+                            // Others station group
+                            ...(stationComparativeData?.data.length > 5 ? [{
+                              name: 'Others (Stations)',
+                              current: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.currentMT, 0) || 0) / 1000,
+                              previous: (stationComparativeData?.data.slice(5).reduce((sum, item) => sum + item.compareMT, 0) || 0) / 1000,
+                              type: 'Station'
+                            }] : [])
                           ]}
                           margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
                         >

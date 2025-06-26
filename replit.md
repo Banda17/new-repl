@@ -140,6 +140,7 @@ The system follows a modern full-stack architecture with clear separation of con
   - Fixed comparative performance chart by enabling data queries for charts tab
   - Added comprehensive duration information to all chart descriptions across dashboard
   - Enhanced chart context with specific time periods and duration details for better operational understanding
+  - Modified comparative performance chart to show "top 5 & others" grouping for improved readability and data summarization
 
 ## User Preferences
 
