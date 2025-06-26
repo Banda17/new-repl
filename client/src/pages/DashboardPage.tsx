@@ -530,7 +530,10 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   {/* Commodity Chart */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Commodities by Tonnage</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities by Tonnage</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing commodity-wise loading operations and tonnage distribution
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={getTopCommodities().map(commodity => ({
@@ -561,7 +564,10 @@ export default function DashboardPage() {
 
                   {/* Station Chart */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Stations by Tonnage</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations by Tonnage</h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing station-wise loading operations and tonnage distribution
+                    </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart data={getTopStations().map(station => ({
