@@ -460,57 +460,39 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Operations Count */}
+                  {/* Wagon Distribution Pie Chart */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Operations Count</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Wagon Distribution by Type</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      {periodView === "daily" 
-                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
-                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
-                      }
+                      Current wagon type distribution across all operations - shows wagon count breakdown by category
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart 
-                          data={periodView === "daily" ? dailyTrendData?.operations || [] : monthlyTrendData?.operations || []}
-                          margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
-                        >
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis 
-                            dataKey={periodView === "daily" ? "date" : "month"} 
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={80}
-                            interval={0}
-                          />
-                          <YAxis 
-                            fontSize={10} 
-                            tick={{ fill: '#374151' }}
-                            domain={['dataMin', 'dataMax']}
+                        <PieChart>
+                          <Pie
+                            data={commodityData?.slice(0, 8).map((item, index) => ({
+                              name: item.commodity,
+                              value: item.totalWagons,
+                              fill: `hsl(${(index * 45) % 360}, 70%, 60%)`
+                            })) || []}
+                            cx="50%"
+                            cy="50%"
+                            labelLine={false}
+                            label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                            outerRadius={80}
+                            fill="#8884d8"
+                            dataKey="value"
                           />
                           <Tooltip 
-                            formatter={(value: number) => [value, 'Operations']}
-                            labelStyle={{ color: '#374151' }}
+                            formatter={(value: number) => [`${value.toLocaleString()}`, 'Wagons']}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
                           <Legend 
                             verticalAlign="bottom" 
                             height={36}
-                            iconType="line"
                             wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
                           />
-                          <Line 
-                            type="monotone" 
-                            dataKey="count" 
-                            stroke="#dc2626" 
-                            strokeWidth={2}
-                            dot={{ fill: '#dc2626', r: 4 }}
-                            connectNulls={false}
-                            name="Operations Count"
-                          />
-                        </LineChart>
+                        </PieChart>
                       </ResponsiveContainer>
                     </div>
                   </div>
@@ -567,24 +549,37 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* Top Stations Trend */}
+                  {/* Comparative Performance Chart */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations Trend</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Comparative Performance Overview</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      {periodView === "daily" 
-                        ? `Daily data from ${new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toLocaleDateString('en-GB')} to ${new Date().toLocaleDateString('en-GB')}`
-                        : `Monthly data from ${new Date(new Date().getFullYear() - 1, new Date().getMonth()).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })} to ${new Date().toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}`
+                      {comparativeData && stationComparativeData
+                        ? `Performance comparison: ${comparativeData.periods.current} vs ${comparativeData.periods.previous}`
+                        : "Current vs previous period performance comparison for top commodities and stations"
                       }
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <LineChart 
-                          data={periodView === "daily" ? dailyTrendData?.stations || [] : monthlyTrendData?.stations || []}
+                        <BarChart 
+                          data={[
+                            ...(comparativeData?.data.slice(0, 3).map(item => ({
+                              name: item.commodity,
+                              current: item.currentPeriod.tonnage / 1000,
+                              previous: item.previousPeriod.tonnage / 1000,
+                              type: 'Commodity'
+                            })) || []),
+                            ...(stationComparativeData?.data.slice(0, 3).map(item => ({
+                              name: item.station,
+                              current: item.currentMT / 1000,
+                              previous: item.compareMT / 1000,
+                              type: 'Station'
+                            })) || [])
+                          ]}
                           margin={{ top: 20, right: 30, left: 20, bottom: 80 }}
                         >
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
-                            dataKey={periodView === "daily" ? "date" : "month"} 
+                            dataKey="name" 
                             fontSize={10}
                             tick={{ fill: '#374151' }}
                             angle={-45}
@@ -595,26 +590,22 @@ export default function DashboardPage() {
                           <YAxis 
                             fontSize={10} 
                             tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value/1000).toFixed(0)}K`}
+                            tickFormatter={(value) => `${value.toFixed(0)}K`}
                             domain={['dataMin', 'dataMax']}
                           />
                           <Tooltip 
-                            formatter={(value: number) => [`${(value/1000).toFixed(1)}K MT`, '']}
+                            formatter={(value: number) => [`${value.toFixed(1)}K MT`, '']}
                             labelStyle={{ color: '#374151' }}
                             contentStyle={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}
                           />
                           <Legend 
                             verticalAlign="bottom" 
                             height={36}
-                            iconType="line"
                             wrapperStyle={{ paddingTop: '10px', fontSize: '12px' }}
                           />
-                          <Line type="monotone" dataKey="PKPK" stroke="#7c3aed" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="PKPK Station" />
-                          <Line type="monotone" dataKey="COA/KSLK" stroke="#059669" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="COA/KSLK Station" />
-                          <Line type="monotone" dataKey="COA/CFL" stroke="#dc2626" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="COA/CFL Station" />
-                          <Line type="monotone" dataKey="RVD" stroke="#2563eb" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="RVD Station" />
-                          <Line type="monotone" dataKey="OTHER" stroke="#6b7280" strokeWidth={2} dot={{ r: 3 }} connectNulls={false} name="Other Stations" />
-                        </LineChart>
+                          <Bar dataKey="current" fill="#3b82f6" name="Current Period" />
+                          <Bar dataKey="previous" fill="#ef4444" name="Previous Period" />
+                        </BarChart>
                       </ResponsiveContainer>
                     </div>
                   </div>

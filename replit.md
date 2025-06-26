@@ -134,6 +134,9 @@ The system follows a modern full-stack architecture with clear separation of con
   - Enhanced yearly commodity and station charts with duration context information
   - Added "Full year duration analysis" descriptions to provide temporal context for yearly data
   - Improved chart readability with consistent year indicators and duration information
+  - Replaced operations count chart with wagon distribution pie chart showing commodity-wise wagon breakdown
+  - Added comparative performance chart displaying current vs previous period data for top commodities and stations
+  - Enhanced trends section with more meaningful visualizations aligned with operational requirements
 
 ## User Preferences
 
