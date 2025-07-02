@@ -4128,6 +4128,7 @@ export function registerRoutes(app: Express): Server {
 
   // Custom Report PDF Export
   app.get("/api/exports/custom-report-pdf", async (req, res) => {
+    console.log('PDF export endpoint called with params:', req.query);
     try {
       const { type, from, to } = req.query;
       
@@ -4188,8 +4189,16 @@ export function registerRoutes(app: Express): Server {
       };
 
       // Generate PDF using existing function
+      console.log('Starting PDF generation with data:', { 
+        periodsCount: data.data.length,
+        periodsStructure: data.periods,
+        sampleData: data.data.slice(0, 2)
+      });
+      
       generateComparativeLoadingPDF(doc, data);
       doc.end();
+      
+      console.log('PDF generation completed successfully');
 
     } catch (error) {
       console.error("Error generating custom PDF report:", error);
