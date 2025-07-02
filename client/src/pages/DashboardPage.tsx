@@ -389,10 +389,10 @@ export default function DashboardPage() {
                 <div>
                   <CardTitle className="text-white text-xl font-bold flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
-                    Current Period Trends
+                    Trend Comparison Analysis
                   </CardTitle>
                   <p className="text-white/80 text-sm mt-1">
-                    Loading operations trend analysis with clear date visualization
+                    Year-over-year trend patterns with comparative visualization
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -643,16 +643,44 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                  {/* 2025 Till Date Performance */}
+                  {/* Year-over-Year Comparison Charts */}
                   <div className="space-y-6">
                     <div className="bg-white rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2025 Till Date - Top Commodities</h3>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Year-over-Year Commodity Comparison</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Cumulative performance from January to {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+                        Side-by-side comparison of 2025 performance vs {getDataByYear(commodityData || [], "2024").length > 0 ? "2024 actual data" : "2024 reference values"}
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={getCommodityChartData("2025")}>
+                          <BarChart data={(() => {
+                            const current2025 = getCommodityChartData("2025");
+                            const reference2024 = getDataByYear(commodityData || [], "2024").length > 0 ? 
+                              getCommodityChartData("2024") :
+                              [
+                                { name: "COAL", fullName: "COAL", tonnage: 7520000 },
+                                { name: "IRON ORE", fullName: "IRON ORE", tonnage: 2650000 },
+                                { name: "FERT.", fullName: "FERTILIZER", tonnage: 2400000 },
+                                { name: "LIMESTO...", fullName: "LIMESTONE", tonnage: 1450000 },
+                                { name: "LATERITE", fullName: "LATERITE", tonnage: 950000 }
+                              ];
+                            
+                            // Combine data for comparison
+                            const allCommodities = new Set([
+                              ...current2025.map(d => d.fullName),
+                              ...reference2024.map(d => d.fullName)
+                            ]);
+                            
+                            return Array.from(allCommodities).slice(0, 5).map(commodity => {
+                              const current = current2025.find(d => d.fullName === commodity);
+                              const previous = reference2024.find(d => d.fullName === commodity);
+                              return {
+                                name: commodity.length > 8 ? commodity.substring(0, 8) + '...' : commodity,
+                                fullName: commodity,
+                                tonnage2025: current?.tonnage || 0,
+                                tonnage2024: previous?.tonnage || 0
+                              };
+                            });
+                          })()}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -670,16 +698,22 @@ export default function DashboardPage() {
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [
                                 `${(value / 1000000).toFixed(2)} MT`, 
-                                props.payload.fullName
+                                name
                               ]}
                               labelFormatter={(label) => `Commodity: ${label}`}
                             />
                             <Legend />
                             <Bar 
-                              dataKey="tonnage" 
+                              dataKey="tonnage2025" 
                               fill="#3b82f6" 
                               radius={[4, 4, 0, 0]}
                               name="2025 Till Date (MT)"
+                            />
+                            <Bar 
+                              dataKey="tonnage2024" 
+                              fill="#94a3b8" 
+                              radius={[4, 4, 0, 0]}
+                              name={getDataByYear(commodityData || [], "2024").length > 0 ? "2024 Actual (MT)" : "2024 Reference (MT)"}
                             />
                           </BarChart>
                         </ResponsiveContainer>
@@ -687,13 +721,41 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="bg-white rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2025 Till Date - Top Stations</h3>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Year-over-Year Station Comparison</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Cumulative performance from January to {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}
+                        Side-by-side comparison of 2025 performance vs {getDataByYear(stationData || [], "2024").length > 0 ? "2024 actual data" : "2024 reference values"}
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={getStationChartData("2025")}>
+                          <BarChart data={(() => {
+                            const current2025 = getStationChartData("2025");
+                            const reference2024 = getDataByYear(stationData || [], "2024").length > 0 ? 
+                              getStationChartData("2024") :
+                              [
+                                { name: "PKPK", fullName: "PKPK", tonnage: 10500000 },
+                                { name: "COA/KSLK", fullName: "COA/KSLK", tonnage: 4200000 },
+                                { name: "COA/CFL", fullName: "COA/CFL", tonnage: 920000 },
+                                { name: "RVD", fullName: "RVD", tonnage: 890000 },
+                                { name: "BPGK", fullName: "BPGK", tonnage: 380000 }
+                              ];
+                            
+                            // Combine data for comparison
+                            const allStations = new Set([
+                              ...current2025.map(d => d.fullName),
+                              ...reference2024.map(d => d.fullName)
+                            ]);
+                            
+                            return Array.from(allStations).slice(0, 5).map(station => {
+                              const current = current2025.find(d => d.fullName === station);
+                              const previous = reference2024.find(d => d.fullName === station);
+                              return {
+                                name: station.length > 10 ? station.substring(0, 10) + '...' : station,
+                                fullName: station,
+                                tonnage2025: current?.tonnage || 0,
+                                tonnage2024: previous?.tonnage || 0
+                              };
+                            });
+                          })()}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -711,16 +773,22 @@ export default function DashboardPage() {
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [
                                 `${(value / 1000000).toFixed(2)} MT`, 
-                                props.payload.fullName
+                                name
                               ]}
                               labelFormatter={(label) => `Station: ${label}`}
                             />
                             <Legend />
                             <Bar 
-                              dataKey="tonnage" 
+                              dataKey="tonnage2025" 
                               fill="#ef4444" 
                               radius={[4, 4, 0, 0]}
                               name="2025 Till Date (MT)"
+                            />
+                            <Bar 
+                              dataKey="tonnage2024" 
+                              fill="#94a3b8" 
+                              radius={[4, 4, 0, 0]}
+                              name={getDataByYear(stationData || [], "2024").length > 0 ? "2024 Actual (MT)" : "2024 Reference (MT)"}
                             />
                           </BarChart>
                         </ResponsiveContainer>
@@ -728,29 +796,25 @@ export default function DashboardPage() {
                     </div>
                   </div>
 
-                  {/* 2024 Full Year Performance for Comparison */}
+                  {/* Comparative Performance Analysis */}
                   <div className="space-y-6">
                     <div className="bg-white rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2024 Full Year - Top Commodities</h3>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Current vs Previous Period - Top Commodities</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        {getDataByYear(commodityData || [], "2024").length > 0 ? 
-                          "Complete 2024 performance for year-over-year comparison" :
-                          "2024 data not available - showing reference values for comparison context"
-                        }
+                        Daily period comparison: {comparativeData?.periods?.current || 'Current'} vs {comparativeData?.periods?.previous || 'Previous'}
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={
-                            getDataByYear(commodityData || [], "2024").length > 0 ? 
-                            getCommodityChartData("2024") :
-                            [
-                              { name: "COAL", fullName: "COAL", tonnage: 7520000 },
-                              { name: "IRON ORE", fullName: "IRON ORE", tonnage: 2650000 },
-                              { name: "FERT.", fullName: "FERTILIZER", tonnage: 2400000 },
-                              { name: "LIMESTO...", fullName: "LIMESTONE", tonnage: 1450000 },
-                              { name: "LATERITE", fullName: "LATERITE", tonnage: 950000 }
-                            ]
-                          }>
+                          <BarChart data={(() => {
+                            if (!comparativeData?.data) return [];
+                            return comparativeData.data.slice(0, 5).map(item => ({
+                              name: item.commodity.length > 8 ? item.commodity.substring(0, 8) + '...' : item.commodity,
+                              fullName: item.commodity,
+                              currentMT: item.currentPeriod.tonnage,
+                              previousMT: item.previousPeriod.tonnage,
+                              changePercent: item.changeInPercentage
+                            }));
+                          })()}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -763,21 +827,28 @@ export default function DashboardPage() {
                             <YAxis 
                               fontSize={12}
                               tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                              tickFormatter={(value) => `${(value / 1000).toFixed(1)}K`}
                             />
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [
-                                `${(value / 1000000).toFixed(2)} MT`, 
-                                props.payload.fullName
+                                `${value.toLocaleString()} MT`,
+                                name,
+                                `Change: ${props.payload.changePercent?.toFixed(1)}%`
                               ]}
                               labelFormatter={(label) => `Commodity: ${label}`}
                             />
                             <Legend />
                             <Bar 
-                              dataKey="tonnage" 
+                              dataKey="currentMT" 
+                              fill="#3b82f6" 
+                              radius={[4, 4, 0, 0]}
+                              name="Current Period (MT)"
+                            />
+                            <Bar 
+                              dataKey="previousMT" 
                               fill="#94a3b8" 
                               radius={[4, 4, 0, 0]}
-                              name={getDataByYear(commodityData || [], "2024").length > 0 ? "2024 Actual Data (MT)" : "2024 Reference (MT)"}
+                              name="Previous Period (MT)"
                             />
                           </BarChart>
                         </ResponsiveContainer>
@@ -785,26 +856,22 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="bg-white rounded-lg p-4">
-                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2024 Full Year - Top Stations</h3>
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">Current vs Previous Period - Top Stations</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        {getDataByYear(stationData || [], "2024").length > 0 ? 
-                          "Complete 2024 performance for year-over-year comparison" :
-                          "2024 data not available - showing reference values for comparison context"
-                        }
+                        Daily period comparison: {stationComparativeData?.periods?.current || 'Current'} vs {stationComparativeData?.periods?.previous || 'Previous'}
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={
-                            getDataByYear(stationData || [], "2024").length > 0 ? 
-                            getStationChartData("2024") :
-                            [
-                              { name: "PKPK", fullName: "PKPK", tonnage: 10500000 },
-                              { name: "COA/KSLK", fullName: "COA/KSLK", tonnage: 4200000 },
-                              { name: "COA/CFL", fullName: "COA/CFL", tonnage: 920000 },
-                              { name: "RVD", fullName: "RVD", tonnage: 890000 },
-                              { name: "BPGK", fullName: "BPGK", tonnage: 380000 }
-                            ]
-                          }>
+                          <BarChart data={(() => {
+                            if (!stationComparativeData?.data) return [];
+                            return stationComparativeData.data.slice(0, 5).map(item => ({
+                              name: item.station.length > 10 ? item.station.substring(0, 10) + '...' : item.station,
+                              fullName: item.station,
+                              currentMT: item.currentMT,
+                              previousMT: item.compareMT,
+                              changePercent: item.variationPercent
+                            }));
+                          })()}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -817,21 +884,28 @@ export default function DashboardPage() {
                             <YAxis 
                               fontSize={12}
                               tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                              tickFormatter={(value) => `${(value / 1000).toFixed(1)}K`}
                             />
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [
-                                `${(value / 1000000).toFixed(2)} MT`, 
-                                props.payload.fullName
+                                `${value.toLocaleString()} MT`,
+                                name,
+                                `Change: ${props.payload.changePercent?.toFixed(1)}%`
                               ]}
                               labelFormatter={(label) => `Station: ${label}`}
                             />
                             <Legend />
                             <Bar 
-                              dataKey="tonnage" 
+                              dataKey="currentMT" 
+                              fill="#ef4444" 
+                              radius={[4, 4, 0, 0]}
+                              name="Current Period (MT)"
+                            />
+                            <Bar 
+                              dataKey="previousMT" 
                               fill="#94a3b8" 
                               radius={[4, 4, 0, 0]}
-                              name={getDataByYear(stationData || [], "2024").length > 0 ? "2024 Actual Data (MT)" : "2024 Reference (MT)"}
+                              name="Previous Period (MT)"
                             />
                           </BarChart>
                         </ResponsiveContainer>
