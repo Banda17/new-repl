@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { ExportWizard } from "@/components/ExportWizard";
 
 interface DateRange {
   from: Date | undefined;
@@ -64,7 +65,6 @@ export default function CustomReportsPage() {
     to: undefined
   });
   const [reportType, setReportType] = useState<string>("commodities");
-  const [exportFormat, setExportFormat] = useState<string>("pdf");
   const [reportGenerated, setReportGenerated] = useState(false);
 
   // Query for filtered commodity data
@@ -117,22 +117,32 @@ export default function CustomReportsPage() {
     setReportGenerated(true);
   };
 
-  const handleDownload = async () => {
+
+
+  const formatNumber = (num: number) => {
+    if (Math.abs(num) >= 1000) {
+      return (num / 1000).toFixed(1) + 'K';
+    }
+    return num.toLocaleString();
+  };
+
+  // Export wizard function
+  const handleExport = (format: string, selectedColumns: string[], data: any[]) => {
     if (!dateRange.from || !dateRange.to) {
       alert("Please generate a report first");
       return;
     }
 
-    const fromDate = format(dateRange.from, "yyyy-MM-dd");
-    const toDate = format(dateRange.to, "yyyy-MM-dd");
+    const fromDate = format === 'pdf' ? dateRange.from.toISOString().split('T')[0] : dateRange.from.toISOString().split('T')[0];
+    const toDate = format === 'pdf' ? dateRange.to.toISOString().split('T')[0] : dateRange.to.toISOString().split('T')[0];
 
-    if (exportFormat === "pdf") {
+    if (format === 'pdf') {
       const endpoint = reportType === "commodities" 
         ? `/api/exports/custom-report-pdf?type=commodities&from=${fromDate}&to=${toDate}`
         : `/api/exports/custom-report-pdf?type=stations&from=${fromDate}&to=${toDate}`;
       
       window.open(endpoint, '_blank');
-    } else {
+    } else if (format === 'csv') {
       const endpoint = reportType === "commodities"
         ? `/api/exports/custom-report-csv?type=commodities&from=${fromDate}&to=${toDate}`
         : `/api/exports/custom-report-csv?type=stations&from=${fromDate}&to=${toDate}`;
@@ -141,12 +151,34 @@ export default function CustomReportsPage() {
     }
   };
 
-  const formatNumber = (num: number) => {
-    if (Math.abs(num) >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toLocaleString();
-  };
+  // Define columns for export wizard
+  const getCommodityColumns = () => [
+    { key: 'commodity', label: 'Commodity' },
+    { key: 'currentRks', label: 'Current RKs' },
+    { key: 'currentAvgDay', label: 'Current Avg/Day' },
+    { key: 'currentWagon', label: 'Current Wagons' },
+    { key: 'currentMT', label: 'Current MT' },
+    { key: 'compareRks', label: 'Previous RKs' },
+    { key: 'compareAvgDay', label: 'Previous Avg/Day' },
+    { key: 'compareWagon', label: 'Previous Wagons' },
+    { key: 'compareMT', label: 'Previous MT' },
+    { key: 'variationUnits', label: 'Variation Units' },
+    { key: 'variationPercent', label: 'Variation %' }
+  ];
+
+  const getStationColumns = () => [
+    { key: 'station', label: 'Station' },
+    { key: 'currentRks', label: 'Current RKs' },
+    { key: 'currentAvgPerDay', label: 'Current Avg/Day' },
+    { key: 'currentWagon', label: 'Current Wagons' },
+    { key: 'currentMT', label: 'Current MT' },
+    { key: 'compareRks', label: 'Previous RKs' },
+    { key: 'compareAvgPerDay', label: 'Previous Avg/Day' },
+    { key: 'compareWagon', label: 'Previous Wagons' },
+    { key: 'compareMT', label: 'Previous MT' },
+    { key: 'variationUnits', label: 'Variation Units' },
+    { key: 'variationPercent', label: 'Variation %' }
+  ];
 
   const formatDecimal = (num: number, decimals: number = 3) => {
     return num.toFixed(decimals);
@@ -205,18 +237,7 @@ export default function CustomReportsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Export Format</label>
-                <Select value={exportFormat} onValueChange={setExportFormat}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select export format" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pdf">PDF Report</SelectItem>
-                    <SelectItem value="csv">CSV Data</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+
             </div>
 
             {/* Action Buttons */}
@@ -229,15 +250,21 @@ export default function CustomReportsPage() {
                 <Search className="h-4 w-4" />
                 Generate Report
               </Button>
-              <Button 
-                onClick={handleDownload}
-                variant="outline"
-                className="flex items-center gap-2"
-                disabled={!reportGenerated || (!commodityData && !stationData)}
-              >
-                <Download className="h-4 w-4" />
-                Download {exportFormat.toUpperCase()}
-              </Button>
+              
+              {/* Export Wizard */}
+              {reportGenerated && (commodityData || stationData) && (
+                <ExportWizard
+                  data={reportType === "commodities" ? (commodityData?.data || []) : (stationData?.data || [])}
+                  columns={reportType === "commodities" ? getCommodityColumns() : getStationColumns()}
+                  onExport={handleExport}
+                  trigger={
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Download className="h-4 w-4" />
+                      Export Data
+                    </Button>
+                  }
+                />
+              )}
             </div>
 
             {/* Date Range Summary */}

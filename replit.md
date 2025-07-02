@@ -183,6 +183,8 @@ The system follows a modern full-stack architecture with clear separation of con
   - Corrected MT (tonnage) display formatting to show values in thousands by dividing raw values by 1000
   - Added color-coded table headers to differentiate current (blue), previous (green), and variation (orange) columns for better readability
   - Implemented duration headers displaying actual time periods in table headers with two-row structure showing date ranges for current vs previous periods
+  - Converted PDF reports to landscape orientation with wider column layouts for better readability and proper table display
+  - Integrated ExportWizard component in Custom Reports page providing advanced export options with column selection, format choice, and data filtering capabilities
 
 ## User Preferences
 
