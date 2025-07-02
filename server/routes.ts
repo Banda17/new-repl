@@ -176,8 +176,8 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('black');
     let yPosition = 130;
 
-    // Properly sized table with better proportions
-    const columnWidths = [95, 50, 55, 55, 55, 70, 50, 55, 55, 55, 70, 70];
+    // Properly sized table with better proportions (removed freight columns)
+    const columnWidths = [95, 50, 55, 55, 55, 50, 55, 55, 55, 70, 70];
     const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
     const startX = (842 - tableWidth) / 2; // Center the table
     
