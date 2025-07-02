@@ -298,37 +298,53 @@ export default function DashboardPage() {
     return null;
   };
 
-  // Get top commodities and stations for charts
-  const getTopCommodities = () => {
-    if (!commodityData) return [];
-    const commodityTotals = commodityData.reduce((acc: any, item) => {
-      if (!acc[item.commodity]) {
-        acc[item.commodity] = 0;
-      }
-      acc[item.commodity] += item.totalTonnage;
-      return acc;
-    }, {});
-    
-    return Object.entries(commodityTotals)
-      .sort(([,a]: any, [,b]: any) => b - a)
-      .slice(0, 5)
-      .map(([commodity]) => commodity);
+  // Helper functions for year-based data processing
+  const getDataByYear = (data: any[], year: string) => {
+    return data?.filter(item => item.year === year) || [];
   };
 
-  const getTopStations = () => {
-    if (!stationData) return [];
-    const stationTotals = stationData.reduce((acc: any, item) => {
-      if (!acc[item.station]) {
-        acc[item.station] = 0;
-      }
-      acc[item.station] += item.totalTonnage;
-      return acc;
-    }, {});
+  const getTopCommodities = (year: string = "2025") => {
+    const yearData = getDataByYear(commodityData || [], year);
+    if (!yearData.length) return [];
     
-    return Object.entries(stationTotals)
-      .sort(([,a]: any, [,b]: any) => b - a)
+    return yearData
+      .sort((a: any, b: any) => b.totalTonnage - a.totalTonnage)
       .slice(0, 5)
-      .map(([station]) => station);
+      .map((item: any) => item.commodity);
+  };
+
+  const getTopStations = (year: string = "2025") => {
+    const yearData = getDataByYear(stationData || [], year);
+    if (!yearData.length) return [];
+    
+    return yearData
+      .sort((a: any, b: any) => b.totalTonnage - a.totalTonnage)
+      .slice(0, 5)
+      .map((item: any) => item.station);
+  };
+
+  const getCommodityChartData = (year: string) => {
+    const yearData = getDataByYear(commodityData || [], year);
+    return getTopCommodities(year).map(commodity => {
+      const item = yearData.find((d: any) => d.commodity === commodity);
+      return {
+        name: commodity.length > 8 ? commodity.substring(0, 8) + '...' : commodity,
+        fullName: commodity,
+        tonnage: item?.totalTonnage || 0
+      };
+    });
+  };
+
+  const getStationChartData = (year: string) => {
+    const yearData = getDataByYear(stationData || [], year);
+    return getTopStations(year).map(station => {
+      const item = yearData.find((d: any) => d.station === station);
+      return {
+        name: station.length > 10 ? station.substring(0, 10) + '...' : station,
+        fullName: station,
+        tonnage: item?.totalTonnage || 0
+      };
+    });
   };
 
   return (
@@ -636,11 +652,7 @@ export default function DashboardPage() {
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={getTopCommodities().map(commodity => ({
-                            name: commodity.length > 8 ? commodity.substring(0, 8) + '...' : commodity,
-                            fullName: commodity,
-                            tonnage: commodityData?.filter(item => item.commodity === commodity).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
-                          }))}>
+                          <BarChart data={getCommodityChartData("2025")}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -681,11 +693,7 @@ export default function DashboardPage() {
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={getTopStations().map(station => ({
-                            name: station.length > 10 ? station.substring(0, 10) + '...' : station,
-                            fullName: station,
-                            tonnage: stationData?.filter(item => item.station === station).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
-                          }))}>
+                          <BarChart data={getStationChartData("2025")}>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -725,17 +733,24 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-lg p-4">
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">2024 Full Year - Top Commodities</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Complete 2024 performance for year-over-year comparison
+                        {getDataByYear(commodityData || [], "2024").length > 0 ? 
+                          "Complete 2024 performance for year-over-year comparison" :
+                          "2024 data not available - showing reference values for comparison context"
+                        }
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={[
-                            { name: "COAL", fullName: "COAL", tonnage: 7520000 },
-                            { name: "IRON ORE", fullName: "IRON ORE", tonnage: 2650000 },
-                            { name: "FERT.", fullName: "FERTILIZER", tonnage: 2400000 },
-                            { name: "LIMESTO...", fullName: "LIMESTONE", tonnage: 1450000 },
-                            { name: "LATERITE", fullName: "LATERITE", tonnage: 950000 }
-                          ]}>
+                          <BarChart data={
+                            getDataByYear(commodityData || [], "2024").length > 0 ? 
+                            getCommodityChartData("2024") :
+                            [
+                              { name: "COAL", fullName: "COAL", tonnage: 7520000 },
+                              { name: "IRON ORE", fullName: "IRON ORE", tonnage: 2650000 },
+                              { name: "FERT.", fullName: "FERTILIZER", tonnage: 2400000 },
+                              { name: "LIMESTO...", fullName: "LIMESTONE", tonnage: 1450000 },
+                              { name: "LATERITE", fullName: "LATERITE", tonnage: 950000 }
+                            ]
+                          }>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -762,7 +777,7 @@ export default function DashboardPage() {
                               dataKey="tonnage" 
                               fill="#94a3b8" 
                               radius={[4, 4, 0, 0]}
-                              name="2024 Full Year (MT)"
+                              name={getDataByYear(commodityData || [], "2024").length > 0 ? "2024 Actual Data (MT)" : "2024 Reference (MT)"}
                             />
                           </BarChart>
                         </ResponsiveContainer>
@@ -772,17 +787,24 @@ export default function DashboardPage() {
                     <div className="bg-white rounded-lg p-4">
                       <h3 className="text-lg font-semibold text-gray-800 mb-2">2024 Full Year - Top Stations</h3>
                       <p className="text-sm text-gray-600 mb-4">
-                        Complete 2024 performance for year-over-year comparison
+                        {getDataByYear(stationData || [], "2024").length > 0 ? 
+                          "Complete 2024 performance for year-over-year comparison" :
+                          "2024 data not available - showing reference values for comparison context"
+                        }
                       </p>
                       <div className="h-80">
                         <ResponsiveContainer width="100%" height="100%">
-                          <BarChart data={[
-                            { name: "PKPK", fullName: "PKPK", tonnage: 10500000 },
-                            { name: "COA/KSLK", fullName: "COA/KSLK", tonnage: 4200000 },
-                            { name: "COA/CFL", fullName: "COA/CFL", tonnage: 920000 },
-                            { name: "RVD", fullName: "RVD", tonnage: 890000 },
-                            { name: "BPGK", fullName: "BPGK", tonnage: 380000 }
-                          ]}>
+                          <BarChart data={
+                            getDataByYear(stationData || [], "2024").length > 0 ? 
+                            getStationChartData("2024") :
+                            [
+                              { name: "PKPK", fullName: "PKPK", tonnage: 10500000 },
+                              { name: "COA/KSLK", fullName: "COA/KSLK", tonnage: 4200000 },
+                              { name: "COA/CFL", fullName: "COA/CFL", tonnage: 920000 },
+                              { name: "RVD", fullName: "RVD", tonnage: 890000 },
+                              { name: "BPGK", fullName: "BPGK", tonnage: 380000 }
+                            ]
+                          }>
                             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                             <XAxis 
                               dataKey="name"
@@ -809,7 +831,7 @@ export default function DashboardPage() {
                               dataKey="tonnage" 
                               fill="#94a3b8" 
                               radius={[4, 4, 0, 0]}
-                              name="2024 Full Year (MT)"
+                              name={getDataByYear(stationData || [], "2024").length > 0 ? "2024 Actual Data (MT)" : "2024 Reference (MT)"}
                             />
                           </BarChart>
                         </ResponsiveContainer>
