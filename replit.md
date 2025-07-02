@@ -152,6 +152,14 @@ The system follows a modern full-stack architecture with clear separation of con
   - Added duration information directly in chart legends showing year-over-year comparison periods (2025 vs 2024)
   - Converted daily comparison charts to bar chart format for clearer period-to-period comparison visualization
   - Corrected comparison periods to show proper year-over-year analysis: current period (24-26 Jun 2025) vs previous period (24-26 Jun 2024)
+- June 26, 2025. Implemented comprehensive data synchronization between charts and tables:
+  - Removed conditional data loading based on active tabs - all data sources now load simultaneously
+  - Added automatic refresh intervals (30 seconds) and reduced stale time (10 seconds) for real-time updates
+  - Created data transformation functions to ensure charts and tables use identical synchronized data sources
+  - Updated Daily Commodities and Daily Stations charts to dynamically pull data from comparative loading APIs
+  - Added manual "Refresh Data" button in dashboard header for immediate data synchronization
+  - Pie chart already uses synchronized commodity data from yearly loading API
+  - All components now reflect real-time data changes immediately across both charts and tables tabs
 
 ## User Preferences
 
