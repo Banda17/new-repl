@@ -176,26 +176,26 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('black');
     let yPosition = 130;
 
-    // Adjusted table for better fit within page width
-    const columnWidths = [70, 40, 45, 50, 50, 40, 45, 50, 50, 50, 50];
+    // Landscape layout allows wider table
+    const columnWidths = [100, 60, 70, 80, 80, 60, 70, 80, 80, 80, 80];
     const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
-    const startX = (842 - tableWidth) / 2; // Center the table
+    const startX = (792 - tableWidth) / 2; // Center the table in landscape (792pt height becomes width)
     
     // Main header row
     doc.rect(startX, yPosition, tableWidth, 25).fill('#1e40af');
     doc.fillColor('white').fontSize(12).font('Helvetica-Bold');
     
-    // Duration headers with actual time periods
-    doc.text('Commodity', startX + 5, yPosition + 8, { width: 65, align: 'center' });
-    doc.text(`CURRENT: ${data.periods.current}`, startX + 75, yPosition + 5, { width: 185, align: 'center' });
-    doc.text(`PREVIOUS: ${data.periods.previous}`, startX + 260, yPosition + 5, { width: 185, align: 'center' });
-    doc.text('Variation', startX + 445, yPosition + 8, { width: 95, align: 'center' });
+    // Duration headers with actual time periods for landscape layout
+    doc.text('Commodity', startX + 5, yPosition + 8, { width: 90, align: 'center' });
+    doc.text(`CURRENT: ${data.periods.current}`, startX + 105, yPosition + 5, { width: 290, align: 'center' });
+    doc.text(`PREVIOUS: ${data.periods.previous}`, startX + 395, yPosition + 5, { width: 290, align: 'center' });
+    doc.text('Variation', startX + 685, yPosition + 8, { width: 155, align: 'center' });
     
     // Clean dividing lines
     doc.strokeColor('#ffffff').lineWidth(1.5);
-    doc.moveTo(startX + 70, yPosition).lineTo(startX + 70, yPosition + 25).stroke();
-    doc.moveTo(startX + 255, yPosition).lineTo(startX + 255, yPosition + 25).stroke();
-    doc.moveTo(startX + 440, yPosition).lineTo(startX + 440, yPosition + 25).stroke();
+    doc.moveTo(startX + 100, yPosition).lineTo(startX + 100, yPosition + 25).stroke();
+    doc.moveTo(startX + 390, yPosition).lineTo(startX + 390, yPosition + 25).stroke();
+    doc.moveTo(startX + 680, yPosition).lineTo(startX + 680, yPosition + 25).stroke();
     
     yPosition += 25;
     
@@ -317,8 +317,8 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
       yPosition = 50;
     }
 
-    const summaryWidth = 700;
-    const summaryX = (842 - summaryWidth) / 2;
+    const summaryWidth = 800;
+    const summaryX = (792 - summaryWidth) / 2;
 
     // Summary header
     doc.rect(summaryX, yPosition, summaryWidth, 30).fill('#1e40af');
@@ -360,9 +360,9 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
 
 
 
-    // Professional footer
+    // Professional footer for landscape
     const footerY = doc.page.height - 40;
-    doc.rect(0, footerY, 842, 40).fill('#1e3a8a');
+    doc.rect(0, footerY, doc.page.width, 40).fill('#1e3a8a');
     // Add small logo in footer too
     try {
       doc.image('./attached_assets/Indian_Railway_Logo_2_1750768462355.png', 40, footerY + 5, { width: 30, height: 30 });
@@ -373,7 +373,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
        .text('South Central Railway - Operations Management System', 80, footerY + 10);
     doc.fontSize(9).font('Helvetica')
        .text('Confidential Report | For Internal Use Only', 40, footerY + 25)
-       .text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1 of 1`, 650, footerY + 25);
+       .text(`Generated: ${new Date().toLocaleDateString('en-IN')} | Page 1 of 1`, doc.page.width - 200, footerY + 25);
 
     console.log("Comparative loading PDF generation completed");
   } catch (error) {
@@ -4166,7 +4166,7 @@ export function registerRoutes(app: Express): Server {
         return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
       };
 
-      const doc = new PDFDocument({ margin: 50 });
+      const doc = new PDFDocument({ margin: 50, layout: 'landscape' });
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename="custom-${type}-report-${from}-to-${to}.pdf"`);
       doc.pipe(res);
