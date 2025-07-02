@@ -185,11 +185,11 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.rect(startX, yPosition, tableWidth, 25).fill('#1e40af');
     doc.fillColor('white').fontSize(12).font('Helvetica-Bold');
     
-    // Properly aligned merged headers
+    // Duration headers with actual time periods
     doc.text('Commodity', startX + 5, yPosition + 8, { width: 85, align: 'center' });
-    doc.text('CURRENT PERIOD', startX + 95, yPosition + 8, { width: 285, align: 'center' });
-    doc.text('PREVIOUS PERIOD', startX + 380, yPosition + 8, { width: 285, align: 'center' });
-    doc.text('Performance', startX + 665, yPosition + 8, { width: 70, align: 'center' });
+    doc.text(`CURRENT PERIOD: ${data.periods.current}`, startX + 95, yPosition + 5, { width: 285, align: 'center' });
+    doc.text(`PREVIOUS PERIOD: ${data.periods.previous}`, startX + 380, yPosition + 5, { width: 285, align: 'center' });
+    doc.text('Variation', startX + 665, yPosition + 8, { width: 70, align: 'center' });
     
     // Clean dividing lines
     doc.strokeColor('#ffffff').lineWidth(1.5);
@@ -203,7 +203,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.rect(startX, yPosition, tableWidth, 20).fill('#3b82f6');
     doc.fillColor('white').fontSize(9).font('Helvetica-Bold');
     
-    const subHeaders = ['', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'RKs', 'Avg/Day', 'Wagons', 'MT', 'Freight', 'Change %'];
+    const subHeaders = ['', 'Rks', 'Avg/Day', 'Wagons', 'MT', 'Rks', 'Avg/Day', 'Wagons', 'MT', 'MT', '%'];
     let xPosition = startX;
     
     subHeaders.forEach((header, index) => {
@@ -261,24 +261,23 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
       doc.strokeColor('#e2e8f0').lineWidth(0.3);
       doc.rect(startX, yPosition, tableWidth, 20).stroke();
       
-      // Enhanced data formatting with proper alignment
+      // Enhanced data formatting matching table format
       const values = [
         row.commodity || 'N/A',
-        row.currentPeriod.rks?.toString() || '0',
-        row.currentPeriod.avgPerDay?.toFixed(1) || '0.0',
-        row.currentPeriod.wagons?.toString() || '0',
-        (row.currentPeriod.tonnage / 1000000)?.toFixed(3) || '0.000',
-        `₹${(row.currentPeriod.freight / 10000000)?.toFixed(1)}Cr`,
-        row.previousPeriod.rks?.toString() || '0',
-        row.previousPeriod.avgPerDay?.toFixed(1) || '0.0',
-        row.previousPeriod.wagons?.toString() || '0',
-        (row.previousPeriod.tonnage / 1000000)?.toFixed(3) || '0.000',
-        `₹${(row.previousPeriod.freight / 10000000)?.toFixed(1)}Cr`,
-        `${row.changeInPercentage > 0 ? '+' : ''}${row.changeInPercentage?.toFixed(1)}%`
+        row.currentRks?.toString() || '0',
+        row.currentAvgDay?.toFixed(3) || '0.000',
+        row.currentWagon?.toLocaleString() || '0',
+        (row.currentMT / 1000)?.toFixed(3) || '0.000',
+        row.compareRks?.toString() || '0',
+        row.compareAvgDay?.toFixed(3) || '0.000',
+        row.compareWagon?.toLocaleString() || '0',
+        (row.compareMT / 1000)?.toFixed(3) || '0.000',
+        (row.variationUnits / 1000)?.toFixed(3) || '0.000',
+        `${row.variationPercent > 0 ? '+' : ''}${row.variationPercent?.toFixed(1)}%`
       ];
 
       // Color coding for performance column
-      const changeValue = row.changeInPercentage || 0;
+      const changeValue = row.variationPercent || 0;
       
       xPosition = startX;
       values.forEach((value, index) => {
@@ -289,7 +288,7 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
             width: columnWidths[index] - 16, 
             align: 'left'
           });
-        } else if (index === 11) {
+        } else if (index === 10) {
           // Change percentage with color coding
           const changeColor = changeValue > 0 ? '#059669' : changeValue < 0 ? '#dc2626' : '#64748b';
           doc.fillColor(changeColor).font('Helvetica-Bold').fontSize(9);
