@@ -176,8 +176,8 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('black');
     let yPosition = 130;
 
-    // Properly sized table with better proportions (removed freight columns)
-    const columnWidths = [95, 50, 55, 55, 55, 50, 55, 55, 55, 70, 70];
+    // Adjusted table for better fit within page width
+    const columnWidths = [70, 40, 45, 50, 50, 40, 45, 50, 50, 50, 50];
     const tableWidth = columnWidths.reduce((sum, width) => sum + width, 0);
     const startX = (842 - tableWidth) / 2; // Center the table
     
@@ -186,16 +186,16 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('white').fontSize(12).font('Helvetica-Bold');
     
     // Duration headers with actual time periods
-    doc.text('Commodity', startX + 5, yPosition + 8, { width: 85, align: 'center' });
-    doc.text(`CURRENT PERIOD: ${data.periods.current}`, startX + 95, yPosition + 5, { width: 285, align: 'center' });
-    doc.text(`PREVIOUS PERIOD: ${data.periods.previous}`, startX + 380, yPosition + 5, { width: 285, align: 'center' });
-    doc.text('Variation', startX + 665, yPosition + 8, { width: 70, align: 'center' });
+    doc.text('Commodity', startX + 5, yPosition + 8, { width: 65, align: 'center' });
+    doc.text(`CURRENT: ${data.periods.current}`, startX + 75, yPosition + 5, { width: 185, align: 'center' });
+    doc.text(`PREVIOUS: ${data.periods.previous}`, startX + 260, yPosition + 5, { width: 185, align: 'center' });
+    doc.text('Variation', startX + 445, yPosition + 8, { width: 95, align: 'center' });
     
     // Clean dividing lines
     doc.strokeColor('#ffffff').lineWidth(1.5);
-    doc.moveTo(startX + 95, yPosition).lineTo(startX + 95, yPosition + 25).stroke();
-    doc.moveTo(startX + 380, yPosition).lineTo(startX + 380, yPosition + 25).stroke();
-    doc.moveTo(startX + 665, yPosition).lineTo(startX + 665, yPosition + 25).stroke();
+    doc.moveTo(startX + 70, yPosition).lineTo(startX + 70, yPosition + 25).stroke();
+    doc.moveTo(startX + 255, yPosition).lineTo(startX + 255, yPosition + 25).stroke();
+    doc.moveTo(startX + 440, yPosition).lineTo(startX + 440, yPosition + 25).stroke();
     
     yPosition += 25;
     
@@ -327,8 +327,9 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     
     yPosition += 35;
     
-    const totalCurrent = data.totals?.currentPeriod?.tonnage || 0;
-    const totalPrevious = data.totals?.previousPeriod?.tonnage || 0;
+    // Calculate totals from the data array
+    const totalCurrent = data.data.reduce((sum, row) => sum + (row.currentMT || 0), 0);
+    const totalPrevious = data.data.reduce((sum, row) => sum + (row.compareMT || 0), 0);
     const totalChange = totalPrevious > 0 ? ((totalCurrent - totalPrevious) / totalPrevious * 100) : 0;
     
     // Summary content with better layout
@@ -338,13 +339,13 @@ function generateComparativeLoadingPDF(doc: typeof PDFDocument, data: any) {
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Current Period Total:", summaryX + 30, yPosition + 20);
     doc.fillColor('#059669').fontSize(16).font('Helvetica-Bold')
-       .text(`${(totalCurrent / 1000000).toFixed(3)} MT`, summaryX + 30, yPosition + 40);
+       .text(`${(totalCurrent / 1000).toFixed(3)} MT`, summaryX + 30, yPosition + 40);
     
     // Middle - Previous period
     doc.fillColor('#1f2937').fontSize(14).font('Helvetica-Bold')
        .text("Previous Period Total:", summaryX + 250, yPosition + 20);
     doc.fillColor('#6b7280').fontSize(16).font('Helvetica')
-       .text(`${(totalPrevious / 1000000).toFixed(3)} MT`, summaryX + 250, yPosition + 40);
+       .text(`${(totalPrevious / 1000).toFixed(3)} MT`, summaryX + 250, yPosition + 40);
     
     // Right side - Performance change
     const changeColor = totalChange > 0 ? '#059669' : totalChange < 0 ? '#dc2626' : '#6b7280';
