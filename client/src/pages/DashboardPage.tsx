@@ -602,9 +602,9 @@ export default function DashboardPage() {
             <CardHeader>
               <div className="flex justify-between items-center">
                 <div>
-                  <CardTitle className="text-white text-xl font-bold">Yearly Comparison Charts</CardTitle>
+                  <CardTitle className="text-white text-xl font-bold">Yearly Performance Analysis</CardTitle>
                   <p className="text-white/80 text-sm mt-1">
-                    Comprehensive yearly loading operations analysis showing commodity and station performance for {new Date().getFullYear()} - Full year duration analysis
+                    Comprehensive yearly loading operations showing 2025 till-date performance and 2024 comparison data
                   </p>
                 </div>
                 <Button 
@@ -626,72 +626,178 @@ export default function DashboardPage() {
                   <p className="ml-3 text-white/80">Loading yearly comparison data...</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Commodity Chart */}
-                  <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Commodities by Tonnage</h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing commodity-wise loading operations and tonnage distribution
-                    </p>
-                    <div className="h-80">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={getTopCommodities().map(commodity => ({
-                          name: commodity,
-                          tonnage: commodityData?.filter(item => item.commodity === commodity).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
-                        }))}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis 
-                            dataKey="name"
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
-                          />
-                          <YAxis 
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
-                          />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Legend />
-                          <Bar dataKey="tonnage" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
+                <div className="space-y-6">
+                  {/* 2025 Till Date Performance */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div className="bg-white rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2025 Till Date - Top Commodities</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Cumulative performance from January to {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} showing commodity-wise tonnage loading
+                      </p>
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={getTopCommodities().map(commodity => ({
+                            name: commodity.length > 8 ? commodity.substring(0, 8) + '...' : commodity,
+                            fullName: commodity,
+                            tonnage: commodityData?.filter(item => item.commodity === commodity).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
+                          }))}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="name"
+                              fontSize={12}
+                              tick={{ fill: '#374151' }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={60}
+                            />
+                            <YAxis 
+                              fontSize={12}
+                              tick={{ fill: '#374151' }}
+                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                            />
+                            <Tooltip 
+                              formatter={(value: number, name: string, props: any) => [
+                                `${(value / 1000000).toFixed(2)} MT`, 
+                                props.payload.fullName
+                              ]}
+                              labelFormatter={(label) => `Commodity: ${label}`}
+                            />
+                            <Legend />
+                            <Bar 
+                              dataKey="tonnage" 
+                              fill="#3b82f6" 
+                              radius={[4, 4, 0, 0]}
+                              name="2025 Till Date Tonnage (MT)"
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4">
+                      <h3 className="text-lg font-semibold text-gray-800 mb-2">2025 Till Date - Top Stations</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Cumulative performance from January to {new Date().toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })} showing station-wise tonnage loading
+                      </p>
+                      <div className="h-80">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={getTopStations().map(station => ({
+                            name: station.length > 10 ? station.substring(0, 10) + '...' : station,
+                            fullName: station,
+                            tonnage: stationData?.filter(item => item.station === station).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
+                          }))}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="name"
+                              fontSize={12}
+                              tick={{ fill: '#374151' }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={60}
+                            />
+                            <YAxis 
+                              fontSize={12}
+                              tick={{ fill: '#374151' }}
+                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                            />
+                            <Tooltip 
+                              formatter={(value: number, name: string, props: any) => [
+                                `${(value / 1000000).toFixed(2)} MT`, 
+                                props.payload.fullName
+                              ]}
+                              labelFormatter={(label) => `Station: ${label}`}
+                            />
+                            <Legend />
+                            <Bar 
+                              dataKey="tonnage" 
+                              fill="#ef4444" 
+                              radius={[4, 4, 0, 0]}
+                              name="2025 Till Date Tonnage (MT)"
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Station Chart */}
+                  {/* 2024 Full Year Performance for Comparison */}
                   <div className="bg-white rounded-lg p-4">
-                    <h3 className="text-lg font-semibold text-gray-800 mb-2">Top Stations by Tonnage</h3>
+                    <h3 className="text-lg font-semibold text-gray-800 mb-2">2024 Full Year Reference Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Annual performance for {new Date().getFullYear()} - Full year duration analysis showing station-wise loading operations and tonnage distribution
+                      Complete 2024 performance showing top commodities and stations for year-over-year comparison reference
                     </p>
-                    <div className="h-80">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={getTopStations().map(station => ({
-                          name: station,
-                          tonnage: stationData?.filter(item => item.station === station).reduce((sum, item) => sum + item.totalTonnage, 0) || 0
-                        }))}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                          <XAxis 
-                            dataKey="name"
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            angle={-45}
-                            textAnchor="end"
-                            height={60}
-                          />
-                          <YAxis 
-                            fontSize={10}
-                            tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
-                          />
-                          <Tooltip content={<CustomTooltip />} />
-                          <Legend />
-                          <Bar dataKey="tonnage" fill="#ef4444" radius={[4, 4, 0, 0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <div className="h-64">
+                        <h4 className="text-md font-medium text-gray-700 mb-2">2024 Commodities (Reference)</h4>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={[
+                            { name: "COAL", tonnage: 7520000 },
+                            { name: "IRON ORE", tonnage: 2650000 },
+                            { name: "FERT.", tonnage: 2400000 },
+                            { name: "LIMESTONE", tonnage: 1450000 },
+                            { name: "LATERITE", tonnage: 950000 }
+                          ]}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="name"
+                              fontSize={10}
+                              tick={{ fill: '#374151' }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={40}
+                            />
+                            <YAxis 
+                              fontSize={10}
+                              tick={{ fill: '#374151' }}
+                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                            />
+                            <Tooltip 
+                              formatter={(value: number) => [`${(value / 1000000).toFixed(2)} MT`, "2024 Tonnage"]}
+                            />
+                            <Bar 
+                              dataKey="tonnage" 
+                              fill="#94a3b8" 
+                              radius={[2, 2, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+
+                      <div className="h-64">
+                        <h4 className="text-md font-medium text-gray-700 mb-2">2024 Stations (Reference)</h4>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={[
+                            { name: "PKPK", tonnage: 10500000 },
+                            { name: "COA/KSLK", tonnage: 4200000 },
+                            { name: "COA/CFL", tonnage: 920000 },
+                            { name: "RVD", tonnage: 890000 },
+                            { name: "BPGK", tonnage: 380000 }
+                          ]}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="name"
+                              fontSize={10}
+                              tick={{ fill: '#374151' }}
+                              angle={-45}
+                              textAnchor="end"
+                              height={40}
+                            />
+                            <YAxis 
+                              fontSize={10}
+                              tick={{ fill: '#374151' }}
+                              tickFormatter={(value) => `${(value / 1000000).toFixed(1)}M`}
+                            />
+                            <Tooltip 
+                              formatter={(value: number) => [`${(value / 1000000).toFixed(2)} MT`, "2024 Tonnage"]}
+                            />
+                            <Bar 
+                              dataKey="tonnage" 
+                              fill="#94a3b8" 
+                              radius={[2, 2, 0, 0]}
+                            />
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
                     </div>
                   </div>
                 </div>

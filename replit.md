@@ -160,6 +160,15 @@ The system follows a modern full-stack architecture with clear separation of con
   - Added manual "Refresh Data" button in dashboard header for immediate data synchronization
   - Pie chart already uses synchronized commodity data from yearly loading API
   - All components now reflect real-time data changes immediately across both charts and tables tabs
+- June 26, 2025. Enhanced yearly comparison charts for better readability and meaningful analysis:
+  - Restructured "Yearly Comparison Charts" into "Yearly Performance Analysis" with clearer sections
+  - Created separate "2025 Till Date" charts showing cumulative performance from January to current month
+  - Added dedicated "2024 Full Year Reference Data" section for year-over-year comparison
+  - Improved chart readability with better font sizes (12px), tooltips showing full names, and legend descriptions
+  - Implemented dynamic period descriptions showing current month context (e.g., "January to June 2025")
+  - Enhanced station/commodity name truncation with ellipsis for better visual fit while preserving full names in tooltips
+  - Added reference 2024 data charts with appropriate grey styling to distinguish from current year performance
+  - Organized layout with 2025 till-date charts prominently displayed above 2024 reference charts
 
 ## User Preferences
 
