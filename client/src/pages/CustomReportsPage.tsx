@@ -75,13 +75,37 @@ export default function CustomReportsPage() {
 
   // Query for filtered commodity data
   const { data: commodityData, isLoading: isLoadingCommodity, refetch: refetchCommodity } = useQuery<FilteredData>({
-    queryKey: ['/api/custom-report-commodities', dateRange.from, dateRange.to],
+    queryKey: ['/api/custom-report-commodities', dateRange.from?.toISOString(), dateRange.to?.toISOString()],
+    queryFn: async () => {
+      if (!dateRange.from || !dateRange.to) {
+        throw new Error("Date range is required");
+      }
+      const fromDate = format(dateRange.from, "yyyy-MM-dd");
+      const toDate = format(dateRange.to, "yyyy-MM-dd");
+      const response = await fetch(`/api/custom-report-commodities?from=${fromDate}&to=${toDate}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch commodity data");
+      }
+      return response.json();
+    },
     enabled: false // Only fetch when explicitly triggered
   });
 
   // Query for filtered station data
   const { data: stationData, isLoading: isLoadingStation, refetch: refetchStation } = useQuery<StationFilteredData>({
-    queryKey: ['/api/custom-report-stations', dateRange.from, dateRange.to],
+    queryKey: ['/api/custom-report-stations', dateRange.from?.toISOString(), dateRange.to?.toISOString()],
+    queryFn: async () => {
+      if (!dateRange.from || !dateRange.to) {
+        throw new Error("Date range is required");
+      }
+      const fromDate = format(dateRange.from, "yyyy-MM-dd");
+      const toDate = format(dateRange.to, "yyyy-MM-dd");
+      const response = await fetch(`/api/custom-report-stations?from=${fromDate}&to=${toDate}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch station data");
+      }
+      return response.json();
+    },
     enabled: false // Only fetch when explicitly triggered
   });
 
@@ -342,12 +366,20 @@ export default function CustomReportsPage() {
                 </div>
               )}
 
-              {isLoadingCommodity || isLoadingStation ? (
+              {(isLoadingCommodity || isLoadingStation) && (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                   <p className="mt-2 text-gray-600">Generating report...</p>
                 </div>
-              ) : null}
+              )}
+
+              {!isLoadingCommodity && !isLoadingStation && reportGenerated && !commodityData && !stationData && (
+                <div className="text-center py-8">
+                  <div className="text-yellow-600 mb-2">⚠️</div>
+                  <p className="text-gray-600">No data found for the selected date range.</p>
+                  <p className="text-sm text-gray-500 mt-1">Try selecting a different date range or report type.</p>
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

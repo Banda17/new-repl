@@ -4028,25 +4028,25 @@ export function registerRoutes(app: Express): Server {
       const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
       const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
 
-      // Query current period data
+      // Query current period data - using SQL for date comparison
       const currentData = await db
         .select()
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+            sql`DATE(${railwayLoadingOperations.pDate}) >= ${fromDate.toISOString().split('T')[0]}`,
+            sql`DATE(${railwayLoadingOperations.pDate}) <= ${toDate.toISOString().split('T')[0]}`
           )
         );
 
-      // Query previous period data
+      // Query previous period data - using SQL for date comparison
       const compareData = await db
         .select()
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+            sql`DATE(${railwayLoadingOperations.pDate}) >= ${prevFromDate.toISOString().split('T')[0]}`,
+            sql`DATE(${railwayLoadingOperations.pDate}) <= ${prevToDate.toISOString().split('T')[0]}`
           )
         );
 
