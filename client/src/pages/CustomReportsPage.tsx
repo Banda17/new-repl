@@ -296,19 +296,19 @@ export default function CustomReportsPage() {
                         {commodityData.data.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.commodity}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentPeriod.rks}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod.avgPerDay)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentPeriod.wagons)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod.tonnage)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.previousPeriod.rks}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod.avgPerDay)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.previousPeriod.wagons)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod.tonnage)}</td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${item.changeInMT >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.changeInMT)}
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentPeriod?.rks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod?.avgPerDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentPeriod?.wagons || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod?.tonnage || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.previousPeriod?.rks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod?.avgPerDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.previousPeriod?.wagons || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod?.tonnage || 0)}</td>
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.changeInMT || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.changeInMT || 0)}
                             </td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${item.changeInPercentage >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.changeInPercentage, 2)}%
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.changeInPercentage || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.changeInPercentage || 0, 2)}%
                             </td>
                           </tr>
                         ))}
@@ -343,20 +343,20 @@ export default function CustomReportsPage() {
                       <tbody>
                         {stationData.data.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
-                            <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.station}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentAvgPerDay)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentWagon)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentMT)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.compareRks}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareAvgPerDay)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.compareWagon)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareMT)}</td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${item.variationUnits >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.variationUnits)}
+                            <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.station || 'N/A'}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentAvgPerDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentWagon || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.compareRks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareAvgPerDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.compareWagon || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareMT || 0)}</td>
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationUnits || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.variationUnits || 0)}
                             </td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${item.variationPercent >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.variationPercent, 2)}%
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.variationPercent || 0, 2)}%
                             </td>
                           </tr>
                         ))}
