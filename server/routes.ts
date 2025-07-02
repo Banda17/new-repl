@@ -4146,8 +4146,8 @@ export function registerRoutes(app: Express): Server {
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+            gte(railwayLoadingOperations.pDate, fromDate),
+            lte(railwayLoadingOperations.pDate, toDate)
           )
         );
 
@@ -4156,8 +4156,8 @@ export function registerRoutes(app: Express): Server {
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+            gte(railwayLoadingOperations.pDate, prevFromDate),
+            lte(railwayLoadingOperations.pDate, prevToDate)
           )
         );
 
@@ -4217,8 +4217,8 @@ export function registerRoutes(app: Express): Server {
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+            gte(railwayLoadingOperations.pDate, fromDate),
+            lte(railwayLoadingOperations.pDate, toDate)
           )
         );
 
@@ -4227,8 +4227,8 @@ export function registerRoutes(app: Express): Server {
         .from(railwayLoadingOperations)
         .where(
           and(
-            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
-            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+            gte(railwayLoadingOperations.pDate, prevFromDate),
+            lte(railwayLoadingOperations.pDate, prevToDate)
           )
         );
 
