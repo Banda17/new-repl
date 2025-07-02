@@ -127,27 +127,86 @@ export default function CustomReportsPage() {
   };
 
   // Export wizard function
-  const handleExport = (format: string, selectedColumns: string[], data: any[]) => {
+  const handleExport = async (format: string, selectedColumns: string[], data: any[]) => {
     if (!dateRange.from || !dateRange.to) {
       alert("Please generate a report first");
       return;
     }
 
-    const fromDate = format === 'pdf' ? dateRange.from.toISOString().split('T')[0] : dateRange.from.toISOString().split('T')[0];
-    const toDate = format === 'pdf' ? dateRange.to.toISOString().split('T')[0] : dateRange.to.toISOString().split('T')[0];
+    const fromDate = dateRange.from.toISOString().split('T')[0];
+    const toDate = dateRange.to.toISOString().split('T')[0];
 
     if (format === 'pdf') {
-      const endpoint = reportType === "commodities" 
-        ? `/api/exports/custom-report-pdf?type=commodities&from=${fromDate}&to=${toDate}`
-        : `/api/exports/custom-report-pdf?type=stations&from=${fromDate}&to=${toDate}`;
+      // Use the new custom export PDF endpoint with column selection
+      const reportTitle = `${reportType === "commodities" ? "Commodity" : "Station"} Analysis Report (${fromDate} to ${toDate})`;
       
-      window.open(endpoint, '_blank');
+      try {
+        const response = await fetch('/api/exports/custom-export-pdf', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            data: data,
+            columns: selectedColumns,
+            reportTitle: reportTitle,
+            reportType: reportType
+          }),
+        });
+
+        if (response.ok) {
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.style.display = 'none';
+          a.href = url;
+          a.download = `custom-${reportType}-export-${Date.now()}.pdf`;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+        } else {
+          console.error('PDF export failed');
+          alert('Failed to generate PDF export');
+        }
+      } catch (error) {
+        console.error('Error exporting PDF:', error);
+        alert('Error occurred while exporting PDF');
+      }
     } else if (format === 'csv') {
       const endpoint = reportType === "commodities"
         ? `/api/exports/custom-report-csv?type=commodities&from=${fromDate}&to=${toDate}`
         : `/api/exports/custom-report-csv?type=stations&from=${fromDate}&to=${toDate}`;
       
       window.open(endpoint, '_blank');
+    } else if (format === 'json') {
+      // Handle JSON export by downloading the data directly
+      const jsonData = {
+        exportInfo: {
+          title: `${reportType === "commodities" ? "Commodity" : "Station"} Analysis Report`,
+          dateRange: `${fromDate} to ${toDate}`,
+          exportedAt: new Date().toISOString(),
+          selectedColumns: selectedColumns
+        },
+        data: data.map(item => {
+          const filtered: any = {};
+          selectedColumns.forEach(col => {
+            filtered[col] = item[col];
+          });
+          return filtered;
+        })
+      };
+      
+      const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.style.display = 'none';
+      a.href = url;
+      a.download = `custom-${reportType}-export-${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     }
   };
 

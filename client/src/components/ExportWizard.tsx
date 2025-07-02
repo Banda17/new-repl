@@ -35,7 +35,7 @@ import { Download, FileDown } from "lucide-react";
 
 // Define the form schema
 const exportFormSchema = z.object({
-  format: z.enum(["csv", "json", "excel"]),
+  format: z.enum(["csv", "json", "excel", "pdf"]),
   dateRange: z.object({
     start: z.string().optional(),
     end: z.string().optional(),
@@ -134,6 +134,7 @@ export function ExportWizard({ data, columns, onExport, trigger }: ExportWizardP
                       <SelectItem value="csv">CSV</SelectItem>
                       <SelectItem value="json">JSON</SelectItem>
                       <SelectItem value="excel">Excel</SelectItem>
+                      <SelectItem value="pdf">PDF</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormDescription>

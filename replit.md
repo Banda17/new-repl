@@ -185,6 +185,10 @@ The system follows a modern full-stack architecture with clear separation of con
   - Implemented duration headers displaying actual time periods in table headers with two-row structure showing date ranges for current vs previous periods
   - Converted PDF reports to landscape orientation with wider column layouts for better readability and proper table display
   - Integrated ExportWizard component in Custom Reports page providing advanced export options with column selection, format choice, and data filtering capabilities
+  - Enhanced ExportWizard with PDF generation capability allowing users to create custom PDFs with selected columns and dynamic layouts
+  - Added new backend API endpoint (/api/exports/custom-export-pdf) for generating customizable PDFs with column selection and professional Railway branding
+  - Implemented dynamic column width calculation and proper page breaks for optimal PDF table presentation
+  - Added support for JSON, CSV, and PDF export formats in ExportWizard with client-side data processing for JSON/CSV and server-side PDF generation
 
 ## User Preferences
 
