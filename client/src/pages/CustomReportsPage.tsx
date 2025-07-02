@@ -273,17 +273,17 @@ export default function CustomReportsPage() {
                     <table className="w-full border-collapse border border-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Commodity</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Current Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Compare Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Variation MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Variation %</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700 bg-gray-100">Commodity</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Current Rks</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Avg/Day</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Wagons</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Compare Rks</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Avg/Day</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Wagons</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">Variation MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">Variation %</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -321,17 +321,17 @@ export default function CustomReportsPage() {
                     <table className="w-full border-collapse border border-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700">Station</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Current Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Compare Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Variation MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-gray-700">Variation %</th>
+                          <th className="border border-gray-300 px-3 py-2 text-left text-xs font-medium text-gray-700 bg-gray-100">Station</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Current Rks</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Avg/Day</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Wagons</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Compare Rks</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Avg/Day</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Wagons</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">Variation MT</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">Variation %</th>
                         </tr>
                       </thead>
                       <tbody>

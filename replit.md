@@ -181,6 +181,7 @@ The system follows a modern full-stack architecture with clear separation of con
   - Maintained consistent table formatting and comparison analysis structure across custom and standard reports
   - Fixed critical runtime errors by aligning frontend interface definitions with backend response structure
   - Corrected MT (tonnage) display formatting to show values in thousands by dividing raw values by 1000
+  - Added color-coded table headers to differentiate current (blue), previous (green), and variation (orange) columns for better readability
 
 ## User Preferences
 
