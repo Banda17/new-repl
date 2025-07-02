@@ -1102,8 +1102,8 @@ export function registerRoutes(app: Express): Server {
           lte(railwayLoadingOperations.pDate, previousPeriodEnd)
         ));
 
-      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24));
+      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24));
 
       const commodityComparison = generateCommodityComparison(currentData, previousData, currentDays, previousDays);
 
