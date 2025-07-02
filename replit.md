@@ -169,6 +169,16 @@ The system follows a modern full-stack architecture with clear separation of con
   - Enhanced station/commodity name truncation with ellipsis for better visual fit while preserving full names in tooltips
   - Added reference 2024 data charts with appropriate grey styling to distinguish from current year performance
   - Organized layout with 2025 till-date charts prominently displayed above 2024 reference charts
+- July 2, 2025. Implemented comprehensive custom reporting functionality:
+  - Created dedicated Custom Reports page with date range picker for flexible report generation
+  - Added custom date filtering for both commodity and station analysis reports
+  - Implemented dual export functionality: PDF reports with professional formatting and CSV data exports
+  - Created backend API endpoints (/api/custom-report-commodities, /api/custom-report-stations) for filtered data queries
+  - Built custom PDF and CSV export endpoints with proper year-over-year comparison logic
+  - Added Custom Reports option to Operations dropdown navigation menu
+  - Enhanced user experience with report configuration interface including date selection, report type, and export format options
+  - Enabled users to generate reports for any custom date range with automatic previous period comparison (same dates one year prior)
+  - Maintained consistent table formatting and comparison analysis structure across custom and standard reports
 
 ## User Preferences
 

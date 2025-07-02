@@ -4011,6 +4011,289 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Custom Report Endpoints
+  app.get("/api/custom-report-commodities", async (req, res) => {
+    try {
+      const { from, to } = req.query;
+      
+      if (!from || !to) {
+        return res.status(400).json({ error: "From and to dates are required" });
+      }
+
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      
+      // Calculate previous period (same duration, one year ago)
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
+      const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
+
+      // Query current period data
+      const currentData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+          )
+        );
+
+      // Query previous period data
+      const compareData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+          )
+        );
+
+      const formatDate = (date: Date) => {
+        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+      };
+
+      const commodityComparison = generateCommodityComparison(currentData, compareData, daysDiff, daysDiff);
+
+      res.json({
+        periods: {
+          current: `${formatDate(fromDate)} to ${formatDate(toDate)}`,
+          previous: `${formatDate(prevFromDate)} to ${formatDate(prevToDate)}`
+        },
+        data: commodityComparison
+      });
+    } catch (error) {
+      console.error("Error fetching custom commodity report:", error);
+      res.status(500).json({ error: "Failed to fetch custom commodity report" });
+    }
+  });
+
+  app.get("/api/custom-report-stations", async (req, res) => {
+    try {
+      const { from, to } = req.query;
+      
+      if (!from || !to) {
+        return res.status(400).json({ error: "From and to dates are required" });
+      }
+
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      
+      // Calculate previous period (same duration, one year ago)
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
+      const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
+
+      // Query current period data
+      const currentData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+          )
+        );
+
+      // Query previous period data
+      const compareData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+          )
+        );
+
+      const formatDate = (date: Date) => {
+        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+      };
+
+      const stationComparison = generateStationComparison(currentData, compareData, daysDiff, daysDiff);
+
+      res.json({
+        periods: {
+          current: `${formatDate(fromDate)} to ${formatDate(toDate)}`,
+          previous: `${formatDate(prevFromDate)} to ${formatDate(prevToDate)}`
+        },
+        data: stationComparison
+      });
+    } catch (error) {
+      console.error("Error fetching custom station report:", error);
+      res.status(500).json({ error: "Failed to fetch custom station report" });
+    }
+  });
+
+  // Custom Report PDF Export
+  app.get("/api/exports/custom-report-pdf", async (req, res) => {
+    try {
+      const { type, from, to } = req.query;
+      
+      if (!from || !to || !type) {
+        return res.status(400).json({ error: "Type, from and to dates are required" });
+      }
+
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
+      const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
+
+      // Query data
+      const currentData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+          )
+        );
+
+      const compareData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+          )
+        );
+
+      const formatDate = (date: Date) => {
+        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+      };
+
+      const doc = new PDFDocument({ margin: 50 });
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', `attachment; filename="custom-${type}-report-${from}-to-${to}.pdf"`);
+      doc.pipe(res);
+
+      // Generate appropriate report data
+      let reportData;
+      if (type === 'commodities') {
+        reportData = generateCommodityComparison(currentData, compareData, daysDiff, daysDiff);
+      } else {
+        reportData = generateStationComparison(currentData, compareData, daysDiff, daysDiff);
+      }
+
+      const data = {
+        periods: {
+          current: `${formatDate(fromDate)} to ${formatDate(toDate)}`,
+          previous: `${formatDate(prevFromDate)} to ${formatDate(prevToDate)}`
+        },
+        data: reportData
+      };
+
+      // Generate PDF using existing function
+      generateComparativeLoadingPDF(doc, data);
+      doc.end();
+
+    } catch (error) {
+      console.error("Error generating custom PDF report:", error);
+      res.status(500).json({ error: "Failed to generate PDF report" });
+    }
+  });
+
+  // Custom Report CSV Export
+  app.get("/api/exports/custom-report-csv", async (req, res) => {
+    try {
+      const { type, from, to } = req.query;
+      
+      if (!from || !to || !type) {
+        return res.status(400).json({ error: "Type, from and to dates are required" });
+      }
+
+      const fromDate = new Date(from as string);
+      const toDate = new Date(to as string);
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
+      const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
+
+      // Query data
+      const currentData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, fromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, toDate.toISOString().split('T')[0])
+          )
+        );
+
+      const compareData = await db
+        .select()
+        .from(railwayLoadingOperations)
+        .where(
+          and(
+            gte(railwayLoadingOperations.pDate, prevFromDate.toISOString().split('T')[0]),
+            lte(railwayLoadingOperations.pDate, prevToDate.toISOString().split('T')[0])
+          )
+        );
+
+      // Generate appropriate report data
+      let reportData;
+      let headers;
+      
+      if (type === 'commodities') {
+        reportData = generateCommodityComparison(currentData, compareData, daysDiff, daysDiff);
+        headers = ['Commodity', 'Current Rks', 'Current Avg/Day', 'Current Wagons', 'Current MT', 'Compare Rks', 'Compare Avg/Day', 'Compare Wagons', 'Compare MT', 'Variation MT', 'Variation %'];
+      } else {
+        reportData = generateStationComparison(currentData, compareData, daysDiff, daysDiff);
+        headers = ['Station', 'Current Rks', 'Current Avg/Day', 'Current Wagons', 'Current MT', 'Compare Rks', 'Compare Avg/Day', 'Compare Wagons', 'Compare MT', 'Variation MT', 'Variation %'];
+      }
+
+      // Convert to CSV
+      const csvRows = [headers.join(',')];
+      
+      reportData.forEach((row: any) => {
+        if (type === 'commodities') {
+          csvRows.push([
+            row.commodity,
+            row.currentRks,
+            row.currentAvgPerDay,
+            row.currentWagon,
+            row.currentMT,
+            row.compareRks,
+            row.compareAvgPerDay,
+            row.compareWagon,
+            row.compareMT,
+            row.variationUnits,
+            row.variationPercent
+          ].join(','));
+        } else {
+          csvRows.push([
+            row.station,
+            row.currentRks,
+            row.currentAvgPerDay,
+            row.currentWagon,
+            row.currentMT,
+            row.compareRks,
+            row.compareAvgPerDay,
+            row.compareWagon,
+            row.compareMT,
+            row.variationUnits,
+            row.variationPercent
+          ].join(','));
+        }
+      });
+
+      const formatDate = (date: Date) => {
+        return `${date.getDate().toString().padStart(2, '0')}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getFullYear()}`;
+      };
+
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', `attachment; filename="custom-${type}-report-${from}-to-${to}.csv"`);
+      res.send(csvRows.join('\n'));
+
+    } catch (error) {
+      console.error("Error generating custom CSV report:", error);
+      res.status(500).json({ error: "Failed to generate CSV report" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
