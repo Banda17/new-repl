@@ -182,6 +182,7 @@ The system follows a modern full-stack architecture with clear separation of con
   - Fixed critical runtime errors by aligning frontend interface definitions with backend response structure
   - Corrected MT (tonnage) display formatting to show values in thousands by dividing raw values by 1000
   - Added color-coded table headers to differentiate current (blue), previous (green), and variation (orange) columns for better readability
+  - Implemented duration headers displaying actual time periods in table headers with two-row structure showing date ranges for current vs previous periods
 
 ## User Preferences
 
