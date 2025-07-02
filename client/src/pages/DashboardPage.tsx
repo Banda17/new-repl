@@ -72,6 +72,8 @@ interface StationComparativeData {
     compareWagon: number;
     compareMT: number;
     compareFreight: number;
+    variationUnits: number;
+    variationPercent: number;
   }>;
   totals: {
     currentPeriod: {
