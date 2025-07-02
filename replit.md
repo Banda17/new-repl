@@ -179,6 +179,8 @@ The system follows a modern full-stack architecture with clear separation of con
   - Enhanced user experience with report configuration interface including date selection, report type, and export format options
   - Enabled users to generate reports for any custom date range with automatic previous period comparison (same dates one year prior)
   - Maintained consistent table formatting and comparison analysis structure across custom and standard reports
+  - Fixed critical runtime errors by aligning frontend interface definitions with backend response structure
+  - Corrected MT (tonnage) display formatting to show values in thousands by dividing raw values by 1000
 
 ## User Preferences
 

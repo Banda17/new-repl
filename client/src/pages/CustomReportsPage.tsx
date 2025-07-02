@@ -293,13 +293,13 @@ export default function CustomReportsPage() {
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentAvgDay || 0)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentWagon || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal((item.currentMT || 0) / 1000)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.compareRks || 0}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareAvgDay || 0)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.compareWagon || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal((item.compareMT || 0) / 1000)}</td>
                             <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationUnits || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.variationUnits || 0)}
+                              {formatDecimal((item.variationUnits || 0) / 1000)}
                             </td>
                             <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {formatDecimal(item.variationPercent || 0, 2)}%
@@ -341,13 +341,13 @@ export default function CustomReportsPage() {
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentAvgPerDay || 0)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentWagon || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal((item.currentMT || 0) / 1000)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.compareRks || 0}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareAvgPerDay || 0)}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.compareWagon || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal((item.compareMT || 0) / 1000)}</td>
                             <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationUnits || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.variationUnits || 0)}
+                              {formatDecimal((item.variationUnits || 0) / 1000)}
                             </td>
                             <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                               {formatDecimal(item.variationPercent || 0, 2)}%
