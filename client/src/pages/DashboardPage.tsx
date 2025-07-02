@@ -151,7 +151,7 @@ export default function DashboardPage() {
     
     const commodityChartData = [
       {
-        period: "Current (24-26 Jun 2025)",
+        period: `Current (${comparativeData.periods.current})`,
         ...Object.fromEntries(
           comparativeData.data.slice(0, 5).map(item => [
             item.commodity,
@@ -160,7 +160,7 @@ export default function DashboardPage() {
         )
       },
       {
-        period: "Previous (24-26 Jun 2024)",
+        period: `Previous (${comparativeData.periods.previous})`,
         ...Object.fromEntries(
           comparativeData.data.slice(0, 5).map(item => [
             item.commodity,
@@ -178,7 +178,7 @@ export default function DashboardPage() {
     
     const stationChartData = [
       {
-        period: "Current (24-26 Jun 2025)",
+        period: `Current (${stationComparativeData.periods.current})`,
         ...Object.fromEntries(
           stationComparativeData.data.slice(0, 5).map(item => [
             item.station,
@@ -187,7 +187,7 @@ export default function DashboardPage() {
         )
       },
       {
-        period: "Previous (24-26 Jun 2024)",
+        period: `Previous (${stationComparativeData.periods.previous})`,
         ...Object.fromEntries(
           stationComparativeData.data.slice(0, 5).map(item => [
             item.station,
@@ -499,7 +499,11 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Commodities Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
+                      {comparativeData ? (
+                        `Current period: ${comparativeData.periods.current} vs Previous period: ${comparativeData.periods.previous}`
+                      ) : (
+                        "Loading period information..."
+                      )}
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
@@ -544,7 +548,11 @@ export default function DashboardPage() {
                   <div className="bg-white rounded-lg p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Daily Stations Data</h3>
                     <p className="text-sm text-gray-600 mb-4">
-                      Current period: 24/06/2025 to 26/06/2025 vs Previous period: 24/06/2024 to 26/06/2024
+                      {stationComparativeData ? (
+                        `Current period: ${stationComparativeData.periods.current} vs Previous period: ${stationComparativeData.periods.previous}`
+                      ) : (
+                        "Loading period information..."
+                      )}
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
