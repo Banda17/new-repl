@@ -27,6 +27,7 @@ import AllEntriesPage from "./pages/AllEntriesPage";
 import ExcelUploadPage from "./pages/ExcelUploadPage";
 import StationComparativePage from "./pages/StationComparativePage";
 import UsersPage from "./pages/UsersPage";
+import CustomReportsPage from "./pages/CustomReportsPage";
 
 function Navigation() {
   const [location, navigate] = useLocation();
@@ -118,6 +119,10 @@ function Navigation() {
             <DropdownMenuItem onClick={() => navigate("/excel-upload")} className="transition-colors duration-200">
               <Upload className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
               <span className="text-xs sm:text-sm">Excel Upload</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate("/custom-reports")} className="transition-colors duration-200">
+              <FileText className="w-3 h-3 sm:w-4 sm:h-4 mr-2" />
+              <span className="text-xs sm:text-sm">Custom Reports</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -231,6 +236,9 @@ function App() {
           </Route>
           <Route path="/users">
             {() => user?.isAdmin ? <UsersPage /> : <NotFound />}
+          </Route>
+          <Route path="/custom-reports">
+            {() => <CustomReportsPage />}
           </Route>
           <Route path="/auth">
             {() => user?.isAdmin ? <AuthPage /> : <NotFound />}
