@@ -21,24 +21,18 @@ interface FilteredData {
   };
   data: Array<{
     commodity: string;
-    currentPeriod: {
-      commodity: string;
-      rks: number;
-      avgPerDay: number;
-      wagons: number;
-      tonnage: number;
-      freight: number;
-    };
-    previousPeriod: {
-      commodity: string;
-      rks: number;
-      avgPerDay: number;
-      wagons: number;
-      tonnage: number;
-      freight: number;
-    };
-    changeInMT: number;
-    changeInPercentage: number;
+    currentRks: number;
+    currentAvgDay: number;
+    currentWagon: number;
+    currentMT: number;
+    currentFreight: number;
+    compareRks: number;
+    compareAvgDay: number;
+    compareWagon: number;
+    compareMT: number;
+    compareFreight: number;
+    variationUnits: number;
+    variationPercent: number;
   }>;
 }
 
@@ -296,19 +290,19 @@ export default function CustomReportsPage() {
                         {commodityData.data.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.commodity}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentPeriod?.rks || 0}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod?.avgPerDay || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentPeriod?.wagons || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentPeriod?.tonnage || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.previousPeriod?.rks || 0}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod?.avgPerDay || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.previousPeriod?.wagons || 0)}</td>
-                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.previousPeriod?.tonnage || 0)}</td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.changeInMT || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.changeInMT || 0)}
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentAvgDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.currentWagon || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.currentMT || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.compareRks || 0}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareAvgDay || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatNumber(item.compareWagon || 0)}</td>
+                            <td className="border border-gray-300 px-3 py-2 text-sm text-center">{formatDecimal(item.compareMT || 0)}</td>
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationUnits || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.variationUnits || 0)}
                             </td>
-                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.changeInPercentage || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                              {formatDecimal(item.changeInPercentage || 0, 2)}%
+                            <td className={`border border-gray-300 px-3 py-2 text-sm text-center ${(item.variationPercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                              {formatDecimal(item.variationPercent || 0, 2)}%
                             </td>
                           </tr>
                         ))}
