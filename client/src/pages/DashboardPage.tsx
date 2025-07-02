@@ -103,41 +103,112 @@ export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("charts");
   const [periodView, setPeriodView] = useState<"daily" | "monthly">("daily");
 
-  // Fetch comparative loading data
-  const { data: comparativeData, isLoading: isLoadingComparative } = useQuery<ComparativeLoadingData>({
+  // Fetch comparative loading data - always enabled for synchronization
+  const { data: comparativeData, isLoading: isLoadingComparative, refetch: refetchComparative } = useQuery<ComparativeLoadingData>({
     queryKey: ['/api/comparative-loading'],
-    enabled: activeTab === "tables"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
 
-  // Fetch station comparative loading data
-  const { data: stationComparativeData, isLoading: isLoadingStationComparative } = useQuery<StationComparativeData>({
+  // Fetch station comparative loading data - always enabled for synchronization
+  const { data: stationComparativeData, isLoading: isLoadingStationComparative, refetch: refetchStationComparative } = useQuery<StationComparativeData>({
     queryKey: ['/api/station-comparative-loading'],
-    enabled: activeTab === "tables"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
 
-  // Fetch yearly commodity data
-  const { data: commodityData, isLoading: isLoadingCommodity } = useQuery<YearlyCommodityData[]>({
+  // Fetch yearly commodity data - always enabled for synchronization
+  const { data: commodityData, isLoading: isLoadingCommodity, refetch: refetchCommodity } = useQuery<YearlyCommodityData[]>({
     queryKey: ['/api/yearly-loading-commodities'],
-    enabled: activeTab === "charts"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
 
-  // Fetch yearly station data
-  const { data: stationData, isLoading: isLoadingStation } = useQuery<YearlyStationData[]>({
+  // Fetch yearly station data - always enabled for synchronization
+  const { data: stationData, isLoading: isLoadingStation, refetch: refetchStation } = useQuery<YearlyStationData[]>({
     queryKey: ['/api/yearly-loading-stations'],
-    enabled: activeTab === "charts"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
 
-  // Fetch daily trend data
-  const { data: dailyTrendData, isLoading: isLoadingDaily } = useQuery<TrendData>({
+  // Fetch daily trend data - always enabled for synchronization
+  const { data: dailyTrendData, isLoading: isLoadingDaily, refetch: refetchDaily } = useQuery<TrendData>({
     queryKey: ['/api/daily-trend-data'],
-    enabled: activeTab === "charts" && periodView === "daily"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
 
-  // Fetch monthly trend data
-  const { data: monthlyTrendData, isLoading: isLoadingMonthly } = useQuery<TrendData>({
+  // Fetch monthly trend data - always enabled for synchronization
+  const { data: monthlyTrendData, isLoading: isLoadingMonthly, refetch: refetchMonthly } = useQuery<TrendData>({
     queryKey: ['/api/monthly-trend-data'],
-    enabled: activeTab === "charts" && periodView === "monthly"
+    refetchInterval: 30000, // Refetch every 30 seconds for real-time updates
+    staleTime: 10000 // Consider data stale after 10 seconds
   });
+
+  // Data transformation functions for synchronized charts and tables
+  const getChartDataFromComparative = () => {
+    if (!comparativeData) return { commodities: [], stations: [] };
+    
+    const commodityChartData = [
+      {
+        period: "Current (24-26 Jun 2025)",
+        ...Object.fromEntries(
+          comparativeData.data.slice(0, 5).map(item => [
+            item.commodity,
+            item.currentPeriod.tonnage
+          ])
+        )
+      },
+      {
+        period: "Previous (24-26 Jun 2024)",
+        ...Object.fromEntries(
+          comparativeData.data.slice(0, 5).map(item => [
+            item.commodity,
+            item.previousPeriod.tonnage
+          ])
+        )
+      }
+    ];
+
+    return { commodities: commodityChartData };
+  };
+
+  const getChartDataFromStationComparative = () => {
+    if (!stationComparativeData) return { stations: [] };
+    
+    const stationChartData = [
+      {
+        period: "Current (24-26 Jun 2025)",
+        ...Object.fromEntries(
+          stationComparativeData.data.slice(0, 5).map(item => [
+            item.station,
+            item.currentMT * 1000 // Convert to tonnage format
+          ])
+        )
+      },
+      {
+        period: "Previous (24-26 Jun 2024)",
+        ...Object.fromEntries(
+          stationComparativeData.data.slice(0, 5).map(item => [
+            item.station,
+            item.compareMT * 1000 // Convert to tonnage format
+          ])
+        )
+      }
+    ];
+
+    return { stations: stationChartData };
+  };
+
+  // Refresh all data sources manually
+  const refreshAllData = () => {
+    refetchComparative();
+    refetchStationComparative();
+    refetchCommodity();
+    refetchStation();
+    refetchDaily();
+    refetchMonthly();
+  };
 
   // Function to format numbers
   const formatNumber = (num: number) => {
@@ -262,12 +333,24 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center gap-2 mb-3 sm:mb-4">
-        <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
-        <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
-          <span className="hidden sm:inline">Operating Dashboard</span>
-          <span className="sm:hidden">Dashboard</span>
-        </h1>
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
+        <div className="flex items-center gap-2">
+          <Activity className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+          <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-white">
+            <span className="hidden sm:inline">Operating Dashboard</span>
+            <span className="sm:hidden">Dashboard</span>
+          </h1>
+        </div>
+        <Button 
+          onClick={refreshAllData}
+          variant="outline" 
+          size="sm"
+          className="flex items-center gap-2 text-white border-white/40 hover:bg-white/10"
+        >
+          <TrendingUp className="h-4 w-4" />
+          <span className="hidden sm:inline">Refresh Data</span>
+          <span className="sm:hidden">Refresh</span>
+        </Button>
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -420,10 +503,7 @@ export default function DashboardPage() {
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={[
-                          { period: "Current (24-26 Jun 2025)", COAL: 95000, "IRON ORE": 45000, "FERT.": 38000, LIMESTONE: 25000, OTHER: 15000 },
-                          { period: "Previous (24-26 Jun 2024)", COAL: 88000, "IRON ORE": 42000, "FERT.": 35000, LIMESTONE: 23000, OTHER: 13000 }
-                        ]}>
+                        <BarChart data={getChartDataFromComparative().commodities}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey="period"
@@ -440,11 +520,17 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Bar dataKey="COAL" fill="#dc2626" name="COAL (2025 vs 2024)" />
-                          <Bar dataKey="IRON ORE" fill="#2563eb" name="IRON ORE (2025 vs 2024)" />
-                          <Bar dataKey="FERT." fill="#059669" name="FERT. (2025 vs 2024)" />
-                          <Bar dataKey="LIMESTONE" fill="#7c3aed" name="LIMESTONE (2025 vs 2024)" />
-                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
+                          {comparativeData?.data.slice(0, 5).map((item, index) => {
+                            const colors = ["#dc2626", "#2563eb", "#059669", "#7c3aed", "#6b7280"];
+                            return (
+                              <Bar 
+                                key={item.commodity}
+                                dataKey={item.commodity} 
+                                fill={colors[index]} 
+                                name={`${item.commodity} (2025 vs 2024)`} 
+                              />
+                            );
+                          })}
                           <Legend 
                             wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
                             formatter={(value) => value}
@@ -462,10 +548,7 @@ export default function DashboardPage() {
                     </p>
                     <div className="h-80">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={[
-                          { period: "Current (24-26 Jun 2025)", PKPK: 125000, "COA/KSLK": 58000, "COA/CFL": 32000, RVD: 28000, OTHER: 18000 },
-                          { period: "Previous (24-26 Jun 2024)", PKPK: 118000, "COA/KSLK": 55000, "COA/CFL": 30000, RVD: 25000, OTHER: 16000 }
-                        ]}>
+                        <BarChart data={getChartDataFromStationComparative().stations}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                           <XAxis 
                             dataKey="period"
@@ -482,11 +565,17 @@ export default function DashboardPage() {
                             formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
-                          <Bar dataKey="PKPK" fill="#dc2626" name="PKPK (2025 vs 2024)" />
-                          <Bar dataKey="COA/KSLK" fill="#2563eb" name="COA/KSLK (2025 vs 2024)" />
-                          <Bar dataKey="COA/CFL" fill="#059669" name="COA/CFL (2025 vs 2024)" />
-                          <Bar dataKey="RVD" fill="#7c3aed" name="RVD (2025 vs 2024)" />
-                          <Bar dataKey="OTHER" fill="#6b7280" name="OTHER (2025 vs 2024)" />
+                          {stationComparativeData?.data.slice(0, 5).map((item, index) => {
+                            const colors = ["#dc2626", "#2563eb", "#059669", "#7c3aed", "#6b7280"];
+                            return (
+                              <Bar 
+                                key={item.station}
+                                dataKey={item.station} 
+                                fill={colors[index]} 
+                                name={`${item.station} (2025 vs 2024)`} 
+                              />
+                            );
+                          })}
                           <Legend 
                             wrapperStyle={{ fontSize: '10px', paddingTop: '10px' }}
                             formatter={(value) => value}
