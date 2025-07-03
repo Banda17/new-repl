@@ -1004,6 +1004,105 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Filter options for quick filter chips
+  app.get("/api/filter-options", async (req, res) => {
+    try {
+      if (!req.isAuthenticated()) {
+        return res.status(401).send("Not authenticated");
+      }
+
+      // Get stations with counts
+      const stationsResult = await db.execute(sql`
+        SELECT station as value, station as label, COUNT(*) as count 
+        FROM railway_loading_operations 
+        WHERE station IS NOT NULL AND station != ''
+        GROUP BY station 
+        ORDER BY count DESC, station ASC
+      `);
+
+      // Get commodities with counts
+      const commoditiesResult = await db.execute(sql`
+        SELECT commodity as value, commodity as label, COUNT(*) as count 
+        FROM railway_loading_operations 
+        WHERE commodity IS NOT NULL AND commodity != ''
+        GROUP BY commodity 
+        ORDER BY count DESC, commodity ASC
+      `);
+
+      // Get commodity types with counts
+      const commodityTypesResult = await db.execute(sql`
+        SELECT comm_type as value, comm_type as label, COUNT(*) as count 
+        FROM railway_loading_operations 
+        WHERE comm_type IS NOT NULL AND comm_type != ''
+        GROUP BY comm_type 
+        ORDER BY count DESC, comm_type ASC
+      `);
+
+      // Get states with counts
+      const statesResult = await db.execute(sql`
+        SELECT state as value, state as label, COUNT(*) as count 
+        FROM railway_loading_operations 
+        WHERE state IS NOT NULL AND state != ''
+        GROUP BY state 
+        ORDER BY count DESC, state ASC
+      `);
+
+      // Get wagon types with counts
+      const wagonTypesResult = await db.execute(sql`
+        SELECT type as value, type as label, COUNT(*) as count 
+        FROM railway_loading_operations 
+        WHERE type IS NOT NULL AND type != ''
+        GROUP BY type 
+        ORDER BY count DESC, type ASC
+      `);
+
+      const filterOptions = {
+        stations: stationsResult.rows.map((row: any) => ({
+          key: row.value,
+          value: row.value,
+          label: row.label,
+          count: parseInt(row.count)
+        })),
+        commodities: commoditiesResult.rows.map((row: any) => ({
+          key: row.value,
+          value: row.value,
+          label: row.label,
+          count: parseInt(row.count)
+        })),
+        commodity_types: commodityTypesResult.rows.map((row: any) => ({
+          key: row.value,
+          value: row.value,
+          label: row.label,
+          count: parseInt(row.count)
+        })),
+        states: statesResult.rows.map((row: any) => ({
+          key: row.value,
+          value: row.value,
+          label: row.label,
+          count: parseInt(row.count)
+        })),
+        wagon_types: wagonTypesResult.rows.map((row: any) => ({
+          key: row.value,
+          value: row.value,
+          label: row.label,
+          count: parseInt(row.count)
+        })),
+        date_ranges: [
+          { key: "last_7_days", value: "last_7_days", label: "Last 7 Days" },
+          { key: "last_30_days", value: "last_30_days", label: "Last 30 Days" },
+          { key: "current_month", value: "current_month", label: "Current Month" },
+          { key: "last_month", value: "last_month", label: "Last Month" },
+          { key: "current_year", value: "current_year", label: "Current Year" }
+        ]
+      };
+
+      res.json(filterOptions);
+    } catch (error) {
+      console.error("Error fetching filter options:", error);
+      res.status(500).json({ error: "Failed to fetch filter options" });
+    }
+  });
+
   // Railway Loading Operations routes
   app.post("/api/railway-loading-operations", async (req, res) => {
     try {

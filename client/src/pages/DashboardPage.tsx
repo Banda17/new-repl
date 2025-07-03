@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Activity, BarChart3, Table2, ChevronDown, ChevronUp, Download, TrendingUp, Calendar } from "lucide-react";
+import { Activity, BarChart3, Table2, ChevronDown, ChevronUp, Download, TrendingUp, Calendar, Filter } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie } from 'recharts';
+import { QuickFilterChips, useQuickFilters, FilterGroup, ActiveFilter } from "@/components/QuickFilterChips";
 
 // Interface for comparative loading data
 interface ComparativeLoadingData {
@@ -104,6 +105,66 @@ interface TrendData {
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState("charts");
   const [periodView, setPeriodView] = useState<"daily" | "monthly">("daily");
+  
+  // Quick filters state
+  const { 
+    activeFilters, 
+    setActiveFilters, 
+    clearAllFilters, 
+    hasActiveFilters 
+  } = useQuickFilters();
+
+  // Fetch filter options for quick filter chips
+  const { data: filterOptionsData } = useQuery({
+    queryKey: ['/api/filter-options'],
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes
+  });
+
+  // Transform filter options data into FilterGroup format
+  const filterGroups: FilterGroup[] = useMemo(() => {
+    if (!filterOptionsData) return [];
+    
+    const data = filterOptionsData as any;
+    
+    return [
+      {
+        id: "stations",
+        label: "Stations",
+        options: data.stations || [],
+        maxVisible: 8
+      },
+      {
+        id: "commodities", 
+        label: "Commodities",
+        options: data.commodities || [],
+        maxVisible: 6
+      },
+      {
+        id: "commodity_types",
+        label: "Commodity Types", 
+        options: data.commodity_types || [],
+        maxVisible: 6
+      },
+      {
+        id: "states",
+        label: "States",
+        options: data.states || [],
+        maxVisible: 8
+      },
+      {
+        id: "wagon_types",
+        label: "Wagon Types",
+        options: data.wagon_types || [],
+        maxVisible: 5
+      },
+      {
+        id: "date_ranges",
+        label: "Date Ranges",
+        options: data.date_ranges || [],
+        maxVisible: 5
+      }
+    ];
+  }, [filterOptionsData]);
 
   // Fetch comparative loading data - always enabled for synchronization
   const { data: comparativeData, isLoading: isLoadingComparative, refetch: refetchComparative } = useQuery<ComparativeLoadingData>({
@@ -365,6 +426,17 @@ export default function DashboardPage() {
           <span className="sm:hidden">Refresh</span>
         </Button>
       </div>
+
+      {/* Quick Filter Chips */}
+      {filterGroups.length > 0 && (
+        <QuickFilterChips
+          filterGroups={filterGroups}
+          activeFilters={activeFilters}
+          onFilterChange={setActiveFilters}
+          onClearAll={clearAllFilters}
+          className="mb-4"
+        />
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 bg-blue-900/40 backdrop-blur-lg border border-white/30 transition-all duration-300">
