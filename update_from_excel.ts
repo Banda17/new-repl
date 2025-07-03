@@ -6,16 +6,18 @@ import { railwayLoadingOperations } from "./db/schema.js";
 async function updateDatabaseFromExcel() {
   try {
     console.log("Starting database update from Excel file...");
-
-    // Read the Excel file
+    
+    // Check if file exists and read Excel file
     const filePath = "./attached_assets/new.xlsx";
     const fileBuffer = readFileSync(filePath);
+    console.log("✓ Excel file found and readable");
+    
     const workbook = read(fileBuffer);
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = utils.sheet_to_json(worksheet);
 
-    console.log(`Found ${jsonData.length} rows in Excel file`);
-    console.log("Sample data:", JSON.stringify(jsonData.slice(0, 2), null, 2));
+    console.log(`✓ Found ${jsonData.length} rows in Excel file`);
+    console.log("Sample data structure:", JSON.stringify(jsonData.slice(0, 1), null, 2));
 
     // Removed the step to clear existing data to preserve records
     // Previously: await db.delete(railwayLoadingOperations);

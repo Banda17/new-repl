@@ -169,6 +169,16 @@ The system follows a modern full-stack architecture with clear separation of con
   - Enhanced station/commodity name truncation with ellipsis for better visual fit while preserving full names in tooltips
   - Added reference 2024 data charts with appropriate grey styling to distinguish from current year performance
   - Organized layout with 2025 till-date charts prominently displayed above 2024 reference charts
+- July 3, 2025. Fixed number formatting throughout the application to display full values instead of abbreviated "K" format:
+  - Updated formatNumber functions in Custom Reports and Dashboard pages to use toLocaleString() for complete number display
+  - Modified all chart formatters to show full numbers with proper comma formatting instead of abbreviated "K" values
+  - Enhanced table displays across the system to preserve and show complete numeric values
+  - Ensured all export functions (CSV, JSON, PDF) maintain original full numeric precision
+  - Applied consistent number formatting with thousands separators for better readability while preserving complete data accuracy
+- July 3, 2025. Verified Excel data upload functionality through update_from_excel.ts script:
+  - Confirmed script successfully processes Excel files from attached_assets/new.xlsx
+  - Validated data import handles 245 rows with proper Excel date conversion and batch processing
+  - Enhanced script with better error handling and progress feedback for reliable data uploads
 - July 2, 2025. Implemented comprehensive custom reporting functionality:
   - Created dedicated Custom Reports page with date range picker for flexible report generation
   - Added custom date filtering for both commodity and station analysis reports
