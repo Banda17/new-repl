@@ -4122,8 +4122,8 @@ export function registerRoutes(app: Express): Server {
       const fromDate = new Date(from as string);
       const toDate = new Date(to as string);
       
-      // Calculate previous period (same duration, one year ago)
-      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      // Calculate previous period (same duration, one year ago) - add 1 for inclusive date range
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
       const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
 
@@ -4179,8 +4179,8 @@ export function registerRoutes(app: Express): Server {
       const fromDate = new Date(from as string);
       const toDate = new Date(to as string);
       
-      // Calculate previous period (same duration, one year ago)
-      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      // Calculate previous period (same duration, one year ago) - add 1 for inclusive date range
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
       const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
 
@@ -4237,7 +4237,7 @@ export function registerRoutes(app: Express): Server {
 
       const fromDate = new Date(from as string);
       const toDate = new Date(to as string);
-      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
       const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
 
@@ -4316,7 +4316,7 @@ export function registerRoutes(app: Express): Server {
 
       const fromDate = new Date(from as string);
       const toDate = new Date(to as string);
-      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24));
+      const daysDiff = Math.ceil((toDate.getTime() - fromDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
       const prevFromDate = new Date(fromDate.getFullYear() - 1, fromDate.getMonth(), fromDate.getDate());
       const prevToDate = new Date(toDate.getFullYear() - 1, toDate.getMonth(), toDate.getDate());
 
