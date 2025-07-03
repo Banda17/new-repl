@@ -515,7 +515,11 @@ export default function CustomReportsPage() {
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {sortedCommodityData.reduce((sum, item) => sum + (item.currentRks || 0), 0)}
                           </td>
-                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {dateRange.from && dateRange.to ? 
+                              formatDecimal(sortedCommodityData.reduce((sum, item) => sum + (item.currentRks || 0), 0) / calculateDays(dateRange.from, dateRange.to)) 
+                              : '-'}
+                          </td>
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {formatNumber(sortedCommodityData.reduce((sum, item) => sum + (item.currentWagon || 0), 0))}
                           </td>
@@ -525,7 +529,11 @@ export default function CustomReportsPage() {
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {sortedCommodityData.reduce((sum, item) => sum + (item.compareRks || 0), 0)}
                           </td>
-                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {dateRange.from && dateRange.to ? 
+                              formatDecimal(sortedCommodityData.reduce((sum, item) => sum + (item.compareRks || 0), 0) / calculateDays(dateRange.from, dateRange.to)) 
+                              : '-'}
+                          </td>
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {formatNumber(sortedCommodityData.reduce((sum, item) => sum + (item.compareWagon || 0), 0))}
                           </td>
@@ -645,7 +653,11 @@ export default function CustomReportsPage() {
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {sortedStationData.reduce((sum, item) => sum + (item.currentRks || 0), 0)}
                           </td>
-                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {dateRange.from && dateRange.to ? 
+                              formatDecimal(sortedStationData.reduce((sum, item) => sum + (item.currentRks || 0), 0) / calculateDays(dateRange.from, dateRange.to)) 
+                              : '-'}
+                          </td>
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {formatNumber(sortedStationData.reduce((sum, item) => sum + (item.currentWagon || 0), 0))}
                           </td>
@@ -655,7 +667,11 @@ export default function CustomReportsPage() {
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {sortedStationData.reduce((sum, item) => sum + (item.compareRks || 0), 0)}
                           </td>
-                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {dateRange.from && dateRange.to ? 
+                              formatDecimal(sortedStationData.reduce((sum, item) => sum + (item.compareRks || 0), 0) / calculateDays(dateRange.from, dateRange.to)) 
+                              : '-'}
+                          </td>
                           <td className="border border-gray-300 px-3 py-2 text-sm text-center">
                             {formatNumber(sortedStationData.reduce((sum, item) => sum + (item.compareWagon || 0), 0))}
                           </td>
