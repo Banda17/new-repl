@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Calendar, Download, FileText, Search } from "lucide-react";
+import { Calendar, Download, FileText, Search, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -66,6 +66,7 @@ export default function CustomReportsPage() {
   });
   const [reportType, setReportType] = useState<string>("commodities");
   const [reportGenerated, setReportGenerated] = useState(false);
+  const [sortConfig, setSortConfig] = useState<{key: string; direction: 'asc' | 'desc'} | null>(null);
 
   // Query for filtered commodity data
   const { data: commodityData, isLoading: isLoadingCommodity, refetch: refetchCommodity } = useQuery<FilteredData>({
@@ -115,12 +116,6 @@ export default function CustomReportsPage() {
       refetchStation();
     }
     setReportGenerated(true);
-  };
-
-
-
-  const formatNumber = (num: number) => {
-    return num.toLocaleString();
   };
 
   // Export wizard function
@@ -240,6 +235,77 @@ export default function CustomReportsPage() {
     return num.toFixed(decimals);
   };
 
+  const formatNumber = (num: number) => {
+    return num.toLocaleString();
+  };
+
+  // Sorting functionality
+  const handleSort = (key: string) => {
+    let direction: 'asc' | 'desc' = 'asc';
+    if (sortConfig && sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const getSortIcon = (columnKey: string) => {
+    if (!sortConfig || sortConfig.key !== columnKey) {
+      return <ArrowUpDown className="h-3 w-3 ml-1 inline" />;
+    }
+    return sortConfig.direction === 'asc' 
+      ? <ArrowUp className="h-3 w-3 ml-1 inline" />
+      : <ArrowDown className="h-3 w-3 ml-1 inline" />;
+  };
+
+  // Calculate number of days between dates
+  const calculateDays = (fromDate: Date, toDate: Date) => {
+    const timeDiff = Math.abs(toDate.getTime() - fromDate.getTime());
+    return Math.ceil(timeDiff / (1000 * 3600 * 24)) + 1; // +1 to include both start and end dates
+  };
+
+  // Sort data based on current sort configuration
+  const sortedCommodityData = useMemo(() => {
+    if (!commodityData?.data || !sortConfig) return commodityData?.data || [];
+    
+    const sorted = [...commodityData.data].sort((a, b) => {
+      const aValue = a[sortConfig.key as keyof typeof a];
+      const bValue = b[sortConfig.key as keyof typeof b];
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      const aNum = Number(aValue) || 0;
+      const bNum = Number(bValue) || 0;
+      return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+    });
+    
+    return sorted;
+  }, [commodityData, sortConfig]);
+
+  const sortedStationData = useMemo(() => {
+    if (!stationData?.data || !sortConfig) return stationData?.data || [];
+    
+    const sorted = [...stationData.data].sort((a, b) => {
+      const aValue = a[sortConfig.key as keyof typeof a];
+      const bValue = b[sortConfig.key as keyof typeof b];
+      
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortConfig.direction === 'asc' 
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
+      }
+      
+      const aNum = Number(aValue) || 0;
+      const bNum = Number(bValue) || 0;
+      return sortConfig.direction === 'asc' ? aNum - bNum : bNum - aNum;
+    });
+    
+    return sorted;
+  }, [stationData, sortConfig]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
@@ -351,31 +417,80 @@ export default function CustomReportsPage() {
                 <div className="space-y-4">
                   <div className="text-sm text-gray-600">
                     Period: {commodityData.periods.current} vs {commodityData.periods.previous}
+                    {dateRange.from && dateRange.to && (
+                      <span className="ml-4 text-blue-600 font-medium">
+                        Days Formula: A ÷ {calculateDays(dateRange.from, dateRange.to)} = B (where A = Total Rks, B = Avg/Day)
+                      </span>
+                    )}
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse border border-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-gray-700 bg-gray-100" rowSpan={2}>Commodity</th>
+                          <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-gray-700 bg-gray-100" rowSpan={2}>
+                            <button onClick={() => handleSort('commodity')} className="flex items-center justify-center w-full">
+                              Commodity {getSortIcon('commodity')}
+                            </button>
+                          </th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-blue-600" colSpan={4}>Current Period: {commodityData.periods.current}</th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-green-600" colSpan={4}>Previous Period: {commodityData.periods.previous}</th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-orange-600" colSpan={2}>Variation</th>
                         </tr>
                         <tr>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">%</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentRks')} className="flex items-center justify-center w-full">
+                              A: Rks {getSortIcon('currentRks')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentAvgDay')} className="flex items-center justify-center w-full">
+                              B: Avg/Day {getSortIcon('currentAvgDay')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentWagon')} className="flex items-center justify-center w-full">
+                              C: Wagons {getSortIcon('currentWagon')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentMT')} className="flex items-center justify-center w-full">
+                              D: MT {getSortIcon('currentMT')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareRks')} className="flex items-center justify-center w-full">
+                              A: Rks {getSortIcon('compareRks')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareAvgDay')} className="flex items-center justify-center w-full">
+                              B: Avg/Day {getSortIcon('compareAvgDay')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareWagon')} className="flex items-center justify-center w-full">
+                              C: Wagons {getSortIcon('compareWagon')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareMT')} className="flex items-center justify-center w-full">
+                              D: MT {getSortIcon('compareMT')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">
+                            <button onClick={() => handleSort('variationUnits')} className="flex items-center justify-center w-full">
+                              MT {getSortIcon('variationUnits')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">
+                            <button onClick={() => handleSort('variationPercent')} className="flex items-center justify-center w-full">
+                              % {getSortIcon('variationPercent')}
+                            </button>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {commodityData.data.map((item, index) => (
+                        {sortedCommodityData.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.commodity}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>
@@ -404,31 +519,80 @@ export default function CustomReportsPage() {
                 <div className="space-y-4">
                   <div className="text-sm text-gray-600">
                     Period: {stationData.periods.current} vs {stationData.periods.previous}
+                    {dateRange.from && dateRange.to && (
+                      <span className="ml-4 text-blue-600 font-medium">
+                        Days Formula: A ÷ {calculateDays(dateRange.from, dateRange.to)} = B (where A = Total Rks, B = Avg/Day)
+                      </span>
+                    )}
                   </div>
                   <div className="overflow-x-auto">
                     <table className="w-full border-collapse border border-gray-300">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-gray-700 bg-gray-100" rowSpan={2}>Station</th>
+                          <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-gray-700 bg-gray-100" rowSpan={2}>
+                            <button onClick={() => handleSort('station')} className="flex items-center justify-center w-full">
+                              Station {getSortIcon('station')}
+                            </button>
+                          </th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-blue-600" colSpan={4}>Current Period: {stationData.periods.current}</th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-green-600" colSpan={4}>Previous Period: {stationData.periods.previous}</th>
                           <th className="border border-gray-300 px-3 py-1 text-center text-xs font-medium text-white bg-orange-600" colSpan={2}>Variation</th>
                         </tr>
                         <tr>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Rks</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Avg/Day</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">Wagons</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">MT</th>
-                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">%</th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentRks')} className="flex items-center justify-center w-full">
+                              A: Rks {getSortIcon('currentRks')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentAvgPerDay')} className="flex items-center justify-center w-full">
+                              B: Avg/Day {getSortIcon('currentAvgPerDay')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentWagon')} className="flex items-center justify-center w-full">
+                              C: Wagons {getSortIcon('currentWagon')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-blue-600">
+                            <button onClick={() => handleSort('currentMT')} className="flex items-center justify-center w-full">
+                              D: MT {getSortIcon('currentMT')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareRks')} className="flex items-center justify-center w-full">
+                              A: Rks {getSortIcon('compareRks')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareAvgPerDay')} className="flex items-center justify-center w-full">
+                              B: Avg/Day {getSortIcon('compareAvgPerDay')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareWagon')} className="flex items-center justify-center w-full">
+                              C: Wagons {getSortIcon('compareWagon')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-green-600">
+                            <button onClick={() => handleSort('compareMT')} className="flex items-center justify-center w-full">
+                              D: MT {getSortIcon('compareMT')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">
+                            <button onClick={() => handleSort('variationUnits')} className="flex items-center justify-center w-full">
+                              MT {getSortIcon('variationUnits')}
+                            </button>
+                          </th>
+                          <th className="border border-gray-300 px-3 py-2 text-center text-xs font-medium text-white bg-orange-600">
+                            <button onClick={() => handleSort('variationPercent')} className="flex items-center justify-center w-full">
+                              % {getSortIcon('variationPercent')}
+                            </button>
+                          </th>
                         </tr>
                       </thead>
                       <tbody>
-                        {stationData.data.map((item, index) => (
+                        {sortedStationData.map((item, index) => (
                           <tr key={index} className="hover:bg-gray-50">
                             <td className="border border-gray-300 px-3 py-2 text-sm font-medium">{item.station || 'N/A'}</td>
                             <td className="border border-gray-300 px-3 py-2 text-sm text-center">{item.currentRks || 0}</td>

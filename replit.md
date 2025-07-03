@@ -179,6 +179,13 @@ The system follows a modern full-stack architecture with clear separation of con
   - Confirmed script successfully processes Excel files from attached_assets/new.xlsx
   - Validated data import handles 245 rows with proper Excel date conversion and batch processing
   - Enhanced script with better error handling and progress feedback for reliable data uploads
+- July 3, 2025. Enhanced Custom Reports with comprehensive table sorting and day division formula display:
+  - Implemented clickable column headers with sort indicators (up/down arrows) for all data columns
+  - Added dynamic day calculation and formula display in table headers showing "A ÷ X = B" format
+  - Column headers now labeled with clear identifiers (A, B, C, D) matching formula references
+  - Sorting works for both commodity and station tables with proper data type handling (string vs numeric)
+  - Formula shows exact number of days calculated from selected date range for transparency
+  - Enhanced user experience with visual sort indicators and comprehensive data organization capabilities
 - July 2, 2025. Implemented comprehensive custom reporting functionality:
   - Created dedicated Custom Reports page with date range picker for flexible report generation
   - Added custom date filtering for both commodity and station analysis reports
