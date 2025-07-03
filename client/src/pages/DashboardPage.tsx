@@ -212,14 +212,9 @@ export default function DashboardPage() {
     refetchMonthly();
   };
 
-  // Function to format numbers
+  // Function to format numbers with full display
   const formatNumber = (num: number) => {
-    if (num >= 1000000) {
-      return (num / 1000000).toFixed(2) + 'M';
-    } else if (num >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
-    return num.toString();
+    return num.toLocaleString();
   };
 
   // Function to format wagon numbers (no K formatting)
@@ -456,10 +451,10 @@ export default function DashboardPage() {
                           <YAxis 
                             fontSize={10}
                             tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                            tickFormatter={(value) => value.toLocaleString()}
                           />
                           <Tooltip 
-                            formatter={(value: any) => [`${(value / 1000000).toFixed(2)} MT`, 'Tonnage']}
+                            formatter={(value: any) => [`${value.toLocaleString()} MT`, 'Tonnage']}
                             labelFormatter={(label) => periodView === "daily" ? `Date: ${label}` : `Month: ${label}`}
                           />
                           <Line 
@@ -536,10 +531,10 @@ export default function DashboardPage() {
                           <YAxis 
                             fontSize={10}
                             tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                            tickFormatter={(value) => value.toLocaleString()}
                           />
                           <Tooltip 
-                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            formatter={(value: any, name: string) => [`${value.toLocaleString()} MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
                           {comparativeData?.data.slice(0, 5).map((item, index) => {
@@ -585,10 +580,10 @@ export default function DashboardPage() {
                           <YAxis 
                             fontSize={10}
                             tick={{ fill: '#374151' }}
-                            tickFormatter={(value) => `${(value / 1000).toFixed(0)}K`}
+                            tickFormatter={(value) => value.toLocaleString()}
                           />
                           <Tooltip 
-                            formatter={(value: any, name: string) => [`${(value / 1000).toFixed(0)}K MT`, name]}
+                            formatter={(value: any, name: string) => [`${value.toLocaleString()} MT`, name]}
                             labelFormatter={(label) => `Period: ${label}`}
                           />
                           {stationComparativeData?.data.slice(0, 5).map((item, index) => {
@@ -829,7 +824,7 @@ export default function DashboardPage() {
                             <YAxis 
                               fontSize={12}
                               tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(1)}K`}
+                              tickFormatter={(value) => value.toLocaleString()}
                             />
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [
@@ -886,7 +881,7 @@ export default function DashboardPage() {
                             <YAxis 
                               fontSize={12}
                               tick={{ fill: '#374151' }}
-                              tickFormatter={(value) => `${(value / 1000).toFixed(1)}K`}
+                              tickFormatter={(value) => value.toLocaleString()}
                             />
                             <Tooltip 
                               formatter={(value: number, name: string, props: any) => [

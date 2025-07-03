@@ -120,9 +120,6 @@ export default function CustomReportsPage() {
 
 
   const formatNumber = (num: number) => {
-    if (Math.abs(num) >= 1000) {
-      return (num / 1000).toFixed(1) + 'K';
-    }
     return num.toLocaleString();
   };
 
