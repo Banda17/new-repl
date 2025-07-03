@@ -509,6 +509,34 @@ export default function CustomReportsPage() {
                             </td>
                           </tr>
                         ))}
+                        {/* Totals Row */}
+                        <tr className="bg-gray-200 font-semibold">
+                          <td className="border border-gray-300 px-3 py-2 text-sm font-bold">TOTAL</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {sortedCommodityData.reduce((sum, item) => sum + (item.currentRks || 0), 0)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatNumber(sortedCommodityData.reduce((sum, item) => sum + (item.currentWagon || 0), 0))}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedCommodityData.reduce((sum, item) => sum + (item.currentMT || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {sortedCommodityData.reduce((sum, item) => sum + (item.compareRks || 0), 0)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatNumber(sortedCommodityData.reduce((sum, item) => sum + (item.compareWagon || 0), 0))}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedCommodityData.reduce((sum, item) => sum + (item.compareMT || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedCommodityData.reduce((sum, item) => sum + (item.variationUnits || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -611,6 +639,34 @@ export default function CustomReportsPage() {
                             </td>
                           </tr>
                         ))}
+                        {/* Totals Row */}
+                        <tr className="bg-gray-200 font-semibold">
+                          <td className="border border-gray-300 px-3 py-2 text-sm font-bold">TOTAL</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {sortedStationData.reduce((sum, item) => sum + (item.currentRks || 0), 0)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatNumber(sortedStationData.reduce((sum, item) => sum + (item.currentWagon || 0), 0))}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedStationData.reduce((sum, item) => sum + (item.currentMT || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {sortedStationData.reduce((sum, item) => sum + (item.compareRks || 0), 0)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatNumber(sortedStationData.reduce((sum, item) => sum + (item.compareWagon || 0), 0))}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedStationData.reduce((sum, item) => sum + (item.compareMT || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">
+                            {formatDecimal(sortedStationData.reduce((sum, item) => sum + (item.variationUnits || 0), 0) / 1000000)}
+                          </td>
+                          <td className="border border-gray-300 px-3 py-2 text-sm text-center">-</td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>

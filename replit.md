@@ -186,6 +186,12 @@ The system follows a modern full-stack architecture with clear separation of con
   - Sorting works for both commodity and station tables with proper data type handling (string vs numeric)
   - Formula shows exact number of days calculated from selected date range for transparency
   - Enhanced user experience with visual sort indicators and comprehensive data organization capabilities
+- July 3, 2025. Fixed critical day calculation bug and updated MT display format:
+  - Corrected day calculation formula to use inclusive date ranges (+1 day) across all custom report API endpoints
+  - Fixed Math.ceil() logic that was causing inaccurate average per day calculations
+  - Updated MT (tonnage) values to display in millions instead of thousands throughout Custom Reports
+  - Added totals rows at bottom of both commodity and station tables for comprehensive data summarization
+  - Maintained clean "MT" column headers while improving data readability with million-based formatting
 - July 2, 2025. Implemented comprehensive custom reporting functionality:
   - Created dedicated Custom Reports page with date range picker for flexible report generation
   - Added custom date filtering for both commodity and station analysis reports
