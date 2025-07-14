@@ -3858,7 +3858,7 @@ export function registerRoutes(app: Express): Server {
       // Calculate totals
       const totalCurrent = comparativeData.reduce((acc, item) => ({
         rks: acc.rks + item.currentPeriod.rks,
-        avgPerDay: acc.avgPerDay + item.currentPeriod.avgPerDay,
+        avgPerDay: 0, // Will be calculated as Total RKs ÷ Number of Days
         wagons: acc.wagons + item.currentPeriod.wagons,
         tonnage: acc.tonnage + item.currentPeriod.tonnage,
         freight: acc.freight + item.currentPeriod.freight
@@ -3866,11 +3866,18 @@ export function registerRoutes(app: Express): Server {
       
       const totalPrevious = comparativeData.reduce((acc, item) => ({
         rks: acc.rks + item.previousPeriod.rks,
-        avgPerDay: acc.avgPerDay + item.previousPeriod.avgPerDay,
+        avgPerDay: 0, // Will be calculated as Total RKs ÷ Number of Days
         wagons: acc.wagons + item.previousPeriod.wagons,
         tonnage: acc.tonnage + item.previousPeriod.tonnage,
         freight: acc.freight + item.previousPeriod.freight
       }), { rks: 0, avgPerDay: 0, wagons: 0, tonnage: 0, freight: 0 });
+
+      // Calculate avgPerDay using Total RKs ÷ Number of Days formula
+      const currentDays = Math.ceil((currentPeriodEnd.getTime() - currentPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      const previousDays = Math.ceil((previousPeriodEnd.getTime() - previousPeriodStart.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+      
+      totalCurrent.avgPerDay = currentDays > 0 ? totalCurrent.rks / currentDays : 0;
+      totalPrevious.avgPerDay = previousDays > 0 ? totalPrevious.rks / previousDays : 0;
       
       const totalChangeInMT = totalCurrent.tonnage - totalPrevious.tonnage;
       const totalChangeInPercentage = totalPrevious.tonnage > 0 ? 
