@@ -427,8 +427,8 @@ export default function DashboardPage() {
         </Button>
       </div>
 
-      {/* Quick Filter Chips */}
-      {filterGroups.length > 0 && (
+      {/* Quick Filter Chips - Hidden per user request */}
+      {false && filterGroups.length > 0 && (
         <QuickFilterChips
           filterGroups={filterGroups}
           activeFilters={activeFilters}
