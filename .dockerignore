@@ -1,0 +1,79 @@
+# Node modules
+node_modules
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+.pnpm-debug.log
+
+# Development files
+.git
+.gitignore
+.env
+.env.*
+!.env.example
+
+# IDE and editor files
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts (will be rebuilt)
+dist
+build
+.cache
+
+# Testing
+coverage
+.nyc_output
+*.test.js
+*.spec.js
+__tests__
+test
+
+# Documentation
+*.md
+!README.md
+docs
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Development scripts
+import_excel.ts
+read_excel_info.ts
+update_from_excel.ts
+
+# Replit specific files
+replit.nix
+.replit
+replit.md
+
+# Temporary files
+tmp
+temp
+*.log
+*.pid
+*.seed
+
+# Images and attachments (optional - uncomment if you want to exclude)
+# attached_assets
+# Capture.PNG
+
+# Database files (will use Docker volume)
+*.db
+*.sqlite
+*.sqlite3
+
+# Credentials (NEVER include in Docker image)
+*.pem
+*.key
+*.crt
+nimble-willow-433310-n1-f8d544889cfe.json
+google-credentials.json
+service-account.json

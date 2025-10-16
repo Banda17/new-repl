@@ -1,7 +1,58 @@
+# Dependencies
 node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build outputs
 dist
-.DS_Store
-server/public
+.cache
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.development
+
+# Credentials - NEVER commit these!
+*.pem
+*.key
+*.crt
+*-credentials.json
+nimble-willow-433310-n1-f8d544889cfe.json
+google-credentials.json
+service-account.json
 new-repl/new-repl/nimble-willow-433310-n1-f8d544889cfe
+
+# IDE and OS
+.DS_Store
+.vscode/
+.idea/
+*.swp
+
+# Temporary and logs
+*.log
+*.pid
+tmp/
+temp/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+
+# Server public
+server/public
+
+# Vite config backups
 vite.config.ts.*
+
+# Archives
 *.tar.gz
+
+# Docker volumes (local development)
+postgres_data/
+uploads_data/

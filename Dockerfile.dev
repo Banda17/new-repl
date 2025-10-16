@@ -1,0 +1,33 @@
+# Development Dockerfile with Hot Reload
+FROM node:20-bullseye-slim AS development
+
+# Install dependencies for native modules
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    build-essential \
+    pkg-config \
+    cairo-dev \
+    pango1.0-dev \
+    libjpeg-dev \
+    libgif-dev \
+    librsvg2-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm install
+
+# Copy application files
+COPY . .
+
+# Expose port
+EXPOSE 5000
+
+# Start development server with hot reload
+CMD ["npm", "run", "dev"]
