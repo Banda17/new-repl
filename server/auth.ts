@@ -128,7 +128,10 @@ export function setupAuth(app: Express) {
         if (!isMatch) {
           return done(null, false, { message: "Incorrect password." });
         }
-        return done(null, user);
+        
+        // Remove password and convert null to undefined for createdAt
+        const { password: _, createdAt, ...userWithoutPassword } = user;
+        return done(null, { ...userWithoutPassword, createdAt: createdAt ?? undefined });
       } catch (err) {
         return done(err);
       }
@@ -151,9 +154,9 @@ export function setupAuth(app: Express) {
         return done(null, false);
       }
 
-      // Remove password from user object
-      const { password, ...userWithoutPassword } = user;
-      done(null, userWithoutPassword);
+      // Remove password from user object and convert null to undefined for createdAt
+      const { password, createdAt, ...userWithoutPassword } = user;
+      done(null, { ...userWithoutPassword, createdAt: createdAt ?? undefined });
     } catch (err) {
       done(err);
     }
@@ -226,10 +229,10 @@ export function setupAuth(app: Express) {
           return next(err);
         }
 
-        const { password, ...userWithoutPassword } = user;
+        // User already has password removed from LocalStrategy
         return res.json({
           message: "Login successful",
-          user: userWithoutPassword,
+          user: user,
         });
       });
     })(req, res, next);
