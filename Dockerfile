@@ -63,7 +63,7 @@ COPY --chown=node:node --from=builder /build/dist ./dist
 COPY --chown=node:node --from=builder /build/package*.json ./
 COPY --chown=node:node --from=builder /build/db ./db
 COPY --chown=node:node --from=builder /build/server ./server
-COPY --chown=node:node --from=builder /build/shared ./shared
+
 
 # Expose application port
 EXPOSE 5000
