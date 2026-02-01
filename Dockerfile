@@ -2,21 +2,21 @@
 # Multi-stage build for optimized image size and security
 
 # Stage 1: Build Stage
-FROM node:20-bullseye-slim AS builder
+FROM node:22-bookworm-slim AS builder
 
 # Install build dependencies for native modules (canvas, bcrypt)
 RUN apt-get update && apt-get install -y \
-    python3 \
-    make \
-    g++ \
-    build-essential \
-    pkg-config \
-    cairo-dev \
-    pango1.0-dev \
-    libjpeg-dev \
-    libgif-dev \
-    librsvg2-dev \
-    && rm -rf /var/lib/apt/lists/*
+  python3 \
+  make \
+  g++ \
+  build-essential \
+  pkg-config \
+  libcairo2-dev \
+  libpango1.0-dev \
+  libjpeg-dev \
+  libgif-dev \
+  librsvg2-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /build
 
@@ -33,16 +33,16 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Production Stage
-FROM node:20-bullseye-slim
+FROM node:22-bookworm-slim
 
 # Install runtime dependencies for native modules
 RUN apt-get update && apt-get install -y \
-    cairo \
-    pango \
-    libjpeg62-turbo \
-    libgif7 \
-    librsvg2-2 \
-    && rm -rf /var/lib/apt/lists/*
+  libcairo2 \
+  libpango-1.0-0 \
+  libjpeg62-turbo \
+  libgif7 \
+  librsvg2-2 \
+  && rm -rf /var/lib/apt/lists/*
 
 # Set production environment
 ENV NODE_ENV=production
