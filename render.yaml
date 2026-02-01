@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: railway-operations
+    env: docker
+    plan: free
+    buildCommand: docker build -t railway-app .
+    startCommand: ./docker-entrypoint.sh # Render overrides CMD in Dockerfile if this is set, but we use Dockerfile CMD. Leaving empty or standard.
+    # Actually for simple Docker deployments on Render, we just specify the env: docker.
+    # The start command is handled by the Dockerfile CMD.
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: railway-postgres
+          property: connectionString
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: PORT
+        value: 5000
+
+databases:
+  - name: railway-postgres
+    databaseName: railway
+    user: railway
+    plan: free
