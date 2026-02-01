@@ -56,3 +56,7 @@ vite.config.ts.*
 # Docker volumes (local development)
 postgres_data/
 uploads_data/
+
+# Replit/Local
+.local/
+.config/
